@@ -1,0 +1,745 @@
+
+> orbit@0.1.0 lint
+> eslint
+
+
+C:\Users\ahmed\Desktop\orbit\scripts\init-db.js
+    8:14  error    A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+   22:7   warning  'res' is defined but never used          @typescript-eslint/no-unused-vars
+  149:18  warning  'e' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\clients\page.tsx
+   58:5    error    Error: Cannot access variable before it is declared
+
+`fetchClients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\clients\page.tsx:58:5
+  56 |
+  57 |   useEffect(() => {
+> 58 |     fetchClients();
+     |     ^^^^^^^^^^^^ `fetchClients` accessed before it is declared
+  59 |   }, []);
+  60 |
+  61 |   const fetchClients = async () => {
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\clients\page.tsx:61:3
+  59 |   }, []);
+  60 |
+> 61 |   const fetchClients = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |     try {
+     | ^^^^^^^^^
+> 63 |       const res = await fetch('/api/clients');
+     | ^^^^^^^^^
+> 64 |       const data = await res.json();
+     | ^^^^^^^^^
+> 65 |       setClients(data.clients || []);
+     | ^^^^^^^^^
+> 66 |     } catch (error) {
+     | ^^^^^^^^^
+> 67 |       toast.error('Failed to fetch clients');
+     | ^^^^^^^^^
+> 68 |     }
+     | ^^^^^^^^^
+> 69 |   };
+     | ^^^^^ `fetchClients` is declared here
+  70 |
+  71 |   const handleSubmit = async (e: React.FormEvent) => {
+  72 |     e.preventDefault();  react-hooks/immutability
+   66:14   warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   93:14   warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  109:14   warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  124:45   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  124:74   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  124:103  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  124:132  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  559:27   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\inquiries\page.tsx
+  354:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\main-page\page.tsx
+   81:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  103:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\news\page.tsx
+  122:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  152:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  164:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  175:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  191:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  214:9   warning  'openEditCategoryModal' is assigned a value but never used                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  344:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  634:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  687:3   warning  'categories' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\offers\page.tsx
+  152:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  182:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  194:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  205:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  221:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  244:9   warning  'openEditCategoryModal' is assigned a value but never used                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  404:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  722:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  763:90  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  915:3   warning  'categories' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\packages\page.tsx
+   59:17  warning  'seedData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  169:26  warning  'error' is defined but never used              @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\page.tsx
+   71:20  warning  'error' is defined but never used                                                                                                                      @typescript-eslint/no-unused-vars
+  228:16  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                        react/no-unescaped-entities
+  242:11  error    Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\partners\page.tsx
+   68:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   88:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  105:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  177:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  222:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  336:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\app\admin\solutions\page.tsx
+    6:8   warning  'RichTextEditor' is defined but never used          @typescript-eslint/no-unused-vars
+  118:14  warning  'error' is defined but never used                   @typescript-eslint/no-unused-vars
+  138:14  warning  'error' is defined but never used                   @typescript-eslint/no-unused-vars
+  155:14  warning  'error' is defined but never used                   @typescript-eslint/no-unused-vars
+  203:9   warning  'addBenefit' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  214:9   warning  'updateBenefit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  227:9   warning  'removeBenefit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  279:24  warning  'error' is defined but never used                   @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\auth\create-admin\route.ts
+    5:28  warning  'request' is defined but never used       @typescript-eslint/no-unused-vars
+   47:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\auth\login\route.ts
+  14:14  warning  'parseError' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\auth\register\route.ts
+  2:10  warning  'connectDB' is defined but never used    @typescript-eslint/no-unused-vars
+  3:10  warning  'User' is defined but never used         @typescript-eslint/no-unused-vars
+  4:10  warning  'createToken' is defined but never used  @typescript-eslint/no-unused-vars
+  6:28  warning  'request' is defined but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\categories\[id]\route.ts
+  62:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\categories\route.ts
+  17:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\client-inquiries\[id]\route.ts
+  39:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\clients\[id]\route.ts
+  59:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  88:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\clients\route.ts
+  41:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\main-page-settings\reset\route.ts
+  93:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\main-page-settings\route.ts
+   82:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\news\[id]\route.ts
+  62:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\news\route.ts
+  45:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\offers\[id]\route.ts
+  62:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\offers\route.ts
+  45:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\packages\[id]\route.ts
+  41:13  warning  '_id' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\packages\seed\route.ts
+  297:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\page-content\[slug]\route.ts
+  54:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\page-content\route.ts
+  34:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\partners\[id]\route.ts
+  61:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\partners\route.ts
+  67:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\solutions\[id]\route.ts
+  57:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\solutions\route.ts
+  40:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\api\solutions\seed\route.ts
+  213:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\app\offers\page.tsx
+    4:18  warning  'AnimatePresence' is defined but never used                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  212:41  warning  'index' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  326:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  340:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\app\packages\PackagesHero.tsx
+  10:11  warning  'isDark' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\packages\page.tsx
+   3:10  warning  'useEffect' is defined but never used        @typescript-eslint/no-unused-vars
+  12:9   warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\portfolio\[slug]\page.tsx
+  242:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\app\portfolio\page.tsx
+    6:34  warning  'isIOS' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  113:28  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\app\portfolio\page.tsx:113:28
+  111 |     const shuffled = [...array];
+  112 |     for (let i = shuffled.length - 1; i > 0; i--) {
+> 113 |       const j = Math.floor(Math.random() * (i + 1));
+      |                            ^^^^^^^^^^^^^ Cannot call impure function
+  114 |       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  115 |     }
+  116 |     return shuffled;  react-hooks/purity
+  522:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @next/next/no-img-element
+  711:30  warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  776:11  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  777:11  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  919:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\app\solutions\[slug]\SolutionPageClient.tsx
+  107:9  warning  'useCases' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\app\solutions\sms-platform\page.tsx
+   65:9   warning  'formatNumber' is assigned a value but never used                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  409:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\About.tsx
+  91:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\components\AdminLayout.tsx
+   74:36  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   81:11  warning  't' is assigned a value but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  100:6   warning  React Hook useEffect has a missing dependency: 'checkAuth'. Either include it or remove the dependency array                                                                                                                                                                             react-hooks/exhaustive-deps
+  111:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  123:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  223:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\AnimatedSection.tsx
+  13:12  warning  'isMobile' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  19:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\components\AnimatedSection.tsx:19:13
+  17 |         if (typeof window !== 'undefined') {
+  18 |             const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+> 19 |             setIsMobile(mobile);
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |             // Disable animations on mobile for better scrolling performance
+  21 |             setShouldAnimate(!mobile);
+  22 |         }  react-hooks/set-state-in-effect
+
+C:\Users\ahmed\Desktop\orbit\src\components\ClarityAnalytics.tsx
+   59:59  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   62:64  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   85:22  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   86:58  error  Use the rest parameters instead of 'arguments'  prefer-rest-params
+  112:14  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\components\Contact.tsx
+  10:11  warning  't' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  11:11  warning  'isDark' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\GoogleDriveMedia.tsx
+   17:3   warning  'type' is assigned a value but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   20:10  warning  'error' is assigned a value but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   90:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  111:7   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\Hero.tsx
+   10:8   warning  'OrbitSectionBackground' is defined but never used                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   21:10  warning  'performanceLevel' is assigned a value but never used                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   24:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   46:71  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  495:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\LightRays.tsx
+  68:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\components\Navbar.tsx
+    7:8   warning  'Image' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   28:21  warning  'setLanguage' is assigned a value but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  139:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  454:6   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  456:11  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  459:23  warning  'isOpen' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\Orb.tsx
+  265:9  warning  'frameCount' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
+  340:6  warning  React Hook useEffect has missing dependencies: 'frag' and 'vert'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitAnimatedBackground.tsx
+   26:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitAnimatedBackground.tsx:26:7
+  24 |   useEffect(() => {
+  25 |     if (typeof window !== 'undefined') {
+> 26 |       setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  27 |               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  28 |     }
+  29 |   }, []);  react-hooks/set-state-in-effect
+  120:19  warning  'radian' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitBackground.tsx
+   8:13  warning  'isDark' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  15:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitBackground.tsx:15:13
+  13 |     useEffect(() => {
+  14 |         if (typeof window !== 'undefined') {
+> 15 |             setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  17 |         }
+  18 |     }, []);  react-hooks/set-state-in-effect
+  37:11  warning  'rotate' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx
+   16:13  warning  'isDark' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   48:27  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+   62:63  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:62:63
+  60 |                 break;
+  61 |             case 'scattered':
+> 62 |                 baseStyles.left = `${(index * 100 / total) + (Math.random() * 30 - 15)}%`;
+     |                                                               ^^^^^^^^^^^^^ Cannot call impure function
+  63 |                 baseStyles.top = `${(Math.random() * 90)}%`;
+  64 |                 baseStyles.transform = `scale(${0.8 + Math.random() * 0.6})`;
+  65 |                 break;                                                                                                                 react-hooks/purity
+   63:38  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:63:38
+  61 |             case 'scattered':
+  62 |                 baseStyles.left = `${(index * 100 / total) + (Math.random() * 30 - 15)}%`;
+> 63 |                 baseStyles.top = `${(Math.random() * 90)}%`;
+     |                                      ^^^^^^^^^^^^^ Cannot call impure function
+  64 |                 baseStyles.transform = `scale(${0.8 + Math.random() * 0.6})`;
+  65 |                 break;
+  66 |             case 'split':                                                                                                                                       react-hooks/purity
+   64:55  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:64:55
+  62 |                 baseStyles.left = `${(index * 100 / total) + (Math.random() * 30 - 15)}%`;
+  63 |                 baseStyles.top = `${(Math.random() * 90)}%`;
+> 64 |                 baseStyles.transform = `scale(${0.8 + Math.random() * 0.6})`;
+     |                                                       ^^^^^^^^^^^^^ Cannot call impure function
+  65 |                 break;
+  66 |             case 'split':
+  67 |             case 'both':                                                                                                                           react-hooks/purity
+   71:49  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:71:49
+  69 |                 if (index % 2 === 0) {
+  70 |                     // Left side
+> 71 |                     baseStyles.left = `${-10 + (Math.random() * 5)}%`;
+     |                                                 ^^^^^^^^^^^^^ Cannot call impure function
+  72 |                     baseStyles.top = `${10 + (index * 12)}%`;
+  73 |                 } else {
+  74 |                     // Right side                                                                                                                                                                         react-hooks/purity
+   75:50  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:75:50
+  73 |                 } else {
+  74 |                     // Right side
+> 75 |                     baseStyles.right = `${-10 + (Math.random() * 5)}%`;
+     |                                                  ^^^^^^^^^^^^^ Cannot call impure function
+  76 |                     baseStyles.top = `${10 + ((index - 1) * 12)}%`;
+  77 |                 }
+  78 |                 baseStyles.transform = 'scale(1.4)';                                                                                                                                                                  react-hooks/purity
+  168:41  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:168:41
+  166 |             <div className="absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-50">
+  167 |                 {[...Array(20)].map((_, i) => {
+> 168 |                     const baseX = 50 + (Math.random() - 0.5) * 30;
+      |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  169 |                     const baseY = 50 + (Math.random() - 0.5) * 30;
+  170 |                     const radius = 200 + Math.random() * 300;
+  171 |                     const angle = (i * 360 / 20) + Math.random() * 30;           react-hooks/purity
+  169:41  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:169:41
+  167 |                 {[...Array(20)].map((_, i) => {
+  168 |                     const baseX = 50 + (Math.random() - 0.5) * 30;
+> 169 |                     const baseY = 50 + (Math.random() - 0.5) * 30;
+      |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  170 |                     const radius = 200 + Math.random() * 300;
+  171 |                     const angle = (i * 360 / 20) + Math.random() * 30;
+  172 |                     return (                                                                                         react-hooks/purity
+  170:42  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:170:42
+  168 |                     const baseX = 50 + (Math.random() - 0.5) * 30;
+  169 |                     const baseY = 50 + (Math.random() - 0.5) * 30;
+> 170 |                     const radius = 200 + Math.random() * 300;
+      |                                          ^^^^^^^^^^^^^ Cannot call impure function
+  171 |                     const angle = (i * 360 / 20) + Math.random() * 30;
+  172 |                     return (
+  173 |                         <motion.div                                                                                                    react-hooks/purity
+  171:52  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:171:52
+  169 |                     const baseY = 50 + (Math.random() - 0.5) * 30;
+  170 |                     const radius = 200 + Math.random() * 300;
+> 171 |                     const angle = (i * 360 / 20) + Math.random() * 30;
+      |                                                    ^^^^^^^^^^^^^ Cannot call impure function
+  172 |                     return (
+  173 |                         <motion.div
+  174 |                             key={`particle-${i}`}                                                                                                           react-hooks/purity
+  177:41  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:177:41
+  175 |                             className="absolute rounded-full blur-[1px]"
+  176 |                             style={{
+> 177 |                                 width: (Math.random() * 8 + 3) + 'px',
+      |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  178 |                                 height: (Math.random() * 8 + 3) + 'px',
+  179 |                                 backgroundColor: i % 3 === 0 ? colors.burgundy : i % 3 === 1 ? colors.beige : colors.coolGray,
+  180 |                                 left: `${baseX}%`,  react-hooks/purity
+  178:42  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:178:42
+  176 |                             style={{
+  177 |                                 width: (Math.random() * 8 + 3) + 'px',
+> 178 |                                 height: (Math.random() * 8 + 3) + 'px',
+      |                                          ^^^^^^^^^^^^^ Cannot call impure function
+  179 |                                 backgroundColor: i % 3 === 0 ? colors.burgundy : i % 3 === 1 ? colors.beige : colors.coolGray,
+  180 |                                 left: `${baseX}%`,
+  181 |                                 top: `${baseY}%`,                        react-hooks/purity
+  190:47  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:190:47
+  188 |                             }}
+  189 |                             transition={{
+> 190 |                                 duration: 8 + Math.random() * 8,
+      |                                               ^^^^^^^^^^^^^ Cannot call impure function
+  191 |                                 repeat: Infinity,
+  192 |                                 ease: "easeInOut",
+  193 |                                 delay: i * 0.2,                                                                                                                                            react-hooks/purity
+  254:55  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\OrbitSectionBackground.tsx:254:55
+  252 |                             left: `${20 + (i * 15)}%`,
+  253 |                             top: `${15 + (i * 20)}%`,
+> 254 |                             transform: `scale(${0.8 + Math.random() * 0.4})`,
+      |                                                       ^^^^^^^^^^^^^ Cannot call impure function
+  255 |                         }}
+  256 |                         animate={{
+  257 |                             rotate: [0, 180, 360],                                                                                                                       react-hooks/purity
+
+C:\Users\ahmed\Desktop\orbit\src\components\Partners.tsx
+   12:27  warning  'setIsMarqueePaused' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   85:28  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\Partners.tsx:85:28
+  83 |     const shuffled = [...logos];
+  84 |     for (let i = shuffled.length - 1; i > 0; i--) {
+> 85 |       const j = Math.floor(Math.random() * (i + 1));
+     |                            ^^^^^^^^^^^^^ Cannot call impure function
+  86 |       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  87 |     }
+  88 |     return shuffled;  react-hooks/purity
+  280:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\Portfolio.tsx
+  179:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\PrivacyConsent.tsx
+  17:10  warning  'consentGiven' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\ProductsShowcase.tsx
+  137:21  warning  'shortDesc' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\WhyOrbit.tsx
+  91:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  96:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\Hero.tsx
+  80:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\Integrations.tsx
+  24:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\Navbar.tsx
+  42:7  error  Error: This value cannot be modified
+
+Modifying a variable defined outside a component or hook is not allowed. Consider using an effect.
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\Navbar.tsx:42:7
+  40 |     // If we're not on the business page, navigate to business first
+  41 |     if (pathname !== "/business") {
+> 42 |       window.location.href = `/business#${id}`;
+     |       ^^^^^^^^^^^^^^^ value cannot be modified
+  43 |     } else {
+  44 |       const element = document.getElementById(id);
+  45 |       element?.scrollIntoView({ behavior: "smooth" });  react-hooks/immutability
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\PersonaTabs.tsx
+  43:18   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  81:52   error    Comments inside children section of tag should be placed inside braces                                                                                                                                                                                                                   react/jsx-no-comment-textnodes
+  83:113  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  83:126  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  84:115  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  84:132  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  85:117  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  85:125  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  87:52   error    Comments inside children section of tag should be placed inside braces                                                                                                                                                                                                                   react/jsx-no-comment-textnodes
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\TrustSection.tsx
+  78:28  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\landing\TrustSection.tsx:78:28
+  76 |     // Fisher-Yates shuffle algorithm
+  77 |     for (let i = shuffled.length - 1; i > 0; i--) {
+> 78 |       const j = Math.floor(Math.random() * (i + 1));
+     |                            ^^^^^^^^^^^^^ Cannot call impure function
+  79 |       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  80 |     }
+  81 |     return shuffled;  react-hooks/purity
+  82:6   warning  React Hook useMemo has a missing dependency: 'logoFiles'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\GovGatePage.tsx
+   4:38  warning  'Network' is defined but never used                              @typescript-eslint/no-unused-vars
+  34:42  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  34:47  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  34:50  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  34:55  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\OTimePage.tsx
+  4:27  warning  'Users' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\SMSPage.tsx
+    5:10   warning  'Card' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+    5:16   warning  'CardContent' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    7:18   warning  'Check' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+    7:30   warning  'Shield' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+    7:38   warning  'BarChart' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+    7:48   warning  'Code' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+    9:3    warning  'TrendingUp' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+    9:15   warning  'Users' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+    9:22   warning  'Globe' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+    9:29   warning  'Lock' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   10:3    warning  'ArrowRight' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   10:15   warning  'Star' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   10:21   warning  'Gift' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   10:27   warning  'Award' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   10:34   warning  'BadgeCheck' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   84:5    error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\SMSPage.tsx:84:5
+  82 |   useEffect(() => {
+  83 |     // Always keep sticky tabs hidden - they should only show within the hero section
+> 84 |     setShowStickyTabs(false);
+     |     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  85 |
+  86 |     // Check on mount and window resize
+  87 |     const handleResize = () => {  react-hooks/set-state-in-effect
+  641:50   error    Comments inside children section of tag should be placed inside braces                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/jsx-no-comment-textnodes
+  643:111  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  643:124  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  644:113  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  644:130  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  645:115  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  645:123  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  647:50   error    Comments inside children section of tag should be placed inside braces                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/jsx-no-comment-textnodes
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\TrustedPartners.tsx
+  78:28  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\TrustedPartners.tsx:78:28
+  76 |     // Fisher-Yates shuffle algorithm
+  77 |     for (let i = shuffled.length - 1; i > 0; i--) {
+> 78 |       const j = Math.floor(Math.random() * (i + 1));
+     |                            ^^^^^^^^^^^^^ Cannot call impure function
+  79 |       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  80 |     }
+  81 |     return shuffled;  react-hooks/purity
+  82:6   warning  React Hook useMemo has a missing dependency: 'logoFiles'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\products\WhatsAppPage.tsx
+  7:3  warning  'Smartphone' is defined but never used  @typescript-eslint/no-unused-vars
+  8:3  warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\ui\sidebar.tsx
+  611:26  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ahmed\Desktop\orbit\src\components\business\ui\sidebar.tsx:611:26
+  609 |   // Random width between 50 to 90%.
+  610 |   const width = React.useMemo(() => {
+> 611 |     return `${Math.floor(Math.random() * 40) + 50}%`;
+      |                          ^^^^^^^^^^^^^ Cannot call impure function
+  612 |   }, []);
+  613 |
+  614 |   return (  react-hooks/purity
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\AdminLanguageContext.tsx
+  106:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\AdminLanguageContext.tsx:106:7
+  104 |     const savedLang = localStorage.getItem('adminLanguage') as 'en' | 'ar' | null;
+  105 |     if (savedLang) {
+> 106 |       setLanguage(savedLang);
+      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  107 |     }
+  108 |   }, []);
+  109 |  react-hooks/set-state-in-effect
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\LanguageContext.tsx
+  19:10  warning  'mounted' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  22:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\LanguageContext.tsx:22:5
+  20 |
+  21 |   useEffect(() => {
+> 22 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |     // Load saved language from localStorage
+  24 |     const saved = localStorage.getItem('language') as Language;
+  25 |     if (saved && (saved === 'en' || saved === 'ar')) {  react-hooks/set-state-in-effect
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\ThemeContext.tsx
+  14:10  warning  'mounted' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  17:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ahmed\Desktop\orbit\src\contexts\ThemeContext.tsx:17:5
+  15 |
+  16 |   useEffect(() => {
+> 17 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |     // Check localStorage for saved preference (only on client)
+  19 |     if (typeof window !== 'undefined') {
+  20 |       const savedTheme = localStorage.getItem('theme');  react-hooks/set-state-in-effect
+
+C:\Users\ahmed\Desktop\orbit\src\lib\auth.ts
+  26:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ahmed\Desktop\orbit\src\lib\mongodb.ts
+  19:3  warning  Unused eslint-disable directive (no problems were reported from 'no-var')
+  23:5  error    'cached' is never reassigned. Use 'const' instead                          prefer-const
+
+C:\Users\ahmed\Desktop\orbit\src\utils\deviceDetection.ts
+  45:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:71  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  66:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ahmed\Desktop\orbit\tailwind.config.js
+  44:5  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+Γ£û 235 problems (116 errors, 119 warnings)
+  1 error and 1 warning potentially fixable with the `--fix` option.
+

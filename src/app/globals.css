@@ -1,0 +1,265 @@
+/* ORBIT Brand Fonts - IBM Plex Sans (English & Arabic) */
+/* Loaded via Google Fonts in layout.tsx */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* ORBIT Brand Fonts - IBM Plex Sans for both English and Arabic */
+  --font-ibm-plex: 'IBM Plex Sans', sans-serif;
+  --font-ibm-plex-arabic: 'IBM Plex Sans Arabic', sans-serif;
+  /* ORBIT Brand Colors (Verified from PDF) */
+  --color-primary: #7A1E2E; /* Burgundy */
+  --color-secondary: #E8DCCB; /* Beige */
+  --color-neutral: #A7A9AC; /* Cool Gray */
+  --color-black: #161616; /* ORBIT Black */
+  --color-white: #FFFFFF;
+}
+
+.dark {
+  --background: #111827;
+  --foreground: #f9fafb;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  /* iOS Safari smooth scrolling fix */
+  -webkit-overflow-scrolling: touch;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-ibm-plex-arabic), var(--font-ibm-plex), sans-serif !important;
+  direction: rtl;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-ibm-plex), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  /* iOS Safari smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent zoom on double-tap on iOS */
+  touch-action: manipulation;
+}
+
+/* 3D Flip Card Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Custom Typography Classes - ORBIT Brand */
+.font-ibm-plex {
+  font-family: var(--font-ibm-plex), sans-serif;
+}
+
+.font-ibm-plex-arabic {
+  font-family: var(--font-ibm-plex-arabic), var(--font-ibm-plex), sans-serif;
+}
+
+/* Heading Styles - ORBIT Brand (IBM Plex Sans) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-ibm-plex), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Ensure Arabic headings render with IBM Plex Sans Arabic in any RTL container */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: var(--font-ibm-plex-arabic), var(--font-ibm-plex), sans-serif !important;
+}
+
+/* Custom scrollbar - Light mode */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-primary) 0%, #5a1623 100%);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-primary) 0%, #5a1623 100%);
+  border: 2px solid #1f2937;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #5a1623 0%, var(--color-primary) 100%);
+}
+
+/* Selection color - ORBIT Brand (Burgundy) */
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+::-moz-selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Striped Text Effect Support */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .striped-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Hardware Acceleration for Smooth Animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* iOS viewport height fix - Use dynamic viewport height */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Mobile optimizations for smooth scrolling - iOS & Android */
+@media (max-width: 768px) {
+  /* Disable will-change on mobile to prevent glitches */
+  * {
+    will-change: auto !important;
+  }
+  
+  /* Optimize scrolling performance */
+  html {
+    scroll-behavior: auto; /* Disable smooth scroll on mobile for better performance */
+  }
+  
+  body {
+    overscroll-behavior: contain; /* Prevent bounce scroll issues */
+  }
+  
+  /* Reduce blur effects on mobile */
+  .blur-3xl {
+    filter: blur(16px) !important;
+  }
+  
+  .blur-2xl {
+    filter: blur(10px) !important;
+  }
+  
+  .blur-xl {
+    filter: blur(6px) !important;
+  }
+  
+  /* Optimize transforms */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: auto !important;
+  }
+  
+  /* Prevent layout shifts */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Disable framer-motion animations on mobile for smooth scrolling */
+  [data-framer-component] {
+    will-change: auto !important;
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Disable problematic backdrop filters on iOS Safari */
+  .backdrop-blur-xl,
+  .backdrop-blur-lg,
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Optimize transforms for iOS */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Samsung/Android specific fixes for glitching */
+@media (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+  /* Fix glitching on Samsung devices */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  /* Reduce animation complexity on Samsung */
+  [class*="motion"] {
+    animation: none !important;
+  }
+  
+  /* Optimize framer-motion on Samsung */
+  [data-framer-component] {
+    will-change: auto !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+}

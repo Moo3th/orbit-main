@@ -1,0 +1,60 @@
+name: Deploy to Forge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build project
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Trigger Forge Deploy
+        run: |
+          echo "🚀 Triggering Forge deployment with full rebuild..."
+          # Forge deployment hook - this will:
+          # 1. Pull latest code from GitHub
+          # 2. Run npm install (if configured in Forge)
+          # 3. Run npm run build (if configured in Forge)
+          # 4. Restart the application (PM2/Node process)
+          response=$(curl -s -w "\n%{http_code}" -X POST "https://forge.laravel.com/servers/955540/sites/2981141/deploy/http?token=PIHGiQAJ7JOUreGGlEljG760DnIsVQ7UMEhMRm1E")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 201 ]; then
+            echo "✅ Deployment triggered successfully!"
+            echo "$body"
+            echo ""
+            echo "⚠️  IMPORTANT: Make sure your Forge deployment script includes:"
+            echo "   1. npm ci (or npm install)"
+            echo "   2. npm run build"
+            echo "   3. pm2 restart orbit (or your app name)"
+            echo ""
+            echo "   This ensures Next.js rebuilds and restarts to serve updated API routes."
+          else
+            echo "❌ Deployment trigger failed with HTTP $http_code"
+            echo "$body"
+            exit 1
+          fi

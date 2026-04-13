@@ -1,0 +1,56 @@
+.light-rays-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+  mix-blend-mode: overlay;
+  opacity: 0.15;
+  filter: blur(4px);
+}
+
+.light-rays-container canvas {
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.hero-light-rays {
+  opacity: 0.8;
+}
+
+/* Light mode specific enhancements - Dark rays for better visibility */
+:not(.dark) .light-rays-container {
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+  filter: blur(6px) brightness(0.9) contrast(1.3) saturate(0.8);
+}
+
+/* Dark mode perfect blend */
+.dark .light-rays-container {
+  mix-blend-mode: screen;
+  opacity: 0.2;
+  filter: blur(4px) brightness(1.1);
+}
+
+/* iOS/Safari optimization - Disable heavy filters and blend modes */
+@supports (-webkit-touch-callout: none) {
+  .light-rays-container {
+    mix-blend-mode: normal;
+    opacity: 0.1;
+    filter: none;
+    display: none; /* Hide completely on iOS for better performance */
+  }
+  
+  :not(.dark) .light-rays-container {
+    mix-blend-mode: normal;
+    filter: none;
+  }
+  
+  .dark .light-rays-container {
+    mix-blend-mode: normal;
+    filter: none;
+  }
+}
+

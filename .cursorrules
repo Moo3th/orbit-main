@@ -1,0 +1,208 @@
+# ORBIT Brand Style Guide Compliance Rules
+
+## MANDATORY STYLE GUIDE REFERENCE
+
+**CRITICAL**: Before making ANY design, styling, or UI decisions, you MUST:
+1. Read and reference `ORBIT_STYLE_GUIDE.md`
+2. Follow all guidelines specified in the style guide
+3. Cite relevant sections when making design choices
+
+The `ORBIT_STYLE_GUIDE.md` file is the **single source of truth** for all brand design decisions.
+
+---
+
+## TYPOGRAPHY RULES (STRICTLY ENFORCED)
+
+### English Text (All Elements)
+- **MUST ALWAYS** use `Gotham` font family for ALL English text
+- **MUST ALWAYS** use `font-heading`, `font-gotham`, or default `sans` (which is Gotham)
+- **MUST ALWAYS** use Gotham for headings (h1-h6), body text, buttons, UI elements
+- **NEVER** use Botera, Montserrat, or any other font for English text
+- **NEVER** use custom fonts outside Gotham (English) and Somar (Arabic)
+
+**Correct:**
+```jsx
+<h1 className="font-heading text-4xl">Title</h1>
+<h2 className="font-gotham text-3xl">Section</h2>
+<p className="font-gotham">Body text</p>
+<p>Body text</p> // ✅ OK - default sans is Gotham
+<button className="font-gotham">Button</button>
+```
+
+**Incorrect:**
+```jsx
+<h1 className="font-botera text-4xl">Title</h1> // ❌ WRONG - Botera was example only
+<p className="font-montserrat">Body text</p> // ❌ WRONG - Montserrat was example only
+```
+
+### Arabic/RTL Text
+- **MUST ALWAYS** use `Somar` font family for ALL Arabic/RTL text
+- **MUST ALWAYS** use `font-somar` Tailwind class
+- **NEVER** use Tajawal or any other font for Arabic text
+- **NEVER** use Gotham for Arabic content
+
+**Correct:**
+```jsx
+<p className="font-somar" dir="rtl">النص العربي</p>
+```
+
+**Incorrect:**
+```jsx
+<p className="font-tajawal" dir="rtl">النص العربي</p> // ❌ WRONG
+```
+
+---
+
+## COLOR RULES (STRICTLY ENFORCED)
+
+### Brand Colors Only
+- **MUST ALWAYS** use ORBIT brand colors from the style guide:
+  - **Primary (Burgundy)**: `bg-primary`, `text-primary` (`#7A1E2E`)
+  - **Secondary (Beige)**: `bg-secondary`, `text-secondary` (`#E8DCCB`)
+  - **Neutral (Cool Gray)**: `bg-neutral`, `text-neutral` (`#A7A9AC`)
+  - **Black**: `#161616` (ORBIT Black)
+  - **White**: `#FFFFFF`
+
+### Prohibited Actions
+- **NEVER** use custom colors outside the brand palette
+- **NEVER** create color variations without explicit approval
+- **NEVER** use non-brand colors for primary elements
+- **NEVER** introduce alternative colors to the system
+
+**Correct:**
+```jsx
+<button className="bg-primary text-white">Button</button>
+<div className="bg-secondary text-primary">Section</div>
+<div className="border-neutral">Border</div>
+```
+
+**Incorrect:**
+```jsx
+<button className="bg-blue-500">Button</button> // ❌ WRONG - not brand color
+<div className="bg-[#FF5733]">Custom color</div> // ❌ WRONG - not in palette
+```
+
+### Color Usage Guidelines
+- Use **Burgundy (primary)** for main brand elements, CTAs, and key highlights
+- Use **Beige (secondary)** as complementary color for backgrounds
+- Use **Cool Gray (neutral)** for balance, borders, and neutral elements
+- Balance Burgundy and Beige usage over time
+
+---
+
+## TYPOGRAPHY SCALE RULES
+
+### Display Sizes
+- **MUST** use predefined display sizes for hero/display text:
+  - `text-display-xl` (5.5rem)
+  - `text-display-lg` (4.5rem)
+  - `text-display-md` (3.5rem)
+  - `text-display-sm` (2.5rem)
+- **MUST** combine with `font-heading` for display text
+
+**Correct:**
+```jsx
+<h1 className="font-heading text-display-xl">Hero Title</h1>
+```
+
+### Heading Sizes
+- **MUST** use standard heading sizes (text-4xl, text-3xl, text-2xl, etc.)
+- **MUST** always include `font-heading` class
+
+**Correct:**
+```jsx
+<h1 className="font-heading text-4xl">Page Title</h1>
+<h2 className="font-heading text-3xl">Section</h2>
+```
+
+---
+
+## SPACING SYSTEM RULES
+
+- **MUST** use Tailwind's spacing scale (4px base unit)
+- **MUST** maintain consistent spacing:
+  - Sections: `py-12` to `py-24`
+  - Components: `mb-6` to `mb-12`
+  - Cards: `p-6` to `p-8`
+  - Buttons: `px-6 py-3`
+
+---
+
+## COMPONENT STYLING RULES
+
+### Buttons
+- **MUST** use Montserrat font (`font-montserrat`)
+- **MUST** use brand colors (primary, secondary, neutral)
+- **MUST** follow button padding guidelines
+
+**Correct:**
+```jsx
+<button className="bg-primary text-white px-6 py-3 rounded-lg font-montserrat font-medium">
+  Button
+</button>
+```
+
+### Cards
+- **MUST** use Botera for card headings
+- **MUST** use Montserrat for card body text
+- **MUST** use brand colors
+
+**Correct:**
+```jsx
+<div className="bg-white p-6 rounded-lg">
+  <h3 className="font-heading text-xl mb-4">Card Title</h3>
+  <p className="font-montserrat">Card content</p>
+</div>
+```
+
+---
+
+## MANDATORY CHECKLIST
+
+Before generating ANY code that involves styling, design, or UI:
+
+- [ ] Have I read the relevant sections of `ORBIT_STYLE_GUIDE.md`?
+- [ ] Is all English text using `font-heading`, `font-gotham`, or default sans (Gotham)?
+- [ ] Is all Arabic/RTL text using `font-somar`?
+- [ ] Are all colors from the brand palette (primary, secondary, neutral)?
+- [ ] Have I avoided custom colors outside the palette?
+- [ ] Does the spacing follow the guidelines?
+- [ ] Are typography sizes appropriate for the element type?
+
+---
+
+## ENFORCEMENT
+
+**These rules are MANDATORY and NON-NEGOTIABLE.**
+
+When generating code:
+1. **ALWAYS** check the style guide first
+2. **ALWAYS** use the correct font families
+3. **ALWAYS** use brand colors only
+4. **ALWAYS** cite style guide sections when making design choices
+5. **NEVER** deviate from these rules without explicit user approval
+
+If you're unsure about any design decision:
+1. Reference `ORBIT_STYLE_GUIDE.md`
+2. Follow the guidelines exactly
+3. Ask the user for clarification only if the style guide doesn't cover the specific case
+
+---
+
+## BRAND NAME
+
+- **ALWAYS** refer to the brand as "ORBIT"
+- **NEVER** use "MarkLine" or any other brand name
+- **NEVER** reference old branding in new code
+
+---
+
+## REMEMBER
+
+- Style guide compliance is **MANDATORY**
+- Font family rules are **STRICTLY ENFORCED**
+- Color palette restrictions are **NON-NEGOTIABLE**
+- When in doubt, **CHECK THE STYLE GUIDE FIRST**
+
+**The style guide is your single source of truth. Follow it always.**
+
