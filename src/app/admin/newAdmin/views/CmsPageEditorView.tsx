@@ -147,7 +147,7 @@ const defaultWhatsAppPlan = (isAr: boolean): WhatsAppPlanConfig => ({
   badge: isAr ? "الأكثر طلباً" : "Most Popular",
   subscribeLabel: isAr ? "اشترك الآن" : "Subscribe Now",
   subscribeUrl: "https://wapp.mobile.net.sa/billing-subscription",
-  subscribeUrlType: "external",
+  subscribeUrlType: "form",
   additionalFeatures: [""],
   tiers: [defaultWhatsAppPlanTier(isAr)],
 });
@@ -278,7 +278,7 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
             />
             <div className="flex items-center gap-2">
               <select
-                value={plan.subscribeUrlType || 'external'}
+                value={plan.subscribeUrlType || 'form'}
                 onChange={(e) => updatePlan(planIndex, { subscribeUrlType: e.target.value as 'form' | 'external' })}
                 className="border border-gray-200 rounded-md px-2 py-2 text-xs bg-white"
               >
@@ -294,6 +294,11 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
                   className="flex-1 border border-gray-200 rounded-md px-3 py-2 text-sm"
                   dir="ltr"
                 />
+              )}
+              {plan.subscribeUrlType === 'form' && (
+                <span className="text-xs text-gray-500 flex-1">
+                  {isAr ? "سيتم توجيه المستخدم لفورم الطلب مع تحديد الباقة تلقائياً" : "User will be directed to request form with package pre-selected"}
+                </span>
               )}
             </div>
           </div>
@@ -589,21 +594,15 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log('=== BEFORE UPDATE ===');
-      console.log('Page ID:', page.id);
-      console.log('SEO data to save:', JSON.stringify(seo, null, 2));
-      
       if (updatePageSeo) {
         updatePageSeo(page.id, seo);
       }
       
-      await new Promise(resolve => setTimeout(resolve, 200));
+      const updatedPages = pages.map(p => 
+        p.id === page.id ? { ...p, seo } : p
+      );
       
-      console.log('=== CHECKING STATE ===');
-      const updatedPage = pages.find(p => p.id === page.id);
-      console.log('Page SEO after update:', JSON.stringify(updatedPage?.seo, null, 2));
-      
-      const ok = await saveSiteData();
+      const ok = await saveSiteData(updatedPages);
       if (ok) {
         alert(isAr ? "تم الحفظ بنجاح!" : "Saved successfully!");
       } else {
@@ -621,9 +620,20 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
     const fieldKey = `${sectionId}-${field.key}`;
     const value = activeLangTab === "en" ? (field.valueEn || field.value) : field.value;
     
-    if (field.key === 'plans_list' && (sectionId === 'sms-pricing' || sectionId === 'wa-pricing')) {
+    if (field.key === 'plans_list' && sectionId === 'sms-pricing') {
       return (
         <SmsPlansListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
+
+    if (field.key === 'plans_list' && sectionId === 'wa-pricing') {
+      return (
+        <WhatsAppPlansEditor
           key={fieldKey}
           value={value}
           onChange={(v) => handleFieldChange(sectionId, field.key, v)}
@@ -679,6 +689,34 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           dir="ltr"
           placeholder="https://"
         />
+      );
+    }
+
+    if (field.type === 'select' && field.options && field.options.length > 0) {
+      return (
+        <div key={fieldKey}>
+          <select
+            value={value}
+            onChange={(e) => handleFieldChange(sectionId, field.key, e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white"
+          >
+            {field.options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {isAr ? opt.label : opt.labelEn}
+              </option>
+            ))}
+          </select>
+          {field.key.includes('type') && value === 'form' && (
+            <p className="text-xs text-gray-500 mt-1">
+              {isAr ? "سيتم توجيه المستخدم لفورم الطلب مع تحديد الباقة تلقائياً" : "User will be directed to request form with package pre-selected"}
+            </p>
+          )}
+          {field.key.includes('type') && value === 'external' && (
+            <p className="text-xs text-gray-500 mt-1">
+              {isAr ? "أدخل الرابط الخارجي في حقل الرابط أعلاه" : "Enter the external URL in the URL field above"}
+            </p>
+          )}
+        </div>
       );
     }
 

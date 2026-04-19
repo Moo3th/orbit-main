@@ -121,10 +121,10 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#104E8B] mb-6">
-              {g.aboutTitle}
+              {getCmsField(cmsPage, 'gg-about', 'title', isRTL, g.aboutTitle)}
             </h2>
             <p className="text-lg text-slate-600 leading-loose max-w-3xl mx-auto">
-              {g.aboutDescription}
+              {getCmsField(cmsPage, 'gg-about', 'description', isRTL, g.aboutDescription)}
             </p>
           </div>
         </div>
@@ -136,18 +136,18 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<Building2 className="w-10 h-10 text-[#00BCD4]" />}
-              title={g.features.independence.title}
-              description={g.features.independence.description}
+              title={getCmsField(cmsPage, 'gg-features', 'feature1_title', isRTL, g.features.independence.title)}
+              description={getCmsField(cmsPage, 'gg-features', 'feature1_desc', isRTL, g.features.independence.description)}
             />
             <FeatureCard 
               icon={<ShieldCheck className="w-10 h-10 text-[#00BCD4]" />}
-              title={g.features.security.title}
-              description={g.features.security.description}
+              title={getCmsField(cmsPage, 'gg-features', 'feature2_title', isRTL, g.features.security.title)}
+              description={getCmsField(cmsPage, 'gg-features', 'feature2_desc', isRTL, g.features.security.description)}
             />
             <FeatureCard 
               icon={<Zap className="w-10 h-10 text-[#00BCD4]" />}
-              title={g.features.reliability.title}
-              description={g.features.reliability.description}
+              title={getCmsField(cmsPage, 'gg-features', 'feature3_title', isRTL, g.features.reliability.title)}
+              description={getCmsField(cmsPage, 'gg-features', 'feature3_desc', isRTL, g.features.reliability.description)}
             />
           </div>
         </div>

@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Script from 'next/script';
 
 interface MetaPixelProps {
   pixelId: string;
 }
-
-type CookieConsentChangedEvent = CustomEvent<{ consent?: boolean }>;
 
 declare global {
   interface Window {
@@ -18,45 +16,54 @@ declare global {
 
 const META_PIXEL_URL = 'https://connect.facebook.net/en_US/fbevents.js';
 
+function getConsentLevel(): string {
+  if (typeof window === 'undefined') return '';
+  const stored = localStorage.getItem('cookie-consent');
+  if (stored === 'accepted' || stored === 'necessary') return stored;
+
+  const cookie = document.cookie.split(';').find(c => c.trim().startsWith('cookie-consent='));
+  if (cookie) {
+    const value = cookie.split('=')[1].trim();
+    if (value === 'accepted' || value === 'necessary') return value;
+  }
+  return '';
+}
+
 export default function MetaPixel({ pixelId }: MetaPixelProps) {
+  const [adsConsent, setAdsConsent] = useState(getConsentLevel() === 'accepted');
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    const initPixel = (consent: boolean) => {
-      if (!consent || initializedRef.current || typeof window === 'undefined') {
-        return;
-      }
-
-      if (window.fbq) {
-        initializedRef.current = true;
-        return;
-      }
-
-      initializedRef.current = true;
-    };
-
-    const storedConsent = localStorage.getItem('cookie-consent');
-    if (storedConsent === 'accepted') {
-      initPixel(true);
-    }
+    const level = getConsentLevel();
+    setAdsConsent(level === 'accepted');
 
     const handleConsentChange = (event: Event) => {
-      const consentEvent = event as CookieConsentChangedEvent;
-      if (consentEvent.detail?.consent) {
-        initPixel(true);
-      }
+      const customEvent = event as CustomEvent;
+      const newLevel = customEvent.detail?.level || (customEvent.detail?.ads ? 'accepted' : 'necessary');
+      setAdsConsent(newLevel === 'accepted');
     };
 
-    window.addEventListener('cookie-consent-changed', handleConsentChange);
-
+    window.addEventListener('cookie-consent-changed' as any, handleConsentChange);
     return () => {
-      window.removeEventListener('cookie-consent-changed', handleConsentChange);
+      window.removeEventListener('cookie-consent-changed' as any, handleConsentChange);
     };
-  }, [pixelId]);
+  }, []);
 
-  if (!pixelId) {
-    return null;
-  }
+  useEffect(() => {
+    if (!adsConsent || initializedRef.current || !pixelId) return;
+    if (typeof window === 'undefined') return;
+
+    if (window.fbq) {
+      window.fbq('init', pixelId);
+      window.fbq('track', 'PageView');
+      initializedRef.current = true;
+      return;
+    }
+  }, [adsConsent, pixelId]);
+
+  if (!pixelId) return null;
+
+  if (!adsConsent) return null;
 
   return (
     <>
@@ -100,9 +107,9 @@ export function trackMetaEvent(
     return;
   }
 
-  const storedConsent = localStorage.getItem('cookie-consent');
-  if (storedConsent !== 'accepted') {
-    console.warn('Meta Pixel: consent not granted');
+  const level = getConsentLevel();
+  if (level !== 'accepted') {
+    console.warn('Meta Pixel: ads consent not granted');
     return;
   }
 

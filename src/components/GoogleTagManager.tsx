@@ -8,7 +8,7 @@ interface GoogleTagManagerProps {
   gtmId: string;
 }
 
-type CookieConsentChangedEvent = CustomEvent<{ consent?: boolean }>;
+type CookieConsentChangedEvent = CustomEvent<{ consent?: boolean; analytics?: boolean; ads?: boolean; level?: string }>;
 
 declare global {
   interface Window {
@@ -17,18 +17,18 @@ declare global {
   }
 }
 
-const CONSENT_GRANTED = {
+const CONSENT_NECESSARY = {
+  analytics_storage: 'granted',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+};
+
+const CONSENT_ALL = {
   analytics_storage: 'granted',
   ad_storage: 'granted',
   ad_user_data: 'granted',
   ad_personalization: 'granted',
-};
-
-const CONSENT_DENIED = {
-  analytics_storage: 'denied',
-  ad_storage: 'denied',
-  ad_user_data: 'denied',
-  ad_personalization: 'denied',
 };
 
 export default function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
@@ -36,10 +36,8 @@ export default function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
   const lastTrackedPathRef = useRef<string>('');
 
   useEffect(() => {
-    const updateConsent = (isGranted: boolean) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
+    const applyConsent = (level: string) => {
+      if (typeof window === 'undefined') return;
 
       window.dataLayer = window.dataLayer || [];
       if (typeof window.gtag !== 'function') {
@@ -48,15 +46,34 @@ export default function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
         };
       }
 
-      window.gtag('consent', 'update', isGranted ? CONSENT_GRANTED : CONSENT_DENIED);
+      if (level === 'accepted') {
+        window.gtag('consent', 'update', CONSENT_ALL);
+      } else {
+        window.gtag('consent', 'update', CONSENT_NECESSARY);
+      }
     };
 
-    const storedConsent = localStorage.getItem('cookie-consent');
-    updateConsent(storedConsent === 'accepted');
+    const getConsentLevel = (): string => {
+      const stored = localStorage.getItem('cookie-consent');
+      if (stored === 'accepted' || stored === 'necessary') return stored;
+
+      const cookie = document.cookie.split(';').find(c => c.trim().startsWith('cookie-consent='));
+      if (cookie) {
+        const value = cookie.split('=')[1].trim();
+        if (value === 'accepted' || value === 'necessary') return value;
+      }
+      return '';
+    };
+
+    const level = getConsentLevel();
+    if (level === 'accepted' || level === 'necessary') {
+      applyConsent(level);
+    }
 
     const handleConsentChange = (event: Event) => {
       const consentEvent = event as CookieConsentChangedEvent;
-      updateConsent(Boolean(consentEvent.detail?.consent));
+      const level = consentEvent.detail?.level || (consentEvent.detail?.ads ? 'accepted' : 'necessary');
+      applyConsent(level);
     };
 
     window.addEventListener('cookie-consent-changed', handleConsentChange);
@@ -66,14 +83,10 @@ export default function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !pathname) {
-      return;
-    }
+    if (typeof window === 'undefined' || !pathname) return;
 
     const pagePath = pathname;
-    if (lastTrackedPathRef.current === pagePath) {
-      return;
-    }
+    if (lastTrackedPathRef.current === pagePath) return;
 
     lastTrackedPathRef.current = pagePath;
     window.dataLayer = window.dataLayer || [];

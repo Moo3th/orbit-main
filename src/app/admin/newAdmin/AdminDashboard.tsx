@@ -7,7 +7,8 @@ import {
   Globe, Edit3, Trash2, Plus, EyeOff,
   Handshake, Save, ChevronDown, ChevronUp, ExternalLink,
   Upload, CheckCircle, XCircle, X,
-  Mail, MessageSquare, Phone, Inbox, PanelBottom, Newspaper
+  Mail, MessageSquare, Phone, Inbox, PanelBottom, Newspaper,
+  ListChecks
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -29,8 +30,9 @@ import {
 import { CmsPagesView } from './views/CmsPagesView';
 import { CmsPageEditorView } from './views/CmsPageEditorView';
 import { CmsSeoView } from './views/CmsSeoView';
+import { FormBuilderView } from './views/FormBuilderView';
 
-type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo";
+type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder";
 
 const adminLogoSrc = encodeImagePath("/logo/شعار المدار-01.svg");
 const ADMIN_EMAIL = "admin@corbit";
@@ -73,6 +75,7 @@ export const AdminDashboard = () => {
   const sidebarItems = [
     { id: "dashboard" as AdminView, icon: LayoutDashboard, label: isAr ? "لوحة التحكم" : "Dashboard" },
     { id: "cms-pages" as AdminView, icon: Edit3, label: isAr ? "إدارة المحتوى" : "Content CMS" },
+    { id: "form-builder" as AdminView, icon: ListChecks, label: isAr ? "نماذج الخدمة" : "Service Forms" },
     { id: "blog" as AdminView, icon: Newspaper, label: isAr ? "المدونة" : "Blog" },
     { id: "partners" as AdminView, icon: Handshake, label: isAr ? "شركاء النجاح" : "Success Partners" },
     { id: "wa-requests" as AdminView, icon: MessageSquare, label: isAr ? "طلبات واتساب" : "WhatsApp Requests" },
@@ -94,6 +97,7 @@ export const AdminDashboard = () => {
     "cms-pages": "/admin/cms/pages",
     "cms-page-editor": "/admin/cms/pages/edit",
     "cms-seo": "/admin/cms/seo",
+    "form-builder": "/admin/form-builder",
   };
 
   const resolveViewFromPath = (path: string): AdminView => {
@@ -105,6 +109,7 @@ export const AdminDashboard = () => {
     if (path === "/admin/cms/pages/edit") return "cms-page-editor";
     if (path === "/admin/cms/pages") return "cms-pages";
     if (path === "/admin/cms/seo") return "cms-seo";
+    if (path === "/admin/form-builder") return "form-builder";
     return "dashboard";
   };
 
@@ -187,6 +192,8 @@ export const AdminDashboard = () => {
         return <PartnersView isAr={isAr} />;
       case "wa-requests":
         return <WhatsAppRequestsView isAr={isAr} />;
+      case "form-builder":
+        return <FormBuilderView isAr={isAr} />;
       case "submissions":
         return <SubmissionsView isAr={isAr} />;
       case "footer":
@@ -1315,7 +1322,7 @@ const defaultWhatsAppPlan = (isAr: boolean): WhatsAppPlanConfig => ({
   badge: isAr ? "الأكثر طلباً" : "Most Popular",
   subscribeLabel: isAr ? "اشترك الآن" : "Subscribe Now",
   subscribeUrl: "https://wapp.mobile.net.sa/billing-subscription",
-  subscribeUrlType: "external",
+  subscribeUrlType: "form",
   additionalFeatures: [""],
   tiers: [defaultWhatsAppPlanTier(isAr)],
 });
@@ -1459,7 +1466,7 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
             />
             <div className="flex items-center gap-2">
               <select
-                value={plan.subscribeUrlType || 'external'}
+                value={plan.subscribeUrlType || 'form'}
                 onChange={(e) => updatePlan(planIndex, { subscribeUrlType: e.target.value as 'form' | 'external' })}
                 className="border border-gray-200 rounded-md px-2 py-2 text-xs bg-white"
               >

@@ -12,6 +12,8 @@ interface WhyUsProps {
 
 export const WhyUs = ({ pageData = null }: WhyUsProps) => {
   const { isRTL } = useLanguage();
+  const sectionTitle = getCmsField(pageData, 'home-whyus', 'section_title', isRTL, isRTL ? 'لماذا المدار؟' : 'Why ORBIT?');
+  const sectionSubtitle = getCmsField(pageData, 'home-whyus', 'section_subtitle', isRTL, isRTL ? 'نقدم لك مزايا فريدة تجعل تجربتك أفضل' : 'We offer unique advantages that make your experience better');
   const features = [
     {
       icon: <Headphones className="h-8 w-8 text-white" />,
@@ -45,6 +47,10 @@ export const WhyUs = ({ pageData = null }: WhyUsProps) => {
       style={{ fontFamily: isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif' }}
     >
       <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{sectionTitle}</h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">{sectionSubtitle}</p>
+        </div>
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
             <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center hover:translate-y-[-5px] transition-transform duration-300">

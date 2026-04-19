@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag, revalidatePath } from 'next/cache';
 import { connectDB } from '@/lib/mongodb';
 import { SeoSettings } from '@/models/SeoSettings';
 
@@ -138,6 +139,19 @@ export async function PUT(request: NextRequest) {
     ).lean();
 
     console.log('Updated settings:', JSON.stringify(settings, null, 2));
+
+    try {
+      revalidateTag('seo-settings', 'max');
+      revalidateTag('site-cms', 'max');
+
+      const pathsToRevalidate = ['/', '/contact', '/about-us', '/products/sms', '/products/whatsapp', '/products/o-time', '/products/gov-gate'];
+      for (const path of pathsToRevalidate) {
+        revalidatePath(path, 'page');
+        revalidatePath(path);
+      }
+    } catch (e) {
+      console.error('SEO settings revalidation error:', e);
+    }
 
     return NextResponse.json({
       success: true,

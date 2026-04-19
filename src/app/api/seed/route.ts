@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import SiteCms from '@/models/SiteCms';
+import FormConfig from '@/models/FormConfig';
 import { cleanupLegacyCollections } from '@/lib/db/legacyCleanup';
 import {
   getDefaultWhatsAppConversationPrices,
@@ -38,6 +39,17 @@ interface SeedPage {
   path: string;
   sections: SeedSection[];
   lastEdited: string;
+  seo?: {
+    title: string;
+    titleEn: string;
+    description: string;
+    descriptionEn: string;
+    keywords: string;
+    keywordsEn: string;
+    canonical: string;
+    noIndex: boolean;
+    ogImage: string;
+  };
 }
 
 interface PageBlueprint {
@@ -45,6 +57,17 @@ interface PageBlueprint {
   path: string;
   title: string;
   titleEn: string;
+  seo?: {
+    title: string;
+    titleEn: string;
+    description: string;
+    descriptionEn: string;
+    keywords: string;
+    keywordsEn: string;
+    canonical: string;
+    noIndex: boolean;
+    ogImage: string;
+  };
 }
 
 interface ExistingSiteDoc {
@@ -60,13 +83,13 @@ const DEFAULT_NOTIFICATION_EMAIL = 'sales@orbit.sa';
 const API_DOCS_URL = 'https://drive.google.com/file/d/1xhdFti973PHqik0T5rGGDipm_30gq064/view?usp=drive_link';
 
 const ACTIVE_PAGE_BLUEPRINTS: PageBlueprint[] = [
-  { id: 'home', path: '/', title: 'الصفحة الرئيسية', titleEn: 'Home' },
-  { id: 'sms', path: '/products/sms', title: 'خدمة الرسائل النصية SMS', titleEn: 'SMS Service' },
-  { id: 'whatsapp', path: '/products/whatsapp', title: 'واتساب أعمال API', titleEn: 'WhatsApp Business API' },
-  { id: 'otime', path: '/products/o-time', title: 'O-Time برنامج الموارد البشرية', titleEn: 'O-Time HR Software' },
-  { id: 'govgate', path: '/products/gov-gate', title: 'Gov Gate', titleEn: 'Gov Gate' },
-  { id: 'contact', path: '/contact', title: 'تواصل معنا', titleEn: 'Contact Us' },
-  { id: 'blog', path: '/blog', title: 'المدونة', titleEn: 'Blog' },
+  { id: 'home', path: '/', title: 'الصفحة الرئيسية', titleEn: 'Home', seo: { title: 'ORBIT | المدار - حلول تقنية رائدة', titleEn: 'ORBIT - Leading Technical Solutions', description: 'ORBIT المدار - مزود حلول تقنية رائد في المملكة العربية السعودية. خدمات الرسائل النصية SMS وواتساب أعمال API وبرامج الموارد البشرية وبوابات المراسلة الحكومية.', descriptionEn: 'ORBIT - Leading technical solutions provider in Saudi Arabia. SMS messaging, WhatsApp Business API, HR software, and government messaging gateways.', keywords: 'ORBIT, المدار, حلول تقنية, SMS, واتساب, السعودية, رسائل نصية', keywordsEn: 'ORBIT, technical solutions, SMS, WhatsApp, Saudi Arabia, messaging, API', canonical: 'https://orbit.sa/', noIndex: false, ogImage: '' } },
+  { id: 'sms', path: '/products/sms', title: 'خدمة الرسائل النصية SMS', titleEn: 'SMS Service', seo: { title: 'خدمة الرسائل النصية SMS | المدار', titleEn: 'SMS Messaging Service | ORBIT', description: 'خدمة الرسائل النصية SMS من المدار - حلول مراسلة موثوقة وفعالة للشركات والمؤسسات في السعودية.', descriptionEn: 'SMS Messaging Service by ORBIT - Reliable and efficient messaging solutions for businesses in Saudi Arabia.', keywords: 'SMS, رسائل نصية, خدمة رسائل, المدار, السعودية', keywordsEn: 'SMS, messaging, text messages, ORBIT, Saudi Arabia, bulk SMS', canonical: 'https://orbit.sa/products/sms', noIndex: false, ogImage: '' } },
+  { id: 'whatsapp', path: '/products/whatsapp', title: 'واتساب أعمال API', titleEn: 'WhatsApp Business API', seo: { title: 'واتساب أعمال API | المدار', titleEn: 'WhatsApp Business API | ORBIT', description: 'واتساب أعمال API من المدار - تواصل مع عملائك عبر واتساب بشكل احترافي وآمن.', descriptionEn: 'WhatsApp Business API by ORBIT - Connect with your customers professionally and securely via WhatsApp.', keywords: 'واتساب, WhatsApp, واتساب أعمال, API, المدار, تسويق', keywordsEn: 'WhatsApp, WhatsApp Business, API, ORBIT, marketing, messaging', canonical: 'https://orbit.sa/products/whatsapp', noIndex: false, ogImage: '' } },
+  { id: 'otime', path: '/products/o-time', title: 'O-Time برنامج الموارد البشرية', titleEn: 'O-Time HR Software', seo: { title: 'O-Time برنامج الموارد البشرية | المدار', titleEn: 'O-Time HR Software | ORBIT', description: 'برنامج O-Time لإدارة الموارد البشرية - منصة متكاملة للحضور والرواتب ودورة حياة الموظف.', descriptionEn: 'O-Time HR Software - Complete platform for attendance, payroll, and employee lifecycle management.', keywords: 'O-Time, موارد بشرية, إدارة حضور, رواتب, المدار', keywordsEn: 'O-Time, HR, attendance, payroll, ORBIT, employee management', canonical: 'https://orbit.sa/products/o-time', noIndex: false, ogImage: '' } },
+  { id: 'govgate', path: '/products/gov-gate', title: 'Gov Gate', titleEn: 'Gov Gate', seo: { title: 'Gov Gate بوابة حكومية | المدار', titleEn: 'Gov Gate | ORBIT', description: 'بوابة Gov Gate للحوسبة المؤسسية - منصة مراسلة آمنة ومتخصصة للجهات الحكومية.', descriptionEn: 'Gov Gate - Secure enterprise messaging gateway for government entities.', keywords: 'Gov Gate, بوابة حكومية, مراسلة, حكومة, المدار', keywordsEn: 'Gov Gate, government gateway, messaging, ORBIT, secure', canonical: 'https://orbit.sa/products/gov-gate', noIndex: false, ogImage: '' } },
+  { id: 'contact', path: '/contact', title: 'تواصل معنا', titleEn: 'Contact Us', seo: { title: 'تواصل معنا | المدار', titleEn: 'Contact Us | ORBIT', description: 'تواصل معنا - المدار لحلول التقنية. نحن هنا لمساعدتك في جميع استفساراتك.', descriptionEn: 'Contact ORBIT - We are here to help with all your inquiries.', keywords: 'تواصل معنا, المدار, اتصل بنا, دعم فني', keywordsEn: 'contact us, ORBIT, support, inquiry', canonical: 'https://orbit.sa/contact', noIndex: false, ogImage: '' } },
+  { id: 'blog', path: '/blog', title: 'المدونة', titleEn: 'Blog', seo: { title: 'المدونة | المدار', titleEn: 'Blog | ORBIT', description: 'مدونة المدار - أحدث الأخبار والمقالات عن الحلول التقنية والاتصالات.', descriptionEn: 'ORBIT Blog - Latest news and articles about technology solutions and communications.', keywords: 'مدونة, المدار, أخبار تقنية, مقالات', keywordsEn: 'blog, ORBIT, tech news, articles', canonical: 'https://orbit.sa/blog', noIndex: false, ogImage: '' } },
 ];
 
 const homeHeroExtraFields: SeedSectionField[] = [
@@ -191,6 +214,8 @@ const defaultHomeSections: SeedSection[] = [
     nameEn: 'Why Us',
     visible: true,
     fields: [
+      { key: 'section_title', label: 'عنوان القسم', labelEn: 'Section Title', type: 'text', value: 'لماذا المدار؟', valueEn: 'Why ORBIT?' },
+      { key: 'section_subtitle', label: 'وصف القسم', labelEn: 'Section Subtitle', type: 'text', value: 'نقدم لك مزايا فريدة تجعل تجربتك أفضل', valueEn: 'We offer unique advantages that make your experience better' },
       { key: 'support_title', label: 'عنوان الدعم', labelEn: 'Support Title', type: 'text', value: 'دعم فني محلي', valueEn: 'Local support' },
       { key: 'support_desc', label: 'وصف الدعم', labelEn: 'Support Description', type: 'textarea', value: 'فريق سعودي يساندك على مدار الساعة.', valueEn: 'A Saudi team supporting you 24/7.' },
       { key: 'security_title', label: 'عنوان الأمان', labelEn: 'Security Title', type: 'text', value: 'أمان عالي', valueEn: 'High security' },
@@ -465,6 +490,7 @@ const buildDefaultPage = (blueprint: PageBlueprint): SeedPage => ({
   path: blueprint.path,
   lastEdited: toToday(),
   sections: (defaultPageSectionsById[blueprint.id] || []).map(cloneSection),
+  seo: blueprint.seo,
 });
 
 const ensureHomeHeroFields = (pages: SeedPage[]): SeedPage[] => pages.map((page) => {
@@ -500,6 +526,7 @@ const normalizePages = (input: unknown): SeedPage[] => {
       sections: rawSections.length
         ? rawSections.map(normalizeSection)
         : (defaultPageSectionsById[blueprint.id] || []).map(cloneSection),
+      seo: (isRecord(row.seo) && Object.keys(row.seo as Record<string, unknown>).length > 0) ? row.seo as SeedPage['seo'] : blueprint.seo,
     });
   }
 
@@ -606,6 +633,55 @@ export async function POST(request: NextRequest) {
 
     const staleSiteDocs = await SiteCms.deleteMany({ key: { $ne: 'primary' } });
     const legacy = cleanLegacy ? await cleanupLegacyCollections() : null;
+
+    const defaultWhatsAppFormConfig = {
+      productId: 'whatsapp',
+      productName: 'نموذج طلب واتساب',
+      productNameEn: 'WhatsApp Request Form',
+      slug: 'whatsapp-request',
+      notificationEmails: 'marketing@corbit.sa',
+      isActive: true,
+      fields: [
+        { id: 'name', type: 'text', labelAr: 'الاسم الكامل', labelEn: 'Full Name', placeholderAr: 'أدخل اسمك الكامل', placeholderEn: 'Enter your full name', required: true, step: 2, options: [] },
+        { id: 'email', type: 'email', labelAr: 'البريد الإلكتروني', labelEn: 'Email', placeholderAr: 'أدخل بريدك الإلكتروني', placeholderEn: 'Enter your email', required: true, step: 2, options: [] },
+        { id: 'phone', type: 'tel', labelAr: 'رقم الجوال', labelEn: 'Phone Number', placeholderAr: '05XXXXXXXX', placeholderEn: '05XXXXXXXX', required: true, step: 2, options: [] },
+        { id: 'companyName', type: 'text', labelAr: 'اسم الشركة', labelEn: 'Company Name', placeholderAr: 'أدخل اسم الشركة', placeholderEn: 'Enter company name', required: false, step: 3, options: [] },
+        { id: 'industry', type: 'select', labelAr: 'الصناعة', labelEn: 'Industry', placeholderAr: 'اختر الصناعة', placeholderEn: 'Select industry', required: true, step: 3, options: [
+          { value: 'retail', labelAr: 'تجزئة ومبيعات', labelEn: 'Retail & Sales' },
+          { value: 'restaurants', labelAr: 'مطاعم وكافيهات', labelEn: 'Restaurants & Cafes' },
+          { value: 'healthcare', labelAr: 'صحة وعناية صحية', labelEn: 'Healthcare' },
+          { value: 'education', labelAr: 'تعليم', labelEn: 'Education' },
+          { value: 'realestate', labelAr: 'عقارات', labelEn: 'Real Estate' },
+          { value: 'logistics', labelAr: 'لوجستيات ونقل', labelEn: 'Logistics & Transport' },
+          { value: 'banking', labelAr: 'بنوك ومالية', labelEn: 'Banking & Finance' },
+          { value: 'government', labelAr: 'حكومي', labelEn: 'Government' },
+          { value: 'automotive', labelAr: 'سيارات', labelEn: 'Automotive' },
+          { value: 'technology', labelAr: 'تكنولوجيا', labelEn: 'Technology' },
+          { value: 'manufacturing', labelAr: 'تصنيع', labelEn: 'Manufacturing' },
+          { value: 'other', labelAr: 'أخرى', labelEn: 'Other' },
+        ] },
+        { id: 'goal', type: 'multiselect', labelAr: 'أهداف الخدمة', labelEn: 'Service Goals', placeholderAr: 'اختر أهداف الخدمة', placeholderEn: 'Select service goals', required: false, step: 4, options: [
+          { value: 'customer-support', labelAr: 'دعم العملاء', labelEn: 'Customer Support' },
+          { value: 'sales', labelAr: 'مبيعات وتسويق', labelEn: 'Sales & Marketing' },
+          { value: 'notifications', labelAr: 'إشعارات آلية', labelEn: 'Automated Notifications' },
+          { value: 'internal-communication', labelAr: 'تواصل داخلي', labelEn: 'Internal Communication' },
+        ] },
+        { id: 'employeeCount', type: 'radio', labelAr: 'عدد الموظفين', labelEn: 'Employee Count', placeholderAr: '', placeholderEn: '', required: true, step: 5, options: [
+          { value: '1-10', labelAr: '1 - 10 موظفين', labelEn: '1 - 10 employees' },
+          { value: '11-50', labelAr: '11 - 50 موظف', labelEn: '11 - 50 employees' },
+          { value: '51-100', labelAr: '51 - 100 موظف', labelEn: '51 - 100 employees' },
+          { value: '101-500', labelAr: '101 - 500 موظف', labelEn: '101 - 500 employees' },
+          { value: '500+', labelAr: 'أكثر من 500', labelEn: '500+ employees' },
+        ] },
+        { id: 'notes', type: 'textarea', labelAr: 'ملاحظات', labelEn: 'Notes', placeholderAr: 'أي ملاحظات إضافية ترغب في إضافتها', placeholderEn: 'Any additional notes you would like to add', required: false, step: 6, options: [] },
+      ],
+    };
+
+    await FormConfig.findOneAndUpdate(
+      { productId: 'whatsapp' },
+      { $set: defaultWhatsAppFormConfig },
+      { upsert: true, new: true }
+    );
 
     return NextResponse.json({
       success: true,

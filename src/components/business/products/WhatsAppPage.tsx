@@ -180,29 +180,29 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const features = [
     {
       icon: Globe,
-      title: isRTL ? "المنصة رقم 1 في المملكة" : "The #1 Platform in the Kingdom",
-      description: isRTL ? "الأكثر انتشاراً واستخداماً في السعودية" : "The most widespread and used in Saudi Arabia",
+      title: getCmsField(cmsPage, 'wa-why', 'feature1_title', isRTL, isRTL ? "المنصة رقم 1 في المملكة" : "The #1 Platform in the Kingdom"),
+      description: getCmsField(cmsPage, 'wa-why', 'feature1_desc', isRTL, isRTL ? "الأكثر انتشاراً واستخداماً في السعودية" : "The most widespread and used in Saudi Arabia"),
       color: "bg-blue-50",
       iconColor: "text-blue-600"
     },
     {
       icon: CheckCircle2,
-      title: isRTL ? "معدل فتح 98%" : "98% Open Rate",
-      description: isRTL ? "يتم فتح وقراءة معظم الرسائل فوراً" : "Most messages are opened and read immediately",
+      title: getCmsField(cmsPage, 'wa-why', 'feature2_title', isRTL, isRTL ? "معدل فتح 98%" : "98% Open Rate"),
+      description: getCmsField(cmsPage, 'wa-why', 'feature2_desc', isRTL, isRTL ? "يتم فتح وقراءة معظم الرسائل فوراً" : "Most messages are opened and read immediately"),
       color: "bg-green-50",
       iconColor: "text-[#65BF7B]"
     },
     {
       icon: Shield,
-      title: isRTL ? "آمن وموثوق" : "Secure & Reliable",
-      description: isRTL ? "تشفير كامل من طرف لطرف للبيانات" : "End-to-end encryption for all data",
+      title: getCmsField(cmsPage, 'wa-why', 'feature3_title', isRTL, isRTL ? "آمن وموثوق" : "Secure & Reliable"),
+      description: getCmsField(cmsPage, 'wa-why', 'feature3_desc', isRTL, isRTL ? "تشفير كامل من طرف لطرف للبيانات" : "End-to-end encryption for all data"),
       color: "bg-purple-50",
       iconColor: "text-purple-600"
     },
     {
       icon: Smartphone,
-      title: isRTL ? "سهل الاستخدام" : "Easy to Use",
-      description: isRTL ? "تطبيق مألوف للجميع بدون تعقيد" : "Familiar app for everyone without complexity",
+      title: getCmsField(cmsPage, 'wa-why', 'feature4_title', isRTL, isRTL ? "سهل الاستخدام" : "Easy to Use"),
+      description: getCmsField(cmsPage, 'wa-why', 'feature4_desc', isRTL, isRTL ? "تطبيق مألوف للجميع بدون تعقيد" : "Familiar app for everyone without complexity"),
       color: "bg-orange-50",
       iconColor: "text-[#F15822]"
     }
@@ -211,38 +211,38 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const solutions = [
     {
       icon: Users,
-      title: isRTL ? "رقم موحد للفريق" : "Unified Team Number",
-      description: isRTL ? "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية" : "No more scattered conversations, one number managed efficiently by the whole team",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution1_title', isRTL, isRTL ? "رقم موحد للفريق" : "Unified Team Number"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution1_desc', isRTL, isRTL ? "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية" : "No more scattered conversations, one number managed efficiently by the whole team"),
       image: solutionTeam
     },
     {
       icon: Target,
-      title: isRTL ? "إدارة الصلاحيات" : "Permissions Management",
-      description: isRTL ? "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية" : "Seamlessly transfer conversations between sales and technical support",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution2_title', isRTL, isRTL ? "إدارة الصلاحيات" : "Permissions Management"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution2_desc', isRTL, isRTL ? "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية" : "Seamlessly transfer conversations between sales and technical support"),
       image: solutionWorkflow
     },
     {
       icon: Bot,
-      title: isRTL ? "الردود الآلية (Chatbot)" : "Automated Replies (Chatbot)",
-      description: isRTL ? "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً" : "24/7 customer service without human intervention, automatically answer FAQs",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution3_title', isRTL, isRTL ? "الردود الآلية (Chatbot)" : "Automated Replies (Chatbot)"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution3_desc', isRTL, isRTL ? "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً" : "24/7 customer service without human intervention, automatically answer FAQs"),
       image: solutionChatbot
     },
     {
       icon: MessageCircle,
-      title: isRTL ? "صندوق وارد مشترك" : "Shared Inbox",
-      description: isRTL ? "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة" : "Filter messages (read, unread, unanswered) in a single interface",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution4_title', isRTL, isRTL ? "صندوق وارد مشترك" : "Shared Inbox"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution4_desc', isRTL, isRTL ? "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة" : "Filter messages (read, unread, unanswered) in a single interface"),
       image: solutionBroadcast
     },
     {
       icon: Clock,
-      title: isRTL ? "جدولة الرسائل" : "Message Scheduling",
-      description: isRTL ? "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي" : "Pre-schedule your messages to be sent at the optimal time",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution5_title', isRTL, isRTL ? "جدولة الرسائل" : "Message Scheduling"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution5_desc', isRTL, isRTL ? "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي" : "Pre-schedule your messages to be sent at the optimal time"),
       image: solutionSchedule
     },
     {
       icon: BarChart3,
-      title: isRTL ? "تقارير تفصيلية" : "Detailed Reports",
-      description: isRTL ? "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً" : "Track campaign performance, read rates, and instant responses",
+      title: getCmsField(cmsPage, 'wa-solutions', 'solution6_title', isRTL, isRTL ? "تقارير تفصيلية" : "Detailed Reports"),
+      description: getCmsField(cmsPage, 'wa-solutions', 'solution6_desc', isRTL, isRTL ? "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً" : "Track campaign performance, read rates, and instant responses"),
       image: solutionReports
     }
   ];
@@ -250,23 +250,23 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const campaigns = [
     {
       icon: Send,
-      title: isRTL ? "استهداف دقيق" : "Precise Targeting",
-      description: isRTL ? "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك" : "Target your audience based on location, interests, and behavior"
+      title: getCmsField(cmsPage, 'wa-marketing', 'campaign1_title', isRTL, isRTL ? "استهداف دقيق" : "Precise Targeting"),
+      description: getCmsField(cmsPage, 'wa-marketing', 'campaign1_desc', isRTL, isRTL ? "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك" : "Target your audience based on location, interests, and behavior")
     },
     {
       icon: Clock,
-      title: isRTL ? "جدولة ذكية" : "Smart Scheduling",
-      description: isRTL ? "أرسل في الوقت الأمثل لزيادة معدلات التفاعل" : "Send at the optimal time to increase interaction rates"
+      title: getCmsField(cmsPage, 'wa-marketing', 'campaign2_title', isRTL, isRTL ? "جدولة ذكية" : "Smart Scheduling"),
+      description: getCmsField(cmsPage, 'wa-marketing', 'campaign2_desc', isRTL, isRTL ? "أرسل في الوقت الأمثل لزيادة معدلات التفاعل" : "Send at the optimal time to increase interaction rates")
     },
     {
       icon: Sparkles,
-      title: isRTL ? "قوالب جاهزة" : "Ready Templates",
-      description: isRTL ? "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع" : "Professional messages with interactive buttons, images, and videos"
+      title: getCmsField(cmsPage, 'wa-marketing', 'campaign3_title', isRTL, isRTL ? "قوالب جاهزة" : "Ready Templates"),
+      description: getCmsField(cmsPage, 'wa-marketing', 'campaign3_desc', isRTL, isRTL ? "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع" : "Professional messages with interactive buttons, images, and videos")
     },
     {
       icon: TrendingUp,
-      title: isRTL ? "تحليل الأداء" : "Performance Analysis",
-      description: isRTL ? "تقارير شاملة عن معدلات الفتح والنقر والتحويل" : "Comprehensive reports on open rates, clicks, and conversions"
+      title: getCmsField(cmsPage, 'wa-marketing', 'campaign4_title', isRTL, isRTL ? "تحليل الأداء" : "Performance Analysis"),
+      description: getCmsField(cmsPage, 'wa-marketing', 'campaign4_desc', isRTL, isRTL ? "تقارير شاملة عن معدلات الفتح والنقر والتحويل" : "Comprehensive reports on open rates, clicks, and conversions")
     }
   ];
 
@@ -287,10 +287,10 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   );
 
   const greenTickComparison = [
-    { feature: isRTL ? "ظهور اسم الشركة" : "Company Name Visibility", basic: true, verified: true, unverified: false },
-    { feature: isRTL ? "الشارة الخضراء الرسمية" : "Official Green Badge", basic: false, verified: true, unverified: false },
-    { feature: isRTL ? "ثقة أعلى من العملاء" : "Higher Customer Trust", basic: true, verified: true, unverified: false },
-    { feature: isRTL ? "رسائل غير محدودة" : "Unlimited Messages", basic: false, verified: true, unverified: false }
+    { feature: getCmsField(cmsPage, 'wa-green-tick', 'feature1', isRTL, isRTL ? "ظهور اسم الشركة" : "Company Name Visibility"), basic: true, verified: true, unverified: false },
+    { feature: getCmsField(cmsPage, 'wa-green-tick', 'feature2', isRTL, isRTL ? "الشارة الخضراء الرسمية" : "Official Green Badge"), basic: false, verified: true, unverified: false },
+    { feature: getCmsField(cmsPage, 'wa-green-tick', 'feature3', isRTL, isRTL ? "ثقة أعلى من العملاء" : "Higher Customer Trust"), basic: true, verified: true, unverified: false },
+    { feature: getCmsField(cmsPage, 'wa-green-tick', 'feature4', isRTL, isRTL ? "رسائل غير محدودة" : "Unlimited Messages"), basic: false, verified: true, unverified: false }
   ];
 
   const defaultApiPricing = useMemo(() => getDefaultWhatsAppConversationPrices(isRTL), [isRTL]);
@@ -581,13 +581,13 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <Badge className="bg-green-100 text-[#25D366] border-none px-4 py-2 text-sm mb-3 md:mb-4">
-              {isRTL ? "المميزات الرئيسية" : "Key Features"}
+              {getCmsField(cmsPage, 'wa-why', 'badge', isRTL, isRTL ? "المميزات الرئيسية" : "Key Features")}
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-3 md:mb-4">
-              {isRTL ? "لماذا واتساب الأعمال؟" : "Why WhatsApp Business?"}
+              {getCmsField(cmsPage, 'wa-why', 'title', isRTL, isRTL ? "لماذا واتساب الأعمال؟" : "Why WhatsApp Business?")}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {isRTL ? "المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة" : "The most trusted and widespread platform for communicating with your customers in the Kingdom"}
+              {getCmsField(cmsPage, 'wa-why', 'subtitle', isRTL, isRTL ? "المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة" : "The most trusted and widespread platform for communicating with your customers in the Kingdom")}
             </p>
           </div>
 
@@ -620,7 +620,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <Badge className="bg-orange-100 text-[#F15822] border-none px-4 py-2 text-sm mb-3 md:mb-4">
-              {isRTL ? "الحلول المتقدمة" : "Advanced Solutions"}
+              {getCmsField(cmsPage, 'wa-solutions', 'badge', isRTL, isRTL ? "الحلول المتقدمة" : "Advanced Solutions")}
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-3 md:mb-4">
               {solutionsTitle}
@@ -711,13 +711,13 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             {/* النص */}
             <div>
               <Badge className="bg-[#F15822] text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
-                {isRTL ? "التسويق الذكي" : "Smart Marketing"}
+                {getCmsField(cmsPage, 'wa-marketing', 'badge', isRTL, isRTL ? "التسويق الذكي" : "Smart Marketing")}
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-4 md:mb-6">
                 {campaignsTitle}
               </h2>
               <p className="text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed">
-                {isRTL ? "استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل." : "Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates."}
+                {getCmsField(cmsPage, 'wa-marketing', 'subtitle', isRTL, isRTL ? "استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل." : "Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates.")}
               </p>
 
               <div className="space-y-4">
@@ -796,10 +796,10 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                 <BadgeCheck className="w-10 h-10 text-white" />
               </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-3 md:mb-4">
-                {isRTL ? "احصل على الشارة الخضراء (Green Tick)" : "Get the Green Tick"}
+                {getCmsField(cmsPage, 'wa-green-tick', 'title', isRTL, isRTL ? "احصل على الشارة الخضراء (Green Tick)" : "Get the Green Tick")}
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {isRTL ? "عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب" : "Boost your customers' trust and stand out from competitors with an officially verified WhatsApp account"}
+                {getCmsField(cmsPage, 'wa-green-tick', 'subtitle', isRTL, isRTL ? "عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب" : "Boost your customers' trust and stand out from competitors with an officially verified WhatsApp account")}
               </p>
             </div>
 
@@ -810,16 +810,16 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gradient-to-r from-green-100 to-green-50">
-                        <th className={`text-${isRTL ? 'right' : 'left'} p-4 font-bold text-[#161616]`}>{isRTL ? "المميزات" : "Features"}</th>
+                        <th className={`text-${isRTL ? 'right' : 'left'} p-4 font-bold text-[#161616]`}>{getCmsField(cmsPage, 'wa-green-tick', 'col_feature', isRTL, isRTL ? "المميزات" : "Features")}</th>
                         <th className="text-center p-4 font-bold text-gray-600">
-                          {isRTL ? "بدون توثيق" : "Unverified"}
+                          {getCmsField(cmsPage, 'wa-green-tick', 'col_unverified', isRTL, isRTL ? "بدون توثيق" : "Unverified")}
                         </th>
                         <th className="text-center p-4 font-bold text-blue-600">
-                          {isRTL ? "حساب تجاري" : "Business Account"}
+                          {getCmsField(cmsPage, 'wa-green-tick', 'col_business', isRTL, isRTL ? "حساب تجاري" : "Business Account")}
                           <BadgeCheck className={`w-5 h-5 inline ${isRTL ? 'mr-1' : 'ml-1'} text-blue-500`} />
                         </th>
                         <th className="text-center p-4 font-bold text-[#25D366]">
-                          {isRTL ? "حساب موثوق" : "Verified Account"}
+                          {getCmsField(cmsPage, 'wa-green-tick', 'col_verified', isRTL, isRTL ? "حساب موثوق" : "Verified Account")}
                           <BadgeCheck className={`w-5 h-5 inline ${isRTL ? 'mr-1' : 'ml-1'}`} />
                         </th>
                       </tr>
@@ -856,10 +856,10 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             <div className="mt-8 text-center bg-green-50 border-2 border-green-200 rounded-xl p-6">
               <Award className="w-12 h-12 text-[#25D366] mx-auto mb-3" />
               <p className="text-lg font-bold text-[#161616] mb-2">
-                {isRTL ? "فريق المدار يساعدك في تجهيز المتطلبات" : "ORBIT Team helps you prepare the requirements"}
+                {getCmsField(cmsPage, 'wa-green-tick', 'support_title', isRTL, isRTL ? "فريق المدار يساعدك في تجهيز المتطلبات" : "ORBIT Team helps you prepare the requirements")}
               </p>
               <p className="text-gray-600 mb-4">
-                {isRTL ? "نوفر لك الدعم الكامل للحصول على التوثيق الرسمي من واتساب" : "We provide you with full support to get official WhatsApp verification"}
+                {getCmsField(cmsPage, 'wa-green-tick', 'support_desc', isRTL, isRTL ? "نوفر لك الدعم الكامل للحصول على التوثيق الرسمي من واتساب" : "We provide you with full support to get official WhatsApp verification")}
               </p>
             </div>
           </div>
@@ -901,7 +901,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                   const currentTier = plan.tiers[currentTierIndex] || plan.tiers[0];
                   const popularBadge = plan.badge || (isRTL ? "الأكثر طلباً" : "Most Popular");
                   const subscribeLabel = plan.subscribeLabel || (isRTL ? "اشترك الآن" : "Subscribe Now");
-                  const subscribeUrlType = plan.subscribeUrlType || 'external';
+                  const subscribeUrlType = plan.subscribeUrlType || 'form';
                   const subscribeUrl = subscribeUrlType === 'form' 
                     ? `/products/whatsapp/request?plan=${encodeURIComponent(plan.id)}&tier=${encodeURIComponent(currentTier.name)}`
                     : (plan.subscribeUrl || primaryCtaUrl);
@@ -1147,11 +1147,11 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <Sparkles className="w-16 h-16 text-[#25D366] mx-auto mb-6" />
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6">
-              {isRTL ? "جاهز لنقل خدمة عملائك لمستوى آخر؟" : "Ready to take your customer service to the next level?"}
+<h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6">
+              {getCmsField(cmsPage, 'wa-footer-cta', 'title', isRTL, isRTL ? "جاهز لنقل خدمة عملائك لمستوى آخر؟" : "Ready to take your customer service to the next level?")}
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              {isRTL ? "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية" : "Our team is ready to help you get the Green Badge and integrate the API easily and professionally"}
+              {getCmsField(cmsPage, 'wa-footer-cta', 'subtitle', isRTL, isRTL ? "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية" : "Our team is ready to help you get the Green Badge and integrate the API easily and professionally")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

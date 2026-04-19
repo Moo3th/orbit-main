@@ -104,7 +104,7 @@ const normalizeSeoSettings = (doc: unknown): ISeoSettings | null => {
 
 export async function getSeoSettings(): Promise<ISeoSettings | null> {
   await connectDB();
-  const doc = await SeoSettings.findOne({ key: 'primary', isActive: true }).lean();
+  const doc = await SeoSettings.findOne({ key: 'primary' }).lean();
   return normalizeSeoSettings(doc);
 }
 
@@ -113,21 +113,54 @@ export const getCachedSeoSettings = unstable_cache(
     return getSeoSettings();
   },
   ['seo-settings'],
-  { revalidate: 300, tags: ['seo-settings'] }
+  { revalidate: 60, tags: ['seo-settings'] }
 );
 
 export function generatePageMetadata(page: PageMetadataInput | null, settings: ISeoSettings | null) {
   const baseUrl = settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa';
   
-  const title = page?.seo?.title?.ar || page?.seo?.title?.en || settings?.defaultSeo?.title?.ar || settings?.siteName?.ar || 'ORBIT';
-  const description = page?.seo?.description?.ar || page?.seo?.description?.en || settings?.defaultSeo?.description?.ar || '';
-  const keywords = page?.seo?.keywords?.ar || page?.seo?.keywords?.en || settings?.defaultSeo?.keywords?.ar || '';
-  const canonical = page?.seo?.canonical || `${baseUrl}${page?.path || ''}`;
+  const firstNonEmpty = (...values: (string | undefined | null)[]): string => {
+    for (const v of values) {
+      if (v && v.trim()) return v.trim();
+    }
+    return '';
+  };
+
+  const title = firstNonEmpty(
+    page?.seo?.title?.ar,
+    page?.seo?.title?.en,
+    settings?.defaultSeo?.title?.ar,
+    settings?.defaultSeo?.title?.en,
+    settings?.siteName?.ar,
+    settings?.siteName?.en,
+    'ORBIT'
+  );
+  const description = firstNonEmpty(
+    page?.seo?.description?.ar,
+    page?.seo?.description?.en,
+    settings?.defaultSeo?.description?.ar,
+    settings?.defaultSeo?.description?.en,
+  );
+  const keywords = firstNonEmpty(
+    page?.seo?.keywords?.ar,
+    page?.seo?.keywords?.en,
+    settings?.defaultSeo?.keywords?.ar,
+    settings?.defaultSeo?.keywords?.en,
+  );
+  const canonical = firstNonEmpty(page?.seo?.canonical) || `${baseUrl}${page?.path || ''}`;
   const noIndex = page?.seo?.noIndex || false;
   
-  const ogTitle = page?.social?.ogTitle?.ar || page?.social?.ogTitle?.en || title;
-  const ogDescription = page?.social?.ogDescription?.ar || page?.social?.ogDescription?.en || description;
-  const ogImage = page?.social?.ogImage || `${baseUrl}/og-image.png`;
+  const ogTitle = firstNonEmpty(
+    page?.social?.ogTitle?.ar,
+    page?.social?.ogTitle?.en,
+    title,
+  );
+  const ogDescription = firstNonEmpty(
+    page?.social?.ogDescription?.ar,
+    page?.social?.ogDescription?.en,
+    description,
+  );
+  const ogImage = firstNonEmpty(page?.social?.ogImage) || `${baseUrl}/og-image.png`;
   
   const metadata: Metadata = {
     title: title,

@@ -12,8 +12,26 @@ interface Props {
 }
 
 export function CmsPagesView({ isAr, onNavigate }: Props) {
-  const { pages } = useSiteData();
+  const { pages, refreshData } = useSiteData();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeed = async () => {
+    setSeeding(true);
+    try {
+      const res = await fetch('/api/seed', { method: 'POST' });
+      if (res.ok) {
+        await refreshData();
+      } else {
+        alert(isAr ? 'حدث خطأ أثناء إضافة الصفحات' : 'Error seeding pages');
+      }
+    } catch (error) {
+      console.error('Seed failed:', error);
+      alert(isAr ? 'حدث خطأ أثناء إضافة الصفحات' : 'Error seeding pages');
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleDelete = async (pageId: string) => {
     if (!confirm(isAr ? 'هل أنت متأكد من حذف هذه الصفحة؟ سيتم حذف جميع محتوياتها.' : 'Are you sure you want to delete this page? All content will be deleted.')) {
@@ -28,7 +46,9 @@ export function CmsPagesView({ isAr, onNavigate }: Props) {
           pages: pages.filter(p => p.id !== pageId),
         }),
       });
-      if (!res.ok) {
+      if (res.ok) {
+        await refreshData();
+      } else {
         alert(isAr ? 'حدث خطأ أثناء الحذف' : 'Error deleting page');
       }
     } catch (error) {
@@ -50,10 +70,14 @@ export function CmsPagesView({ isAr, onNavigate }: Props) {
         </div>
         <Card className="border border-gray-200">
           <CardContent className="p-12 text-center">
-            <p className="text-gray-500 mb-4">{isAr ? 'لا توجد صفحات. قم بتشغيل سكربت التأسيس لإضافة الصفحات.' : 'No pages found. Run the seed script to add pages.'}</p>
-            <Button onClick={() => alert('Please run: npm run seed')} className="bg-[#104E8B] hover:bg-[#0A2647]">
+            <p className="text-gray-500 mb-4">{isAr ? 'لا توجد صفحات بعد. اضغط الزر أدناه لإضافة الصفحات الافتراضية.' : 'No pages found. Click the button below to add default pages.'}</p>
+            <Button 
+              onClick={handleSeed} 
+              disabled={seeding}
+              className="bg-[#104E8B] hover:bg-[#0A2647] text-white"
+            >
               <Plus className="w-4 h-4 mr-2" />
-              {isAr ? 'إضافة صفحات' : 'Add Pages'}
+              {seeding ? (isAr ? 'جارِ الإضافة...' : 'Adding pages...') : (isAr ? 'إضافة الصفحات الافتراضية' : 'Add Default Pages')}
             </Button>
           </CardContent>
         </Card>

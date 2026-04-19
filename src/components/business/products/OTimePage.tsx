@@ -399,7 +399,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
               {valueSectionTitle}
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-3 md:mb-4">
-              {isRTL ? "القيمة الاستراتيجية التي تحتاجها" : "The Strategic Value You Need"}
+              {getCmsField(cmsPage, 'ot-features', 'value_title', isRTL, isRTL ? "القيمة الاستراتيجية التي تحتاجها" : "The Strategic Value You Need")}
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               {valueSectionSubtitle}
@@ -434,10 +434,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
               {modulesSectionTitle}
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#161616] mb-3 md:mb-4">
-              {isRTL ? "نظام شامل لكل احتياجاتك" : "A Comprehensive System for All Your Needs"}
+              {getCmsField(cmsPage, 'ot-features', 'modules_title', isRTL, isRTL ? "نظام شامل لكل احتياجاتك" : "A Comprehensive System for All Your Needs")}
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              {isRTL ? "من التوظيف إلى التقاعد - إدارة دورة حياة الموظف الكاملة في منصة واحدة متكاملة" : "From recruitment to retirement - Manage the full employee lifecycle in a single integrated platform"}
+              {getCmsField(cmsPage, 'ot-features', 'modules_subtitle', isRTL, isRTL ? "من التوظيف إلى التقاعد - إدارة دورة حياة الموظف الكاملة في منصة واحدة متكاملة" : "From recruitment to retirement - Manage the full employee lifecycle in a single integrated platform")}
             </p>
           </div>
 
@@ -511,15 +511,15 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
       <section className="py-12 md:py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-10 md:mb-12">
-            <Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
-              {isRTL ? "UX/UI متقدم" : "Advanced UX/UI"}
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
-              {isRTL ? "تجربة مستخدم لا تضاهى" : "Unmatched User Experience"}
-            </h2>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
-              {isRTL ? "واجهة بديهية مصممة بعناية لتوفير أفضل تجربة لجميع المستخدمين" : "An intuitive interface carefully designed to provide the best experience for all users"}
-            </p>
+<Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
+               {getCmsField(cmsPage, 'ot-features', 'ux_title', isRTL, isRTL ? "UX/UI متقدم" : "Advanced UX/UI")}
+             </Badge>
+             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
+               {getCmsField(cmsPage, 'ot-features', 'ux_title', isRTL, isRTL ? "تجربة مستخدم لا تضاهى" : "Unmatched User Experience")}
+             </h2>
+             <p className="text-lg text-white/90 max-w-2xl mx-auto">
+               {getCmsField(cmsPage, 'ot-features', 'ux_subtitle', isRTL, isRTL ? "واجهة بديهية مصممة بعناية لتوفير أفضل تجربة لجميع المستخدمين" : "An intuitive interface carefully designed to provide the best experience for all users")}
+             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
@@ -657,16 +657,16 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
       <section className="py-12 md:py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-10 md:mb-12">
-            <Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
-              <Server className="w-4 h-4 ml-2 inline" />
-              {isRTL ? "المواصفات التقنية" : "Technical Specifications"}
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
-              {techSectionTitle}
-            </h2>
-            <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              {isRTL ? "تقنية حديثة مع أعلى معايير الأمان والتوافق" : "Modern technology with the highest standards of security and compatibility"}
-            </p>
+<Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
+               <Server className="w-4 h-4 ml-2 inline" />
+               {isRTL ? "المواصفات التقنية" : "Technical Specifications"}
+             </Badge>
+             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
+               {techSectionTitle}
+             </h2>
+             <p className="text-lg text-white/80 max-w-2xl mx-auto">
+               {getCmsField(cmsPage, 'ot-features', 'tech_subtitle', isRTL, isRTL ? "تقنية حديثة مع أعلى معايير الأمان والتوافق" : "Modern technology with the highest standards of security and compatibility")}
+             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
@@ -724,16 +724,16 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
-                <MapPin className="w-4 h-4 ml-2 inline" />
-                {isRTL ? "مصمم للسوق السعودي" : "Designed for the Saudi Market"}
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
-                {isRTL ? "متوافق 100% مع الأنظمة المحلية" : "100% Compatible with Local Regulations"}
-              </h2>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">
-                {isRTL ? "دعم كامل للأنظمة واللوائح السعودية مع تحديثات مستمرة" : "Full support for Saudi regulations and policies with continuous updates"}
-              </p>
+<Badge className="bg-white/20 text-white border-none px-4 py-2 text-sm mb-3 md:mb-4">
+                 <MapPin className="w-4 h-4 ml-2 inline" />
+                 {isRTL ? "مصمم للسوق السعودي" : "Designed for the Saudi Market"}
+               </Badge>
+               <h2 className="text-3xl md:text-4xl font-extrabold mb-3 md:mb-4">
+                 {getCmsField(cmsPage, 'ot-features', 'local_title', isRTL, isRTL ? "متوافق 100% مع الأنظمة المحلية" : "100% Compatible with Local Regulations")}
+               </h2>
+               <p className="text-lg text-white/90 max-w-2xl mx-auto">
+                 {getCmsField(cmsPage, 'ot-features', 'local_subtitle', isRTL, isRTL ? "دعم كامل للأنظمة واللوائح السعودية مع تحديثات مستمرة" : "Full support for Saudi regulations and policies with continuous updates")}
+               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -768,10 +768,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
           <div className="max-w-4xl mx-auto text-center">
             <Sparkles className="w-16 h-16 text-[#FFA502] mx-auto mb-6" />
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
-              {isRTL ? "هل أنت مستعد لنقل إدارة الموارد البشرية إلى مستوى جديد؟" : "Are you ready to take your HR management to a new level?"}
+              {getCmsField(cmsPage, 'ot-features', 'footer_cta_title', isRTL, isRTL ? "هل أنت مستعد لنقل إدارة الموارد البشرية إلى مستوى جديد؟" : "Are you ready to take your HR management to a new level?")}
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              {isRTL ? "انضم إلى الشركات التي تعتمد على O-Time لتحقيق الكفاءة والامتثال" : "Join the companies relying on O-Time to achieve efficiency and compliance"}
+              {getCmsField(cmsPage, 'ot-features', 'footer_cta_subtitle', isRTL, isRTL ? "انضم إلى الشركات التي تعتمد على O-Time لتحقيق الكفاءة والامتثال" : "Join the companies relying on O-Time to achieve efficiency and compliance")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button 

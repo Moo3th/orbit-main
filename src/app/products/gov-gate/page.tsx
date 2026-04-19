@@ -2,7 +2,7 @@ import { GovGatePage } from '@/components/business/products/GovGatePage';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
-import { getCmsPageById } from '@/lib/cms/helpers';
+import { getCmsPageById, extractPageSeo } from '@/lib/cms/helpers';
 import { getCachedSeoSettings, generatePageMetadata } from '@/lib/seo';
 import type { CmsPage } from '@/lib/cms/types';
 import type { Metadata } from 'next';
@@ -14,36 +14,20 @@ export async function generateMetadata(): Promise<Metadata> {
   ]);
   
   const page = getCmsPageById(snapshot, 'govgate');
+  const seo = extractPageSeo(page, page?.path || '/products/gov-gate');
   
   const normalizedPage = page ? {
-    pageId: page.id,
-    path: page.path,
     seo: {
-      title: { 
-        ar: (page.seo as any)?.title || '', 
-        en: (page.seo as any)?.titleEn || '' 
-      },
-      description: { 
-        ar: (page.seo as any)?.description || '', 
-        en: (page.seo as any)?.descriptionEn || '' 
-      },
-      keywords: { 
-        ar: (page.seo as any)?.keywords || '', 
-        en: (page.seo as any)?.keywordsEn || '' 
-      },
-      canonical: (page.seo as any)?.canonical || '',
-      noIndex: (page.seo as any)?.noIndex || false,
+      title: seo.title,
+      description: seo.description,
+      keywords: seo.keywords,
+      canonical: seo.canonical,
+      noIndex: seo.noIndex,
     },
     social: {
-      ogImage: (page.seo as any)?.ogImage || '',
-      ogTitle: { ar: '', en: '' },
-      ogDescription: { ar: '', en: '' },
+      ogImage: seo.ogImage,
     },
-    sections: [],
-    order: 0,
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    path: page.path,
   } : null;
   
   return generatePageMetadata(normalizedPage, settings);

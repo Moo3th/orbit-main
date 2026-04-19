@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await connectDB();
-    const site = (await SiteCms.findOne({ key: 'primary', isActive: true }).lean()) as (ExistingSiteDoc & {
+    const site = (await SiteCms.findOne({ key: 'primary' }).lean()) as (ExistingSiteDoc & {
       key?: string;
       isActive?: boolean;
       pages?: unknown[];
@@ -61,21 +61,40 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { pages, partners, socialLinks, contactSubmissions, notificationEmail, footerData } = body || {};
     
-    // Debug: Log incoming pages
-    console.log('=== API PUT RECEIVED ===');
-    if (Array.isArray(pages)) {
-      const homePage = pages.find(p => p.id === 'home');
-      console.log('Home page SEO in request:', JSON.stringify(homePage?.seo, null, 2));
-    }
-    
     const existing = (await SiteCms.findOne({ key: 'primary' }).lean()) as ExistingSiteDoc | null;
+
+    let mergedPages: unknown[];
+    if (Array.isArray(pages) && pages.length > 0) {
+      if (Array.isArray(existing?.pages) && existing.pages.length > 0) {
+        const existingMap = new Map((existing.pages as Array<{ id: string }>).map((p: { id: string }) => [p.id, p]));
+        const incomingMap = new Map((pages as Array<{ id: string }>).map((p: { id: string }) => [p.id, p]));
+        const result: unknown[] = [];
+        for (const existingPage of existing.pages as Array<{ id: string }>) {
+          if (incomingMap.has(existingPage.id)) {
+            result.push(incomingMap.get(existingPage.id)!);
+          } else {
+            result.push(existingPage);
+          }
+        }
+        for (const incomingPage of pages as Array<{ id: string }>) {
+          if (!existingMap.has(incomingPage.id)) {
+            result.push(incomingPage);
+          }
+        }
+        mergedPages = result;
+      } else {
+        mergedPages = pages;
+      }
+    } else {
+      mergedPages = Array.isArray(existing?.pages) ? existing.pages : [];
+    }
 
     const site = await SiteCms.findOneAndUpdate(
       { key: 'primary' },
       {
         key: 'primary',
         isActive: true,
-        pages: Array.isArray(pages) ? pages : (Array.isArray(existing?.pages) ? existing.pages : []),
+        pages: mergedPages,
         partners: Array.isArray(partners) ? partners : (Array.isArray(existing?.partners) ? existing.partners : []),
         socialLinks: Array.isArray(socialLinks) ? socialLinks : (Array.isArray(existing?.socialLinks) ? existing.socialLinks : []),
         contactSubmissions: Array.isArray(contactSubmissions) ? contactSubmissions : (Array.isArray(existing?.contactSubmissions) ? existing.contactSubmissions : []),
@@ -89,14 +108,11 @@ export async function PUT(request: NextRequest) {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     ).lean();
 
-    // Debug: Log saved pages
-    console.log('=== AFTER SAVE ===');
-    const savedHomePage = (site as any)?.pages?.find((p: any) => p.id === 'home');
-    console.log('Saved home page SEO:', JSON.stringify(savedHomePage?.seo, null, 2));
-    
     // Revalidate all pages
     const pathsToRevalidate = [
       '/',
+      '/contact',
+      '/about-us',
       '/products/sms',
       '/products/whatsapp',
       '/products/o-time',

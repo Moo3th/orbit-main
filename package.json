@@ -8,7 +8,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/init-db.js"
+    "seed": "node scripts/init-db.js",
+    "seed:cms": "node scripts/seed-site-cms.js"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",

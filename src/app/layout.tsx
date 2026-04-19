@@ -12,11 +12,6 @@ import { OrganizationJsonLd } from "@/components/JsonLd";
 import { getCachedSeoSettings, generateOrganizationJsonLd, generateWebsiteJsonLd } from "@/lib/seo";
 import { WebsiteJsonLd } from "@/components/JsonLd";
 
-const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
-const clarityProjectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim();
-const facebookPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim();
-const analyticsEnabled = Boolean(gtmId) && process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
-
 const ibmPlexSans = IBM_Plex_Sans({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
@@ -81,8 +76,14 @@ export default async function RootLayout({
   const websiteJsonLd = generateWebsiteJsonLd(settings);
 
   const gscVerification = settings?.analytics?.gscVerification || '';
-  const gtmIdFromSettings = settings?.analytics?.gtmId || gtmId;
-  const analyticsEnabledFromSettings = Boolean(gtmIdFromSettings) && process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+  const gtmIdFromSettings = settings?.analytics?.gtmId || process.env.NEXT_PUBLIC_GTM_ID?.trim() || '';
+  const facebookPixelIdFromSettings = settings?.analytics?.facebookPixelId || process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() || '';
+  const clarityProjectIdFromSettings = settings?.analytics?.clarityProjectId || process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim() || '';
+
+  const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+  const hasGtm = Boolean(gtmIdFromSettings);
+  const hasPixel = Boolean(facebookPixelIdFromSettings);
+  const hasClarity = Boolean(clarityProjectIdFromSettings);
 
   return (
     <html lang="ar" className={`scroll-smooth overflow-x-hidden ${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
@@ -94,24 +95,25 @@ export default async function RootLayout({
         <WebsiteJsonLd data={websiteJsonLd} />
       </head>
       <body className="antialiased transition-colors duration-300 overflow-x-hidden" style={{ width: '100%', maxWidth: '100vw' }} suppressHydrationWarning>
-        {analyticsEnabledFromSettings && gtmIdFromSettings ? <GoogleTagManager gtmId={gtmIdFromSettings} /> : null}
-        {analyticsEnabledFromSettings && (settings?.analytics?.facebookPixelId || facebookPixelId) ? (
-          <MetaPixel pixelId={(settings?.analytics?.facebookPixelId || facebookPixelId) as string} />
+        {analyticsEnabled && hasGtm ? <GoogleTagManager gtmId={gtmIdFromSettings} /> : null}
+        {analyticsEnabled && hasPixel ? (
+          <MetaPixel pixelId={facebookPixelIdFromSettings} />
         ) : null}
-        {analyticsEnabledFromSettings && (settings?.analytics?.clarityProjectId || clarityProjectId) ? (
+        {analyticsEnabled && hasClarity ? (
           <ClarityAnalytics 
-            projectId={(settings?.analytics?.clarityProjectId || clarityProjectId) as string} 
-            respectPrivacy={true} 
+            projectId={clarityProjectIdFromSettings}
+            enabled={true}
+            respectPrivacy={true}
           />
         ) : null}
         <ThemeProvider>
           <LanguageProvider>
-            {analyticsEnabledFromSettings ? <PrivacyConsent /> : null}
+            {(analyticsEnabled && (hasGtm || hasPixel || hasClarity)) ? <PrivacyConsent /> : null}
 
             {children}
           </LanguageProvider>
         </ThemeProvider>
-        {analyticsEnabledFromSettings ? <SpeedInsights /> : null}
+        {analyticsEnabled ? <SpeedInsights /> : null}
       </body>
     </html>
   );

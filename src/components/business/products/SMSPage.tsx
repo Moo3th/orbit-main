@@ -445,10 +445,10 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 <div className="w-12 h-12 bg-[#7A1E2E]/10 rounded-xl flex items-center justify-center shrink-0">
                   <Rocket className="w-6 h-6 text-[#7A1E2E]" />
                 </div>
-                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{t.products.sms.valueProps.zeroLatency.title}</h3>
+                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{getCmsField(cmsPage, 'sms-value', 'feature1_title', isRTL, t.products.sms.valueProps.zeroLatency.title)}</h3>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                {t.products.sms.valueProps.zeroLatency.description}
+                {getCmsField(cmsPage, 'sms-value', 'feature1_desc', isRTL, t.products.sms.valueProps.zeroLatency.description)}
               </p>
             </div>
 
@@ -457,10 +457,10 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 <div className="w-12 h-12 bg-[#7A1E2E]/10 rounded-xl flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-6 h-6 text-[#7A1E2E]" />
                 </div>
-                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{t.products.sms.valueProps.senderId.title}</h3>
+                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{getCmsField(cmsPage, 'sms-value', 'feature2_title', isRTL, t.products.sms.valueProps.senderId.title)}</h3>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                {t.products.sms.valueProps.senderId.description}
+                {getCmsField(cmsPage, 'sms-value', 'feature2_desc', isRTL, t.products.sms.valueProps.senderId.description)}
               </p>
             </div>
 
@@ -469,10 +469,10 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 <div className="w-12 h-12 bg-[#7A1E2E]/10 rounded-xl flex items-center justify-center shrink-0">
                   <Headphones className="w-6 h-6 text-[#7A1E2E]" />
                 </div>
-                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{t.products.sms.valueProps.support.title}</h3>
+                <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{getCmsField(cmsPage, 'sms-value', 'feature3_title', isRTL, t.products.sms.valueProps.support.title)}</h3>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                {t.products.sms.valueProps.support.description}
+                {getCmsField(cmsPage, 'sms-value', 'feature3_desc', isRTL, t.products.sms.valueProps.support.description)}
               </p>
             </div>
           </div>
@@ -486,20 +486,22 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
 
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-medium mb-6 border border-white/20">
-            {t.products.sms.specialOffer.badge}
+            {getCmsField(cmsPage, 'sms-special-offer', 'badge', isRTL, t.products.sms.specialOffer.badge)}
           </div>
           <h2 className={`${headingFontClass} text-3xl md:text-5xl font-bold mb-6`}>
-            {t.products.sms.specialOffer.titlePart1}<br />
-            <span className="text-[#F8A36B] mt-4 block">{t.products.sms.specialOffer.titlePart2}</span>
+            {getCmsField(cmsPage, 'sms-special-offer', 'title_part1', isRTL, t.products.sms.specialOffer.titlePart1)}<br />
+            <span className="text-[#F8A36B] mt-4 block">{getCmsField(cmsPage, 'sms-special-offer', 'title_part2', isRTL, t.products.sms.specialOffer.titlePart2)}</span>
           </h2>
           <div className="mt-10 flex flex-col items-center gap-4">
             <Button
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              asChild
               className="bg-white text-[#7A1E2E] hover:bg-[#E8DCCB] h-14 px-10 text-lg font-bold rounded-xl shadow-2xl shadow-black/20 transform hover:scale-105 transition-all"
             >
-              {t.products.sms.specialOffer.cta}
+              <a href={getCmsField(cmsPage, 'sms-special-offer', 'cta_url', isRTL, '#pricing')} target="_blank" rel="noopener noreferrer">
+                {getCmsField(cmsPage, 'sms-special-offer', 'cta_text', isRTL, t.products.sms.specialOffer.cta)}
+              </a>
             </Button>
-            <p className="text-white/60 text-sm">{t.products.sms.specialOffer.disclaimer}</p>
+            <p className="text-white/60 text-sm">{getCmsField(cmsPage, 'sms-special-offer', 'disclaimer', isRTL, t.products.sms.specialOffer.disclaimer)}</p>
           </div>
         </div>
       </section>
@@ -509,15 +511,15 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-8`}>{t.products.sms.useCases.title}</h2>
+              <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-8`}>{getCmsField(cmsPage, 'sms-usecases', 'title', isRTL, t.products.sms.useCases.title)}</h2>
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="mt-1">
                     <CheckCircle2 className="w-6 h-6 text-[#7A1E2E]" />
                   </div>
                   <div>
-                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{t.products.sms.useCases.otp.title}</h3>
-                    <p className="text-slate-600">{t.products.sms.useCases.otp.description}</p>
+                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{getCmsField(cmsPage, 'sms-usecases', 'otp_title', isRTL, t.products.sms.useCases.otp.title)}</h3>
+                    <p className="text-slate-600">{getCmsField(cmsPage, 'sms-usecases', 'otp_desc', isRTL, t.products.sms.useCases.otp.description)}</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -525,9 +527,9 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                     <CheckCircle2 className="w-6 h-6 text-[#7A1E2E]" />
                   </div>
                   <div>
-                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{t.products.sms.useCases.api.title}</h3>
+                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{getCmsField(cmsPage, 'sms-usecases', 'api_title', isRTL, t.products.sms.useCases.api.title)}</h3>
                     <p className="text-slate-600">
-                      {t.products.sms.useCases.api.description}
+                      {getCmsField(cmsPage, 'sms-usecases', 'api_desc', isRTL, t.products.sms.useCases.api.description)}
                     </p>
                   </div>
                 </div>
@@ -536,9 +538,9 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                     <CheckCircle2 className="w-6 h-6 text-[#7A1E2E]" />
                   </div>
                   <div>
-                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{t.products.sms.useCases.marketing.title}</h3>
+                    <h3 className={`${headingFontClass} text-xl font-bold text-slate-900 mb-2`}>{getCmsField(cmsPage, 'sms-usecases', 'marketing_title', isRTL, t.products.sms.useCases.marketing.title)}</h3>
                     <p className="text-slate-600">
-                      {t.products.sms.useCases.marketing.description}
+                      {getCmsField(cmsPage, 'sms-usecases', 'marketing_desc', isRTL, t.products.sms.useCases.marketing.description)}
                     </p>
                   </div>
                 </div>
@@ -698,23 +700,23 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 text-[#7A1E2E] bg-[#7A1E2E]/10 px-3 py-1 rounded-full text-xs font-bold mb-4">
-                <Code2 className="w-4 h-4" /> {t.products.sms.developers.badge}
+                <Code2 className="w-4 h-4" /> {getCmsField(cmsPage, 'sms-developers', 'badge', isRTL, t.products.sms.developers.badge)}
               </div>
-              <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-4`}>{t.products.sms.developers.title}</h2>
+              <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-4`}>{getCmsField(cmsPage, 'sms-developers', 'title', isRTL, t.products.sms.developers.title)}</h2>
               <p className="text-slate-600 leading-relaxed mb-6">
-                {t.products.sms.developers.description}
+                {getCmsField(cmsPage, 'sms-developers', 'description', isRTL, t.products.sms.developers.description)}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 mb-8">
                 {/* Platform Badges */}
-                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{isRTL ? "دفترة" : "Daftra"}</span>
-                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{isRTL ? "سلة" : "Salla"}</span>
-                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{isRTL ? "نظام نور" : "Noor"}</span>
-                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{isRTL ? "إتقان" : "Itqan"}</span>
+                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{getCmsField(cmsPage, 'sms-developers', 'platform_1', isRTL, isRTL ? "دفترة" : "Daftra")}</span>
+                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{getCmsField(cmsPage, 'sms-developers', 'platform_2', isRTL, isRTL ? "سلة" : "Salla")}</span>
+                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{getCmsField(cmsPage, 'sms-developers', 'platform_3', isRTL, isRTL ? "نظام نور" : "Noor")}</span>
+                <span className="bg-white border px-3 py-1 rounded text-sm font-bold text-slate-600">{getCmsField(cmsPage, 'sms-developers', 'platform_4', isRTL, isRTL ? "إتقان" : "Itqan")}</span>
               </div>
 
-              <a href="#" className="flex items-center gap-2 text-[#7A1E2E] font-bold hover:underline">
-                {t.products.sms.developers.cta} {isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              <a href={getCmsField(cmsPage, 'sms-developers', 'cta_url', isRTL, '#')} className="flex items-center gap-2 text-[#7A1E2E] font-bold hover:underline">
+                {getCmsField(cmsPage, 'sms-developers', 'cta_text', isRTL, t.products.sms.developers.cta)} {isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
               </a>
             </div>
 
@@ -740,17 +742,17 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
       <section className="py-24 bg-white text-center">
         <div className="container mx-auto px-4 max-w-2xl">
           <MessageSquare className="w-16 h-16 text-[#7A1E2E] mx-auto mb-6 opacity-20" />
-          <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-6`}>{t.products.sms.finalCta.title}</h2>
+          <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-6`}>{getCmsField(cmsPage, 'sms-final-cta', 'title', isRTL, t.products.sms.finalCta.title)}</h2>
           <Button
             size="lg"
             className="bg-[#7A1E2E] hover:bg-[#601824] text-white text-lg px-10 h-16 rounded-xl shadow-xl shadow-[#7A1E2E]/20"
             asChild
           >
-            <a href="https://app.mobile.net.sa/reg" target="_blank" rel="noopener noreferrer">
-              {t.products.sms.finalCta.cta}
+            <a href={getCmsField(cmsPage, 'sms-final-cta', 'cta_url', isRTL, 'https://app.mobile.net.sa/reg')} target="_blank" rel="noopener noreferrer">
+              {getCmsField(cmsPage, 'sms-final-cta', 'cta_text', isRTL, t.products.sms.finalCta.cta)}
             </a>
           </Button>
-          <p className="mt-4 text-slate-400 text-sm">{t.products.sms.finalCta.sub}</p>
+          <p className="mt-4 text-slate-400 text-sm">{getCmsField(cmsPage, 'sms-final-cta', 'subtitle', isRTL, t.products.sms.finalCta.sub)}</p>
         </div>
       </section>
 

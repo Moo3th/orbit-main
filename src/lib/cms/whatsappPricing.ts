@@ -40,7 +40,7 @@ const defaultWhatsAppPlansAr: WhatsAppPlanConfig[] = [
     badge: "",
     subscribeLabel: "اشترك الآن",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "الويب هوك وواجهة برمجة التطبيقات",
       "ربط المتجر مع المنصة",
@@ -60,7 +60,7 @@ const defaultWhatsAppPlansAr: WhatsAppPlanConfig[] = [
     badge: "الأكثر طلباً",
     subscribeLabel: "اشترك الآن",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "كل مميزات الباقة الأساسية",
       "ربط أكثر من متجر مع المنصة",
@@ -82,7 +82,7 @@ const defaultWhatsAppPlansAr: WhatsAppPlanConfig[] = [
     badge: "",
     subscribeLabel: "اشترك الآن",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "كل مميزات باقة النمو",
       "موظف ذكاء اصطناعي (AI Agent)",
@@ -107,7 +107,7 @@ const defaultWhatsAppPlansEn: WhatsAppPlanConfig[] = [
     badge: "",
     subscribeLabel: "Subscribe Now",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "Webhooks and API",
       "Store integration with platform",
@@ -127,7 +127,7 @@ const defaultWhatsAppPlansEn: WhatsAppPlanConfig[] = [
     badge: "Most Popular",
     subscribeLabel: "Subscribe Now",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "All features of the Basic Package",
       "Multiple store integrations",
@@ -149,7 +149,7 @@ const defaultWhatsAppPlansEn: WhatsAppPlanConfig[] = [
     badge: "",
     subscribeLabel: "Subscribe Now",
     subscribeUrl: DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: "external",
+    subscribeUrlType: "form",
     additionalFeatures: [
       "All features of the Growth Package",
       "AI Agent Employee",
@@ -281,7 +281,7 @@ const normalizePlan = (value: unknown, index: number): WhatsAppPlanConfig | null
     badge: asString(value.badge).trim(),
     subscribeLabel: asString(value.subscribeLabel).trim(),
     subscribeUrl: asString(value.subscribeUrl).trim() || DEFAULT_SUBSCRIBE_URL,
-    subscribeUrlType: (asString(value.subscribeUrlType).trim() === 'form' ? 'form' : 'external') as 'form' | 'external',
+    subscribeUrlType: (asString(value.subscribeUrlType).trim() === 'external' ? 'external' : 'form') as 'form' | 'external',
     additionalFeatures,
     tiers,
   };

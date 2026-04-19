@@ -8,7 +8,7 @@ import { Input } from "@/components/business/ui/input";
 import { Textarea } from "@/components/business/ui/textarea";
 import { 
   ArrowRight, ArrowLeft, CheckCircle, MessageCircle, 
-  Users, Building2, Target, Send, Loader2, Sparkles
+  Users, Building2, Target, Send, Loader2, Sparkles, Ban, Phone, Mail
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { CmsPage } from '@/lib/cms/types';
@@ -22,6 +22,24 @@ import toast from "react-hot-toast";
 
 interface WhatsAppRequestWizardProps {
   cmsPage?: CmsPage | null;
+}
+
+interface FormFieldOption {
+  value: string;
+  labelAr: string;
+  labelEn: string;
+}
+
+interface FormField {
+  id: string;
+  type: 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio';
+  labelAr: string;
+  labelEn: string;
+  placeholderAr: string;
+  placeholderEn: string;
+  required: boolean;
+  step: number;
+  options: FormFieldOption[];
 }
 
 const steps = [
@@ -105,6 +123,10 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
   const [isComplete, setIsComplete] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [dynamicFields, setDynamicFields] = useState<FormField[]>([]);
+  const [formConfigLoaded, setFormConfigLoaded] = useState(false);
+  const [isFormInactive, setIsFormInactive] = useState(false);
+  const [dynamicFormData, setDynamicFormData] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     planId: '',
     tierId: '',
@@ -118,6 +140,38 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
     employeeCount: '',
     notes: '',
   });
+
+  useEffect(() => {
+    const fetchFormConfig = async () => {
+      try {
+        const res = await fetch('/api/form-configs/whatsapp');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.config) {
+            if (data.config.isActive === false) {
+              setIsFormInactive(true);
+              setFormConfigLoaded(true);
+              return;
+            }
+            if (data.config.fields && data.config.fields.length > 0) {
+              setDynamicFields(data.config.fields);
+              const initial: Record<string, string> = {};
+              data.config.fields.forEach((f: FormField) => { initial[f.id] = ''; });
+              setDynamicFormData(initial);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch form config:', e);
+      }
+      setFormConfigLoaded(true);
+    };
+    fetchFormConfig();
+  }, []);
+
+  const hasDynamicFields = dynamicFields.length > 0;
+  const maxDynamicStep = hasDynamicFields ? Math.max(...dynamicFields.map(f => f.step)) : 0;
+  const totalSteps = hasDynamicFields ? maxDynamicStep : 6;
 
   const defaultPricingPlans = useMemo(() => getDefaultWhatsAppPlans(isRTL), [isRTL]);
   const cmsPricingPlansRaw = useMemo(() => getCmsField(
@@ -232,13 +286,34 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
       }
     }
 
+    if (hasDynamicFields) {
+      const stepFields = dynamicFields.filter(f => f.step === step);
+      stepFields.forEach(field => {
+        if (field.required) {
+          if (field.type === 'multiselect') {
+            if (selectedGoals.length === 0 && !dynamicFormData[field.id]) {
+              newErrors[field.id] = isRTL ? 'يرجى اختيار خيار واحد على الأقل' : 'Please select at least one option';
+            }
+          } else if (!dynamicFormData[field.id]?.trim()) {
+            newErrors[field.id] = isRTL ? `يرجى إدخال ${field.labelAr}` : `Please enter ${field.labelEn}`;
+          }
+          if (field.type === 'email' && dynamicFormData[field.id] && !validateEmail(dynamicFormData[field.id])) {
+            newErrors[field.id] = isRTL ? 'البريد الإلكتروني غير صحيح' : 'Invalid email address';
+          }
+          if (field.type === 'tel' && dynamicFormData[field.id] && !validatePhone(dynamicFormData[field.id])) {
+            newErrors[field.id] = isRTL ? 'رقم الهاتف غير صحيح' : 'Invalid phone number';
+          }
+        }
+      });
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      if (currentStep < steps.length) {
+      if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
       }
     }
@@ -273,10 +348,9 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
   };
 
   const handleSubmit = async () => {
-    const finalFormData = {
-      ...formData,
-      goal: selectedGoals.join(', '),
-    };
+    const finalFormData = hasDynamicFields
+      ? { ...formData, ...dynamicFormData, goal: selectedGoals.length > 0 ? selectedGoals.join(', ') : dynamicFormData.goal || '' }
+      : { ...formData, goal: selectedGoals.join(', ') };
 
     setIsSubmitting(true);
     try {
@@ -298,6 +372,133 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const renderDynamicStepFields = (step: number) => {
+    const stepFields = dynamicFields.filter(f => f.step === step);
+    if (stepFields.length === 0) return null;
+
+    const stepIcons: Record<number, React.ElementType> = { 2: Users, 3: Building2, 4: Target, 5: Users, 6: Send };
+    const stepLabels: Record<number, { ar: string; en: string }> = {
+      2: { ar: 'بيانات التواصل', en: 'Contact Info' },
+      3: { ar: 'بيانات الشركة', en: 'Company Info' },
+      4: { ar: 'الهدف من الخدمة', en: 'Service Goal' },
+      5: { ar: 'تفاصيل إضافية', en: 'Additional Details' },
+      6: { ar: 'تفاصيل إضافية', en: 'Additional Details' },
+    };
+    const StepIcon = stepIcons[step] || Send;
+    const stepInfo = stepLabels[step] || { ar: `الخطوة ${step}`, en: `Step ${step}` };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <Badge className="bg-[#25D366] text-white border-none px-4 py-2 text-sm mb-3">
+            <StepIcon className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isRTL ? stepInfo.ar : stepInfo.en}
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
+            {isRTL ? stepInfo.ar : stepInfo.en}
+          </h2>
+        </div>
+        <div className="max-w-lg mx-auto space-y-4">
+          {stepFields.map(field => (
+            <div key={field.id} className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                {isRTL ? field.labelAr : field.labelEn}
+                {field.required && <span className="text-red-500 mr-1">*</span>}
+              </label>
+
+              {field.type === 'textarea' ? (
+                <Textarea
+                  value={dynamicFormData[field.id] || ''}
+                  onChange={e => {
+                    setDynamicFormData(prev => ({ ...prev, [field.id]: e.target.value }));
+                    if (errors[field.id]) setErrors(prev => ({ ...prev, [field.id]: '' }));
+                  }}
+                  placeholder={isRTL ? field.placeholderAr : field.placeholderEn}
+                  className="border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
+                  rows={3}
+                />
+              ) : field.type === 'select' ? (
+                <select
+                  value={dynamicFormData[field.id] || ''}
+                  onChange={e => {
+                    setDynamicFormData(prev => ({ ...prev, [field.id]: e.target.value }));
+                    if (errors[field.id]) setErrors(prev => ({ ...prev, [field.id]: '' }));
+                  }}
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:border-[#25D366] focus:ring-[#25D366]"
+                >
+                  <option value="">{isRTL ? field.placeholderAr : field.placeholderEn}</option>
+                  {field.options.map(opt => (
+                    <option key={opt.value} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>
+                  ))}
+                </select>
+              ) : field.type === 'radio' ? (
+                <div className="space-y-2">
+                  {field.options.map(opt => (
+                    <label
+                      key={opt.value}
+                      className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                        dynamicFormData[field.id] === opt.value
+                          ? 'border-[#25D366] bg-green-50'
+                          : 'border-gray-200 hover:border-[#25D366]'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name={field.id}
+                        value={opt.value}
+                        checked={dynamicFormData[field.id] === opt.value}
+                        onChange={e => {
+                          setDynamicFormData(prev => ({ ...prev, [field.id]: e.target.value }));
+                          if (errors[field.id]) setErrors(prev => ({ ...prev, [field.id]: '' }));
+                        }}
+                        className="w-4 h-4 accent-[#25D366]"
+                      />
+                      <span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : field.type === 'multiselect' ? (
+                <div className="space-y-2">
+                  {field.options.map(opt => {
+                    const isSelected = selectedGoals.includes(opt.value);
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected ? 'border-[#25D366] bg-green-50' : 'border-gray-200 hover:border-[#25D366]'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleGoal(opt.value)}
+                          className="w-4 h-4 accent-[#25D366]"
+                        />
+                        <span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <Input
+                  type={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'number' ? 'number' : 'text'}
+                  value={dynamicFormData[field.id] || ''}
+                  onChange={e => {
+                    setDynamicFormData(prev => ({ ...prev, [field.id]: e.target.value }));
+                    if (errors[field.id]) setErrors(prev => ({ ...prev, [field.id]: '' }));
+                  }}
+                  placeholder={isRTL ? field.placeholderAr : field.placeholderEn}
+                  className="border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
+                />
+              )}
+              {errors[field.id] && <p className="text-red-500 text-xs mt-1">{errors[field.id]}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   const renderStep = () => {
@@ -385,6 +586,10 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 2:
+        if (hasDynamicFields) {
+          const stepFields = dynamicFields.filter(f => f.step === 2);
+          if (stepFields.length > 0) return renderDynamicStepFields(2);
+        }
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -449,6 +654,10 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 3:
+        if (hasDynamicFields) {
+          const stepFields = dynamicFields.filter(f => f.step === 3);
+          if (stepFields.length > 0) return renderDynamicStepFields(3);
+        }
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -517,6 +726,10 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 4:
+        if (hasDynamicFields) {
+          const stepFields = dynamicFields.filter(f => f.step === 4);
+          if (stepFields.length > 0) return renderDynamicStepFields(4);
+        }
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -563,6 +776,10 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 5:
+        if (hasDynamicFields) {
+          const stepFields = dynamicFields.filter(f => f.step === 5);
+          if (stepFields.length > 0) return renderDynamicStepFields(5);
+        }
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -738,6 +955,32 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
     }
   };
 
+  if (isFormInactive) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-lg mx-auto text-center">
+            <Ban className="w-20 h-20 text-red-400 mx-auto mb-6" />
+            <h1 className="text-3xl font-extrabold text-[#161616] mb-4">
+              {isRTL ? 'هذه الخدمة غير متاحة حالياً' : 'This service is currently unavailable'}
+            </h1>
+            <p className="text-gray-600 text-lg mb-8">
+              {isRTL ? 'عذراً، تم تعطيل هذه الخدمة مؤقتاً. يرجى التواصل معنا للمزيد من المعلومات.' : 'Sorry, this service has been temporarily disabled. Please contact us for more information.'}
+            </p>
+            <div className="flex gap-4 justify-center">
+              <a href="tel:+966500000000" className="inline-flex items-center gap-2 px-6 py-3 bg-[#128C7E] text-white rounded-lg hover:bg-[#0d6b5f] transition-colors font-bold">
+                <Phone className="w-5 h-5" /> {isRTL ? 'اتصل بنا' : 'Call Us'}
+              </a>
+              <a href="mailto:info@orbit.sa" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#128C7E] text-[#128C7E] rounded-lg hover:bg-[#128C7E]/5 transition-colors font-bold">
+                <Mail className="w-5 h-5" /> {isRTL ? 'راسلنا' : 'Email Us'}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isComplete) {
     return (
       <div className={`min-h-screen bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -813,7 +1056,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         </div>
 
         {/* Navigation Buttons */}
-        {currentStep < 6 && (
+        {currentStep < totalSteps && (
           <div className="flex justify-between mt-10 max-w-2xl mx-auto">
             <Button 
               variant="outline"

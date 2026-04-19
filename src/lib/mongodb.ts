@@ -1,13 +1,9 @@
 import mongoose from 'mongoose';
 
-// ORBIT Database Connection
-// ⚠️ IMPORTANT: This connects to the 'orbit' database, NOT 'markline'
-// Make sure your .env.local has: MONGODB_URI=.../orbit?appName=...
-// The database name is specified in the connection string (last part before ?)
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/orbit';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
+  throw new Error('Please define the MONGODB_URI environment variable in .env.local');
 }
 
 interface MongooseCache {
@@ -37,7 +33,7 @@ export async function connectDB() {
         bufferCommands: false,
       };
 
-      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
         console.log('✅ MongoDB Connected');
         return mongoose;
       }).catch((error) => {
