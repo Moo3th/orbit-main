@@ -127,6 +127,8 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
   const [formConfigLoaded, setFormConfigLoaded] = useState(false);
   const [isFormInactive, setIsFormInactive] = useState(false);
   const [dynamicFormData, setDynamicFormData] = useState<Record<string, string>>({});
+  const [thankYouMessage, setThankYouMessage] = useState({ ar: '', en: '' });
+  const [title, setTitle] = useState({ ar: '', en: '' });
   const [formData, setFormData] = useState({
     planId: '',
     tierId: '',
@@ -153,6 +155,8 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
               setFormConfigLoaded(true);
               return;
             }
+            setTitle({ ar: data.config.titleAr || '', en: data.config.titleEn || '' });
+            setThankYouMessage({ ar: data.config.thankYouMessageAr || '', en: data.config.thankYouMessageEn || '' });
             if (data.config.fields && data.config.fields.length > 0) {
               setDynamicFields(data.config.fields);
               const initial: Record<string, string> = {};
@@ -242,6 +246,8 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
 
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
+
+    const hasDynamicStepFields = hasDynamicFields && dynamicFields.filter(f => f.step === step).length > 0;
     
     if (step === 1) {
       if (!formData.planId) {
@@ -252,7 +258,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
       }
     }
     
-    if (step === 2) {
+    if (step === 2 && !hasDynamicStepFields) {
       if (!formData.name.trim()) {
         newErrors.name = isRTL ? 'يرجى إدخال الاسم' : 'Please enter your name';
       }
@@ -268,19 +274,19 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
       }
     }
     
-    if (step === 3) {
+    if (step === 3 && !hasDynamicStepFields) {
       if (formData.industry === 'other' && !formData.otherIndustry.trim()) {
         newErrors.otherIndustry = isRTL ? 'يرجى إدخال نشاطك' : 'Please enter your industry';
       }
     }
     
-    if (step === 4) {
+    if (step === 4 && !hasDynamicStepFields) {
       if (selectedGoals.length === 0) {
         newErrors.goal = isRTL ? 'يرجى اختيار هدف واحد على الأقل' : 'Please select at least one goal';
       }
     }
     
-    if (step === 5) {
+    if (step === 5 && !hasDynamicStepFields) {
       if (!formData.employeeCount) {
         newErrors.employeeCount = isRTL ? 'يرجى اختيار عدد الموظفين' : 'Please select number of employees';
       }
@@ -291,7 +297,8 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
       stepFields.forEach(field => {
         if (field.required) {
           if (field.type === 'multiselect') {
-            if (selectedGoals.length === 0 && !dynamicFormData[field.id]) {
+            const fieldVal = dynamicFormData[field.id];
+            if (!Array.isArray(fieldVal) || fieldVal.length === 0) {
               newErrors[field.id] = isRTL ? 'يرجى اختيار خيار واحد على الأقل' : 'Please select at least one option';
             }
           } else if (!dynamicFormData[field.id]?.trim()) {
@@ -828,6 +835,117 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
       case 6:
         const selectedPlan = pricingPlans.find(p => p.id === formData.planId);
         const selectedTier = selectedPlan?.tiers.find(t => t.name === formData.tierId);
+
+        const renderDynamicReviewFields = (stepNumber: number) => {
+          const fields = dynamicFields.filter(f => f.step === stepNumber);
+          if (fields.length === 0) return null;
+          return fields.map(field => {
+            const val = dynamicFormData[field.id];
+            const displayVal = Array.isArray(val) ? val.join(', ') : val || '-';
+            const label = isRTL ? field.labelAr : field.labelEn;
+            let displayLabel = label;
+            if (field.type === 'select' || field.type === 'radio') {
+              const opt = field.options.find(o => o.value === val);
+              displayLabel = label;
+              const displayValue = opt ? (isRTL ? opt.labelAr : opt.labelEn) : displayVal;
+              return (
+                <div key={field.id}>
+                  <p className="text-sm text-gray-500">{displayLabel}</p>
+                  <p className="font-bold text-[#161616]">{displayValue}</p>
+                </div>
+              );
+            }
+            if (field.type === 'multiselect' && Array.isArray(val)) {
+              const labels = val.map(v => {
+                const opt = field.options.find(o => o.value === v);
+                return opt ? (isRTL ? opt.labelAr : opt.labelEn) : v;
+              });
+              return (
+                <div key={field.id}>
+                  <p className="text-sm text-gray-500">{displayLabel}</p>
+                  <p className="font-bold text-[#161616]">{labels.join(', ')}</p>
+                </div>
+              );
+            }
+            return (
+              <div key={field.id}>
+                <p className="text-sm text-gray-500">{displayLabel}</p>
+                <p className="font-bold text-[#161616]" dir={field.type === 'email' || field.type === 'tel' ? 'ltr' : undefined}>{displayVal}</p>
+              </div>
+            );
+          });
+        };
+
+        if (hasDynamicFields) {
+          const dynamicSteps = [2, 3, 4, 5].filter(s => dynamicFields.some(f => f.step === s));
+          const stepColors: Record<number, string> = { 2: 'from-blue-500 to-blue-600', 3: 'from-purple-500 to-purple-600', 4: 'from-orange-500 to-orange-600', 5: 'from-teal-500 to-teal-600' };
+          const stepIcons: Record<number, React.ElementType> = { 2: Users, 3: Building2, 4: Target, 5: Users };
+
+          return (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <Badge className="bg-[#F15822] text-white border-none px-4 py-2 text-sm mb-3">
+                  <Sparkles className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'ml-2'}`} />
+                  {isRTL ? 'مراجعة الطلب' : 'Review Request'}
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
+                  {isRTL ? 'مراجعة وإرسال' : 'Review & Submit'}
+                </h2>
+                <p className="text-gray-600 mt-2 text-lg">
+                  {isRTL ? 'راجع بيانات طلبك قبل الإرسال' : 'Review your request before submitting'}
+                </p>
+              </div>
+              <div className="max-w-2xl mx-auto space-y-4">
+                <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] px-6 py-4">
+                    <h3 className="text-white text-xl font-bold flex items-center gap-2">
+                      <MessageCircle className="w-6 h-6" />
+                      {isRTL ? 'الباقة المختارة' : 'Selected Package'}
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-center flex-wrap gap-4">
+                      <div>
+                        <p className="text-2xl font-extrabold text-[#161616]">
+                          {selectedPlan?.name}
+                        </p>
+                        <p className="text-lg text-gray-600">{selectedTier?.name}</p>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-3xl font-extrabold text-[#25D366]">
+                          {selectedTier?.price}
+                          <span className="text-sm text-gray-500"> {isRTL ? 'ر.س/شهر' : 'SAR/mo'}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {dynamicSteps.map(step => {
+                  const StepIcon = stepIcons[step] || Users;
+                  const stepLabelAr = { 2: 'بيانات التواصل', 3: 'بيانات الشركة', 4: 'الهدف من الخدمة', 5: 'تفاصيل إضافية' }[step] || `الخطوة ${step}`;
+                  const stepLabelEn = { 2: 'Contact Info', 3: 'Company Info', 4: 'Service Goal', 5: 'Additional Details' }[step] || `Step ${step}`;
+                  return (
+                    <Card key={step} className="border-2 border-gray-100 shadow-lg overflow-hidden">
+                      <div className={`bg-gradient-to-r ${stepColors[step] || 'from-gray-500 to-gray-600'} px-6 py-4`}>
+                        <h3 className="text-white text-xl font-bold flex items-center gap-2">
+                          <StepIcon className="w-6 h-6" />
+                          {isRTL ? stepLabelAr : stepLabelEn}
+                        </h3>
+                      </div>
+                      <CardContent className="p-6 space-y-3">
+                        <div className="grid grid-cols-2 gap-4">
+                          {renderDynamicReviewFields(step)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
         const selectedIndustry = industryOptions.find(i => i.value === formData.industry);
         const displayIndustry = formData.industry === 'other' 
           ? formData.otherIndustry 
@@ -957,7 +1075,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
 
   if (isFormInactive) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`min-h-[70vh] bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-lg mx-auto text-center">
             <Ban className="w-20 h-20 text-red-400 mx-auto mb-6" />
@@ -983,20 +1101,24 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
 
   if (isComplete) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`min-h-[70vh] bg-gradient-to-br from-green-50 to-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-lg mx-auto text-center">
             <div className="w-24 h-24 bg-[#25D366] rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-[#25D366]/30">
               <CheckCircle className="w-14 h-14 text-white" />
             </div>
             <h1 className="text-4xl font-extrabold text-[#161616] mb-4">
-              {isRTL ? 'تم إرسال طلبك بنجاح!' : 'Request Submitted!'}
-            </h1>
-            <p className="text-gray-600 text-lg mb-8">
               {isRTL 
-                ? 'شكراً لطلبك خدمة واتساب أعمال API.سيقوم فريق المبيعات بالتواصل معك خلال 24 ساعة.'
-                : 'Thank you for your WhatsApp Business API request. Our sales team will contact you within 24 hours.'}
-            </p>
+                ? (thankYouMessage.ar || 'تم إرسال طلبك بنجاح!') 
+                : (thankYouMessage.en || 'Request Submitted!')}
+            </h1>
+            {!thankYouMessage.ar && !thankYouMessage.en ? (
+              <p className="text-gray-600 text-lg mb-8">
+                {isRTL 
+                  ? 'شكراً لطلبك خدمة واتساب أعمال API. سيقوم فريق المبيعات بالتواصل معك خلال 24 ساعة.'
+                  : 'Thank you for your WhatsApp Business API request. Our sales team will contact you within 24 hours.'}
+              </p>
+            ) : <div className="mb-8" />}
             <div className="bg-white rounded-2xl p-8 shadow-xl mb-8 border border-gray-100">
               <p className="text-sm text-gray-500 mb-2">
                 {isRTL ? 'رقم الطلب' : 'Request ID'}
@@ -1019,10 +1141,18 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
 
   return (
     <div 
-      className={`min-h-screen bg-gradient-to-br from-white via-green-50/30 to-orange-50/20 ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} 
+      className={`min-h-[70vh] bg-gradient-to-br from-white via-green-50/30 to-orange-50/20 ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} 
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className="container mx-auto px-4 pt-28 pb-12 md:pt-32 md:pb-16">
+        {(title.ar || title.en) && (
+          <div className="text-center mb-10">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-[#161616] mb-4">
+              {isRTL ? (title.ar || title.en) : (title.en || title.ar)}
+            </h1>
+            <div className="w-24 h-1.5 bg-[#128C7E] mx-auto rounded-full" />
+          </div>
+        )}
         {/* Progress Steps */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">

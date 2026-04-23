@@ -18,6 +18,11 @@ export async function GET() {
         createdAt: { $gte: today },
       });
       return {
+        titleAr: config.productName || '',
+        titleEn: config.productNameEn || '',
+        thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
+        thankYouMessageEn: 'Request submitted successfully!',
+        formType: 'service',
         ...config,
         totalSubmissions,
         todaySubmissions,

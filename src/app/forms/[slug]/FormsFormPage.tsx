@@ -39,6 +39,8 @@ export const FormsFormPage = ({ slug }: Props) => {
   const [isFormInactive, setIsFormInactive] = useState(false);
   const [productId, setProductId] = useState<string>('');
   const [formNotFound, setFormNotFound] = useState(false);
+  const [title, setTitle] = useState({ ar: '', en: '' });
+  const [thankYouMessage, setThankYouMessage] = useState({ ar: '', en: '' });
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -52,6 +54,8 @@ export const FormsFormPage = ({ slug }: Props) => {
               return;
             }
             setProductId(data.config.productId);
+            setTitle({ ar: data.config.titleAr || '', en: data.config.titleEn || '' });
+            setThankYouMessage({ ar: data.config.thankYouMessageAr || '', en: data.config.thankYouMessageEn || '' });
             if (data.config.fields && data.config.fields.length > 0) {
               setFields(data.config.fields);
               const initial: Record<string, string | string[]> = {};
@@ -206,17 +210,41 @@ export const FormsFormPage = ({ slug }: Props) => {
   );
 
   if (isComplete) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center p-8">
-      <CheckCircle className="w-16 h-16 text-green-500" />
-      <h2 className="text-2xl font-bold text-gray-900">{isRTL ? 'تم إرسال طلبك بنجاح!' : 'Request submitted successfully!'}</h2>
-      <p className="text-gray-600">{isRTL ? 'سنتواصل معك قريباً' : 'We will contact you soon'}</p>
+    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center p-8">
+      <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <CheckCircle className="w-12 h-12" />
+      </div>
+      <h2 className="text-3xl font-extrabold text-gray-900">
+        {isRTL 
+          ? (thankYouMessage.ar || 'تم إرسال طلبك بنجاح!') 
+          : (thankYouMessage.en || 'Request submitted successfully!')}
+      </h2>
+      {!thankYouMessage.ar && !thankYouMessage.en && (
+        <p className="text-gray-600 text-lg">{isRTL ? 'سنتواصل معك قريباً' : 'We will contact you soon'}</p>
+      )}
+      <Link href="/" className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[#7A1E2E] text-white rounded-lg hover:bg-[#601824] transition-colors font-medium">
+        {isRTL ? 'العودة للرئيسية' : 'Go to Home'}
+      </Link>
     </div>
   );
-  if (fields.length === 0) return <div className="flex items-center justify-center min-h-[60vh]"><p className="text-gray-500">{isRTL ? 'لا يوجد نموذج متاح' : 'No form available'}</p></div>;
+  if (fields.length === 0) return (
+    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center p-8">
+      <p className="text-gray-500 text-lg">{isRTL ? 'لا يوجد نموذج متاح حالياً' : 'No form available at the moment'}</p>
+      <Link href="/" className="text-[#7A1E2E] hover:underline font-medium">{isRTL ? 'العودة للرئيسية' : 'Go to Home'}</Link>
+    </div>
+  );
 
   return (
-    <div className={`min-h-screen ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} bg-gray-50`} dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className={`${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} bg-gray-50 py-12 md:py-20`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="max-w-2xl mx-auto px-4">
+        {(title.ar || title.en) && (
+          <div className="text-center mb-10">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
+              {isRTL ? (title.ar || title.en) : (title.en || title.ar)}
+            </h1>
+            <div className="w-20 h-1.5 bg-[#7A1E2E] mx-auto mt-4 rounded-full" />
+          </div>
+        )}
         <div className="flex items-center justify-center gap-2 mb-8">
           {stepNumbers.map((step, i) => (
             <div key={step} className="flex items-center gap-2">

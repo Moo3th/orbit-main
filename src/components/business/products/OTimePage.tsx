@@ -51,9 +51,14 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   );
   const heroHighlight = getCmsField(cmsPage, 'ot-hero', 'highlight', isRTL, isRTL ? "لإدارة الموارد البشرية" : "For Human Resources Management");
   const primaryCtaText = getCmsField(cmsPage, 'ot-hero', 'cta_primary_text', isRTL, isRTL ? "احجز ديمو الآن" : "Book a Demo Now");
-  const primaryCtaUrl = getCmsField(cmsPage, 'ot-hero', 'cta_primary_url', isRTL, "https://wa.me/966920006900");
+  const primaryCtaType = getCmsField(cmsPage, 'ot-hero', 'cta_primary_type', isRTL, "external");
+  const primaryCtaUrlRaw = getCmsField(cmsPage, 'ot-hero', 'cta_primary_url', isRTL, "https://wa.me/966920006900");
+  const primaryCtaUrl = primaryCtaType === 'form' ? '/products/o-time/form' : primaryCtaUrlRaw;
+
   const secondaryCtaText = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_text', isRTL, isRTL ? "جرب النظام مجاناً" : "Try the System for Free");
-  const secondaryCtaUrl = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_url', isRTL, "https://otime.mobile.sa/register");
+  const secondaryCtaType = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_type', isRTL, "external");
+  const secondaryCtaUrlRaw = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_url', isRTL, "https://otime.mobile.sa/register");
+  const secondaryCtaUrl = secondaryCtaType === 'form' ? '/products/o-time/form' : secondaryCtaUrlRaw;
   const valueSectionTitle = getCmsField(cmsPage, 'ot-features', 'title', isRTL, isRTL ? "لماذا O-Time؟" : "Why O-Time?");
   const valueSectionSubtitle = getCmsField(cmsPage, 'ot-features', 'subtitle', isRTL, isRTL ? "منصة موحدة تجمع كل ما تحتاجه لإدارة الموارد البشرية بكفاءة عالية." : "A unified platform covering everything you need to manage HR efficiently.");
   const modulesSectionTitle = getCmsField(cmsPage, 'ot-features', 'modules_title', isRTL, isRTL ? "وحدات متكاملة لإدارة الموارد البشرية" : "Integrated HR Management Modules");
@@ -279,7 +284,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] hover:from-[#0d3d6e] hover:to-[#0a2f56] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#104E8B]/30"
-                  onClick={() => window.open(primaryCtaUrl, '_blank')}
+                  onClick={() => {
+                    if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');
+                    else window.location.href = primaryCtaUrl;
+                  }}
                 >
                   {primaryCtaText}
                   <Play className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
@@ -288,7 +296,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                   size="lg" 
                   variant="outline" 
                   className="border-2 border-[#FFA502] text-[#FFA502] hover:bg-[#FFA502] hover:text-white font-bold px-8 h-14 text-lg"
-                  onClick={() => window.open(secondaryCtaUrl, '_blank')}
+                  onClick={() => {
+                    if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
+                    else window.location.href = secondaryCtaUrl;
+                  }}
                 >
                   {secondaryCtaText}
                   <ArrowRight className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
@@ -777,7 +788,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
               <Button 
                 size="lg" 
                 className="bg-[#FFA502] text-white hover:bg-[#e69302] font-bold px-10 h-14 text-lg shadow-2xl"
-                onClick={() => window.open(secondaryCtaUrl, '_blank')}
+                onClick={() => {
+                  if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
+                  else window.location.href = secondaryCtaUrl;
+                }}
               >
                 {secondaryCtaText}
                 <ArrowRight className={`w-6 h-6 ${isRTL ? "mr-2" : "ml-2"}`} />
@@ -786,7 +800,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                 size="lg" 
                 variant="outline" 
                 className="bg-white/10 border-2 border-[#00BCD4] text-[#00BCD4] hover:bg-[#00BCD4] hover:text-white font-bold px-10 h-14 text-lg backdrop-blur-sm"
-                onClick={() => window.open(primaryCtaUrl, '_blank')}
+                onClick={() => {
+                  if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');
+                  else window.location.href = primaryCtaUrl;
+                }}
               >
                 <Play className={`w-6 h-6 ${isRTL ? "ml-2" : "mr-2"}`} />
                 {primaryCtaText}

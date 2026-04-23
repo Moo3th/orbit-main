@@ -1,6 +1,8 @@
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
 import { getCmsPageById } from '@/lib/cms/helpers';
 import { DynamicFormPage } from './DynamicFormPage';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const PRODUCT_SLUG_TO_ID: Record<string, string> = {
   'o-time': 'otime',
@@ -18,5 +20,14 @@ export default async function ProductFormPage({ params }: Props) {
   const productId = PRODUCT_SLUG_TO_ID[product] || product;
   const snapshot = await getSiteCmsSnapshot();
   const cmsPage = getCmsPageById(snapshot, product);
-  return <DynamicFormPage productId={productId} cmsPage={cmsPage} />;
+  
+  return (
+    <>
+      <Navbar />
+      <div className="pt-20">
+        <DynamicFormPage productId={productId} cmsPage={cmsPage} />
+      </div>
+      <Footer />
+    </>
+  );
 }

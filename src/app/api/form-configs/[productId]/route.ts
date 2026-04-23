@@ -9,14 +9,36 @@ export async function GET(
   try {
     await connectDB();
     const { productId } = await params;
-    let config = await FormConfig.findOne({ productId }).lean();
+    const config = await FormConfig.findOne({ productId }).lean() as any;
     if (!config) {
-      config = await FormConfig.findOne({ slug: productId }).lean();
+      // Try by slug
+      const bySlug = await FormConfig.findOne({ slug: productId }).lean() as any;
+      if (!bySlug) {
+        return NextResponse.json({ error: 'Form config not found' }, { status: 404 });
+      }
+      // Re-assign to config if found by slug
+      const enrichedConfig = {
+        titleAr: bySlug.productName || '',
+        titleEn: bySlug.productNameEn || '',
+        thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
+        thankYouMessageEn: 'Request submitted successfully!',
+        formType: 'service',
+        ...bySlug
+      };
+      return NextResponse.json({ config: enrichedConfig });
     }
-    if (!config) {
-      return NextResponse.json({ error: 'Form config not found' }, { status: 404 });
-    }
-    return NextResponse.json({ config });
+
+    // Ensure all new fields have defaults for frontend
+    const enrichedConfig = {
+      titleAr: config.productName || '',
+      titleEn: config.productNameEn || '',
+      thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
+      thankYouMessageEn: 'Request submitted successfully!',
+      formType: 'service',
+      ...config
+    };
+
+    return NextResponse.json({ config: enrichedConfig });
   } catch (error) {
     console.error('Error fetching form config:', error);
     return NextResponse.json({ error: 'Failed to fetch form config' }, { status: 500 });
@@ -37,9 +59,15 @@ export async function PUT(
       productNameEn: data.productNameEn,
       fields: data.fields || [],
     };
-    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.slug !== undefined) updateData.slug = data.slug.startsWith('/') ? data.slug.substring(1) : data.slug;
+    if (data.customDomain !== undefined) updateData.customDomain = data.customDomain;
     if (data.notificationEmails !== undefined) updateData.notificationEmails = data.notificationEmails;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.titleAr !== undefined) updateData.titleAr = data.titleAr;
+    if (data.titleEn !== undefined) updateData.titleEn = data.titleEn;
+    if (data.thankYouMessageAr !== undefined) updateData.thankYouMessageAr = data.thankYouMessageAr;
+    if (data.thankYouMessageEn !== undefined) updateData.thankYouMessageEn = data.thankYouMessageEn;
+    if (data.formType !== undefined) updateData.formType = data.formType;
 
     const config = await FormConfig.findOneAndUpdate(
       { productId },

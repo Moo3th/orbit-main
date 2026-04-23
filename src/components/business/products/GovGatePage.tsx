@@ -58,7 +58,9 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
   const heroSubtitle = getCmsField(cmsPage, 'gg-hero', 'subtitle', isRTL, g.heroSubtitle);
   const heroDescription = getCmsField(cmsPage, 'gg-hero', 'description', isRTL, g.heroDescription);
   const ctaText = getCmsField(cmsPage, 'gg-cta', 'cta_text', isRTL, g.cta);
-  const ctaUrl = getCmsField(cmsPage, 'gg-cta', 'cta_url', isRTL, `https://wa.me/966920006900?text=${encodeURIComponent(isRTL ? "مرحبا، أرغب أنا مهتم بـ GoveGate" : "Hello, I am interested in GoveGate")}`);
+  const ctaType = getCmsField(cmsPage, 'gg-cta', 'cta_type', isRTL, "external");
+  const ctaUrlRaw = getCmsField(cmsPage, 'gg-cta', 'cta_url', isRTL, `https://wa.me/966920006900?text=${encodeURIComponent(isRTL ? "مرحبا، أرغب أنا مهتم بـ GoveGate" : "Hello, I am interested in GoveGate")}`);
+  const ctaUrl = ctaType === 'form' ? '/products/gov-gate/form' : ctaUrlRaw;
   const finalCtaTitle = getCmsField(cmsPage, 'gg-cta', 'final_cta_title', isRTL, g.finalCta.title);
   const finalCtaDescription = getCmsField(cmsPage, 'gg-cta', 'final_cta_description', isRTL, g.finalCta.description);
 
@@ -103,7 +105,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
                   className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-8 py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
                   asChild
                 >
-                  <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
                     {ctaText}
                   </a>
                 </Button>
@@ -265,7 +267,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
             className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-10 py-6 h-auto shadow-lg"
             asChild
           >
-            <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
+            <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
               {ctaText}
             </a>
           </Button>

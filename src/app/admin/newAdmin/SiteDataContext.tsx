@@ -1029,8 +1029,10 @@ const otHeroFields: SectionField[] = [
   { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "من التوظيف إلى التقاعد، O-Time يمنحك السيطرة الكاملة على الرواتب، الحضور، الأداء، والتوظيف في منصة سحابية واحدة آمنة وقابلة للتوسع.", valueEn: "From recruitment to retirement, O-Time gives you full control over payroll, attendance, performance, and recruitment in a single, secure, and scalable cloud platform." },
   { key: "highlight", label: "النص المميز", labelEn: "Highlight Text", type: "text", value: "لإدارة الموارد البشرية", valueEn: "For Human Resources Management" },
   { key: "cta_primary_text", label: "نص الزر الرئيسي", labelEn: "Primary CTA Text", type: "text", value: "احجز ديمو الآن", valueEn: "Book a Demo Now" },
+  { key: "cta_primary_type", label: "نوع الزر الرئيسي", labelEn: "Primary CTA Type", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط خارجي", labelEn: "External URL" }] },
   { key: "cta_primary_url", label: "رابط الزر الرئيسي", labelEn: "Primary CTA URL", type: "url", value: "https://wa.me/966920006900", valueEn: "https://wa.me/966920006900" },
   { key: "cta_secondary_text", label: "نص الزر الثانوي", labelEn: "Secondary CTA Text", type: "text", value: "جرب النظام مجاناً", valueEn: "Try the System for Free" },
+  { key: "cta_secondary_type", label: "نوع الزر الثانوي", labelEn: "Secondary CTA Type", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط خارجي", labelEn: "External URL" }] },
   { key: "cta_secondary_url", label: "رابط الزر الثانوي", labelEn: "Secondary CTA URL", type: "url", value: "https://otime.mobile.sa/register", valueEn: "https://otime.mobile.sa/register" },
 ];
 
@@ -1074,7 +1076,8 @@ const ggFeaturesFields: SectionField[] = [
 
 const ggCtaFields: SectionField[] = [
   { key: "cta_text", label: "نص الزر", labelEn: "CTA Text", type: "text", value: "تواصل معنا الآن", valueEn: "Contact Us Now" },
-  { key: "cta_url", label: "رابط الزر", labelEn: "CTA URL", type: "url", value: "https://wa.me/966920006900", valueEn: "https://wa.me/966920006900" },
+  { key: "cta_type", label: "نوع الزر", labelEn: "CTA Type", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط خارجي", labelEn: "External URL" }] },
+  { key: "cta_url", label: "رابط الزر (إذا كان خارجي)", labelEn: "CTA URL (if external)", type: "url", value: "https://wa.me/966920006900", valueEn: "https://wa.me/966920006900" },
   { key: "final_cta_title", label: "عنوان CTA النهائي", labelEn: "Final CTA Title", type: "text", value: "جاهز لتأمين اتصالاتكم الحكومية؟", valueEn: "Ready to Secure Your Government Communications?" },
   { key: "final_cta_description", label: "وصف CTA النهائي", labelEn: "Final CTA Description", type: "textarea", value: "انضم إلى الجهات الحكومية التي تثق في Gov Gate لتوفير اتصالات آمنة وموثوقة", valueEn: "Join government entities that trust Gov Gate for secure and reliable communications" },
 ];

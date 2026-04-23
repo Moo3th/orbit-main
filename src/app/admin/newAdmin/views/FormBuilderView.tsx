@@ -1,13 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
+import * as XLSX from 'xlsx';
 import { Button } from '@/components/business/ui/button';
 import { Card, CardContent } from '@/components/business/ui/card';
 import { Badge } from '@/components/business/ui/badge';
 import {
   Plus, Trash2, ChevronUp, ChevronDown, Save, Eye,
   Loader2, ArrowRight, ArrowLeft, ListChecks, Edit3,
-  ExternalLink, Mail, ToggleLeft, ToggleRight, Inbox
+  ExternalLink, Mail, ToggleLeft, ToggleRight, Inbox,
+  BarChart3, PieChart as PieChartIcon
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -38,7 +44,13 @@ export interface FormConfigData {
   productId: string;
   productName: string;
   productNameEn: string;
+  titleAr?: string;
+  titleEn?: string;
+  thankYouMessageAr?: string;
+  thankYouMessageEn?: string;
+  formType: 'service' | 'survey';
   slug: string;
+  customDomain?: string;
   notificationEmails: string;
   isActive: boolean;
   fields: FormField[];
@@ -58,7 +70,16 @@ const FORM_URLS: Record<string, string> = {
   govgate: '/products/gov-gate/form',
 };
 
-const getFormUrl = (slug: string, productId: string) => FORM_URLS[productId] || `/forms/${slug || productId}`;
+const getFormUrl = (slug: string, productId: string, customDomain?: string) => {
+  if (customDomain) {
+    const path = slug.startsWith('/') ? slug : `/${slug}`;
+    return `https://${customDomain}${path}`;
+  }
+  // Standard products have fixed URLs unless custom slug is used for custom forms
+  if (FORM_URLS[productId] && !slug) return FORM_URLS[productId];
+  
+  return slug.startsWith('/') ? slug : `/${slug}`;
+};
 
 const FIELD_TYPES: { value: FormFieldType; labelAr: string; labelEn: string }[] = [
   { value: 'text', labelAr: 'نص قصير', labelEn: 'Short Text' },
@@ -115,7 +136,7 @@ interface Props {
   isAr: boolean;
 }
 
-type ViewMode = 'list' | 'edit' | 'submissions';
+type ViewMode = 'list' | 'edit' | 'submissions' | 'analytics';
 
 export const FormBuilderView = ({ isAr }: Props) => {
   const [configs, setConfigs] = useState<FormConfigData[]>([]);
@@ -124,6 +145,12 @@ export const FormBuilderView = ({ isAr }: Props) => {
   const [slug, setSlug] = useState('');
   const [notificationEmails, setNotificationEmails] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [customDomain, setCustomDomain] = useState('');
+  const [titleAr, setTitleAr] = useState('');
+  const [titleEn, setTitleEn] = useState('');
+  const [thankYouMessageAr, setThankYouMessageAr] = useState('');
+  const [thankYouMessageEn, setThankYouMessageEn] = useState('');
+  const [formType, setFormType] = useState<'service' | 'survey'>('service');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -163,11 +190,23 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setSlug(config.slug || productId);
       setNotificationEmails(config.notificationEmails || '');
       setIsActive(config.isActive !== false);
+      setCustomDomain(config.customDomain || '');
+      setTitleAr(config.titleAr || '');
+      setTitleEn(config.titleEn || '');
+      setThankYouMessageAr(config.thankYouMessageAr || '');
+      setThankYouMessageEn(config.thankYouMessageEn || '');
+      setFormType(config.formType || 'service');
     } else {
       setFields(productId === 'whatsapp' ? DEFAULT_WHATSAPP_FIELDS : []);
       setSlug(FORM_URLS[productId]?.replace('/products/', '').replace('/form', '').replace('/request', '') || productId);
       setNotificationEmails('');
       setIsActive(true);
+      setCustomDomain('');
+      setTitleAr('');
+      setTitleEn('');
+      setThankYouMessageAr('');
+      setThankYouMessageEn('');
+      setFormType('service');
     }
     setViewMode('edit');
   }, [configs]);
@@ -220,29 +259,49 @@ export const FormBuilderView = ({ isAr }: Props) => {
   };
 
   const handleSave = async () => {
+    const reservedSlugs = ['admin', 'api', 'contact', 'about-us', 'portfolio', 'news', 'blog', 'solutions', 'products', 'forms', 'offers', 'healthcare', 'request-quote', 'packages', 'enterprise'];
+    if (reservedSlugs.includes(slug.split('/')[0].toLowerCase()) && !customDomain) {
+      toast.error(isAr ? 'هذا الرابط محجوز للنظام' : 'This slug is reserved by the system');
+      return;
+    }
+
     setSaving(true);
     try {
-      const isExisting = configs.some(c => c.productId === selectedProduct);
       const product = PRODUCTS.find(p => p.id === selectedProduct);
       const body = {
         productId: selectedProduct,
         productName: product?.nameAr || (newFormMode ? newFormNameAr : selectedProduct),
         productNameEn: product?.nameEn || (newFormMode ? newFormNameEn : selectedProduct),
         slug: slug || selectedProduct,
+        customDomain,
         notificationEmails,
         isActive,
+        titleAr,
+        titleEn,
+        thankYouMessageAr,
+        thankYouMessageEn,
+        formType,
         fields,
       };
-      const res = isExisting
-        ? await fetch(`/api/form-configs/${selectedProduct}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-        : await fetch('/api/form-configs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (!res.ok) throw new Error('Failed to save');
+
+      // Use PUT for everything as it handles upsert: true
+      const res = await fetch(`/api/form-configs/${selectedProduct}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to save');
+      }
+
       toast.success(isAr ? 'تم الحفظ بنجاح' : 'Saved successfully');
       setNewFormMode(false);
       fetchConfigs();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving form config:', err);
-      toast.error(isAr ? 'فشل الحفظ' : 'Failed to save');
+      toast.error(isAr ? `فشل الحفظ: ${err.message}` : `Failed to save: ${err.message}`);
     } finally {
       setSaving(false);
     }
@@ -282,6 +341,42 @@ export const FormBuilderView = ({ isAr }: Props) => {
       await fetch(`/api/form-submit/${id}`, { method: 'DELETE' });
       fetchSubmissions(selectedProduct);
     } catch { toast.error(isAr ? 'فشل الحذف' : 'Delete failed'); }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const config = configs.find(c => c.productId === selectedProduct);
+      const dataToExport = submissions.map(sub => {
+        const row: any = {
+          [isAr ? 'التاريخ' : 'Date']: new Date(sub.createdAt).toLocaleString(isAr ? 'ar-SA' : 'en-US'),
+          [isAr ? 'الحالة' : 'Status']: sub.status,
+        };
+        
+        // Add form data fields
+        if (config) {
+          config.fields.forEach(f => {
+            const label = isAr ? f.labelAr : f.labelEn;
+            const val = sub.data?.[f.id];
+            row[label] = Array.isArray(val) ? val.join(', ') : val || '';
+          });
+        } else {
+          // Fallback if config not found
+          Object.entries(sub.data || {}).forEach(([key, val]) => {
+            row[key] = Array.isArray(val) ? val.join(', ') : val || '';
+          });
+        }
+        return row;
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Submissions");
+      XLSX.writeFile(workbook, `${selectedProduct}_submissions_${new Date().toISOString().split('T')[0]}.xlsx`);
+      toast.success(isAr ? 'تم تصدير ملف إكسيل بنجاح' : 'Excel exported successfully');
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error(isAr ? 'فشل تصدير إكسيل' : 'Excel export failed');
+    }
   };
 
   const steps = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
@@ -399,8 +494,8 @@ export const FormBuilderView = ({ isAr }: Props) => {
                     <Badge className="bg-amber-100 text-amber-700 text-xs">{t('مخصص', 'Custom')}</Badge>
                   </td>
                   <td className="px-4 py-3 text-sm text-blue-600">
-                    <a href={getFormUrl(config.slug || config.productId, config.productId)} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {config.slug || config.productId} <ExternalLink className="w-3 h-3 inline" />
+                    <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      {config.customDomain ? `${config.customDomain}/` : ''}{config.slug || config.productId} <ExternalLink className="w-3 h-3 inline" />
                     </a>
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -432,7 +527,12 @@ export const FormBuilderView = ({ isAr }: Props) => {
                       <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(config.productId)} title={t('الطلبات', 'Submissions')}>
                         <Inbox className="w-4 h-4" />
                       </Button>
-                      <a href={getFormUrl(config.slug || config.productId, config.productId)} target="_blank" rel="noopener noreferrer">
+                      {config.formType === 'survey' && (
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedProduct(config.productId); fetchSubmissions(config.productId); setViewMode('analytics'); }} title={t('التحليلات', 'Analytics')} className="text-purple-600">
+                          <BarChart3 className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer">
                         <Button variant="ghost" size="sm" title={t('معاينة', 'Preview')}>
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -483,6 +583,11 @@ export const FormBuilderView = ({ isAr }: Props) => {
                   setSlug(newFormNameSlug || newFormProductId.trim());
                   setNotificationEmails('');
                   setIsActive(true);
+                  setTitleAr(newFormNameAr.trim());
+                  setTitleEn(newFormNameEn.trim());
+                  setThankYouMessageAr('');
+                  setThankYouMessageEn('');
+                  setFormType('service');
                   setNewFormMode(true);
                   setShowNewFormDialog(false);
                   setNewFormProductId('');
@@ -505,8 +610,41 @@ export const FormBuilderView = ({ isAr }: Props) => {
   }
 
   // --- SUBMISSIONS VIEW ---
-  if (viewMode === 'submissions') {
-    const product = PRODUCTS.find(p => p.id === selectedProduct);
+  if (viewMode === 'analytics') {
+    const config = configs.find(c => c.productId === selectedProduct);
+    const CHART_COLORS = ['#7A1E2E', '#F15822', '#128C7E', '#104E8B', '#FFA502', '#00BCD4', '#9C27B0'];
+
+    const getFieldAnalytics = (field: FormField) => {
+      const counts: Record<string, number> = {};
+      let totalCount = 0;
+      
+      submissions.forEach(sub => {
+        const val = sub.data?.[field.id];
+        if (val === undefined || val === null || val === '') return;
+        
+        if (Array.isArray(val)) {
+          val.forEach(v => {
+            counts[v] = (counts[v] || 0) + 1;
+            totalCount++;
+          });
+        } else {
+          counts[val] = (counts[val] || 0) + 1;
+          totalCount++;
+        }
+      });
+
+      // Map values to labels for charts
+      const data = Object.entries(counts).map(([val, count]) => {
+        const opt = field.options.find(o => o.value === val);
+        const name = opt ? (isAr ? opt.labelAr : opt.labelEn) : val;
+        return { name, value: count, percentage: totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : 0 };
+      });
+
+      return { data, totalCount };
+    };
+
+    const aggregatableTypes: FormFieldType[] = ['select', 'radio', 'multiselect', 'rating', 'scale'];
+
     return (
       <div className={`space-y-6 ${isAr ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isAr ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between">
@@ -514,13 +652,175 @@ export const FormBuilderView = ({ isAr }: Props) => {
             <Button variant="ghost" onClick={() => setViewMode('list')}>
               <ArrowRight className={`w-4 h-4 ${isAr ? 'ml-1' : 'mr-1'}`} /> {t('رجوع', 'Back')}
             </Button>
-            <h2 className="text-xl font-bold text-gray-900">{t('طلبات', 'Submissions')} - {isAr ? product?.nameAr : product?.nameEn}</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('تحليلات الاستبيان', 'Survey Analytics')} - {isAr ? config?.productName : config?.productNameEn}</h2>
           </div>
+          <div className="flex gap-2">
+            <Button onClick={() => setViewMode('submissions')} variant="outline">
+              <Inbox className="w-4 h-4 mr-2" />
+              {t('الردود التفصيلية', 'Detailed Responses')}
+            </Button>
+            <Button onClick={exportToExcel} variant="outline" className="text-green-600 border-green-200 hover:bg-green-50">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              {t('تصدير إكسيل', 'Export Excel')}
+            </Button>
+          </div>
+        </div>
+
+        {submissionsLoading ? (
+          <div className="flex items-center justify-center h-32"><Loader2 className="w-6 h-6 animate-spin text-[#7A1E2E]" /></div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="col-span-full bg-white border-none shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase tracking-wider">{t('إجمالي الردود', 'Total Submissions')}</p>
+                    <p className="text-4xl font-extrabold text-[#7A1E2E]">{submissions.length}</p>
+                  </div>
+                  <BarChart3 className="w-12 h-12 text-[#7A1E2E]/10" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {config?.fields.filter(f => aggregatableTypes.includes(f.type)).map(field => {
+              const { data, totalCount } = getFieldAnalytics(field);
+              if (totalCount === 0) return null;
+
+              return (
+                <Card key={field.id} className="border shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b">
+                    <h3 className="font-bold text-gray-900">{isAr ? field.labelAr : field.labelEn}</h3>
+                    <p className="text-xs text-gray-500">{t('إجمالي الاختيارات:', 'Total selections:')} {totalCount}</p>
+                  </div>
+                  <CardContent className="p-4">
+                    <div className="h-[250px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        {field.type === 'radio' || field.type === 'select' ? (
+                          <PieChart>
+                            <Pie
+                              data={data}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              paddingAngle={5}
+                              dataKey="value"
+                            >
+                              {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        ) : (
+                          <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                            <XAxis type="number" hide />
+                            <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12 }} />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#7A1E2E" radius={[0, 4, 4, 0]} barSize={20} />
+                          </BarChart>
+                        )}
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+
+            {config?.fields.filter(f => !aggregatableTypes.includes(f.type) && f.type !== 'file').map(field => (
+              <Card key={field.id} className="border shadow-sm">
+                <div className="bg-gray-50 px-4 py-3 border-b">
+                  <h3 className="font-bold text-gray-900">{isAr ? field.labelAr : field.labelEn}</h3>
+                </div>
+                <CardContent className="p-4">
+                  <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                    {submissions.filter(sub => sub.data?.[field.id]).slice(0, 10).map((sub, i) => (
+                      <div key={i} className="p-2 bg-gray-50 rounded text-sm text-gray-700">
+                        {String(sub.data[field.id])}
+                      </div>
+                    ))}
+                    {submissions.filter(sub => sub.data?.[field.id]).length > 10 && (
+                      <p className="text-xs text-center text-gray-400 mt-2">{t('يوجد المزيد من الردود في جدول البيانات', 'More responses available in data table')}</p>
+                    )}
+                    {submissions.filter(sub => sub.data?.[field.id]).length === 0 && (
+                      <p className="text-sm text-gray-400 text-center py-4">{t('لا يوجد ردود بعد', 'No responses yet')}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (viewMode === 'submissions') {
+    const product = PRODUCTS.find(p => p.id === selectedProduct);
+    const config = configs.find(c => c.productId === selectedProduct);
+    const isSurvey = config?.formType === 'survey';
+
+    return (
+      <div className={`space-y-6 ${isAr ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isAr ? 'rtl' : 'ltr'}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={() => setViewMode('list')}>
+              <ArrowRight className={`w-4 h-4 ${isAr ? 'ml-1' : 'mr-1'}`} /> {t('رجوع', 'Back')}
+            </Button>
+            <h2 className="text-xl font-bold text-gray-900">{t('طلبات', 'Submissions')} - {isAr ? config?.productName || product?.nameAr : config?.productNameEn || product?.nameEn}</h2>
+            {isSurvey && <Badge className="bg-purple-100 text-purple-700">{t('استبيان', 'Survey')}</Badge>}
+          </div>
+          <Button onClick={exportToExcel} variant="outline" className="text-green-600 border-green-200 hover:bg-green-50">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            {t('تصدير إكسيل', 'Export Excel')}
+          </Button>
         </div>
         {submissionsLoading ? (
           <div className="flex items-center justify-center h-32"><Loader2 className="w-6 h-6 animate-spin text-[#7A1E2E]" /></div>
         ) : submissions.length === 0 ? (
           <Card className="border-dashed"><CardContent className="py-12 text-center"><p className="text-gray-500">{t('لا توجد طلبات بعد', 'No submissions yet')}</p></CardContent></Card>
+        ) : isSurvey ? (
+          <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600 min-w-[150px]">{t('التاريخ', 'Date')}</th>
+                  {config?.fields.map(f => (
+                    <th key={f.id} className="px-4 py-3 text-right font-semibold text-gray-600 min-w-[120px]">{isAr ? f.labelAr : f.labelEn}</th>
+                  ))}
+                  <th className="px-4 py-3 text-center font-semibold text-gray-600">{t('إجراءات', 'Actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((sub: any) => (
+                  <tr key={sub._id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                      {new Date(sub.createdAt).toLocaleString(isAr ? 'ar-SA' : 'en-US')}
+                    </td>
+                    {config?.fields.map(f => {
+                      const val = sub.data?.[f.id];
+                      return (
+                        <td key={f.id} className="px-4 py-3 text-gray-900">
+                          {Array.isArray(val) ? (
+                            <div className="flex flex-wrap gap-1">
+                              {val.map((v, i) => <Badge key={i} variant="outline" className="text-[10px] py-0">{v}</Badge>)}
+                            </div>
+                          ) : String(val || '-')}
+                        </td>
+                      );
+                    })}
+                    <td className="px-4 py-3 text-center">
+                      <Button variant="ghost" size="sm" onClick={() => deleteSubmission(sub._id)} className="text-red-400 hover:text-red-600">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="space-y-3">
             {submissions.map((sub: any) => (
@@ -530,11 +830,14 @@ export const FormBuilderView = ({ isAr }: Props) => {
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">{sub.data?.name || sub.data?.email || '-'}</span>
-                        <span className="text-xs text-gray-400">{new Date(sub.createdAt).toLocaleDateString(isAr ? 'ar-SA' : 'en-US')}</span>
+                        <span className="text-xs text-gray-400">{new Date(sub.createdAt).toLocaleString(isAr ? 'ar-SA' : 'en-US')}</span>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                        {Object.entries(sub.data || {}).slice(0, 4).map(([key, val]) => (
-                          <span key={key}>{String(val)}</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
+                        {config?.fields.slice(0, 8).map(f => (
+                          <div key={f.id}>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-wider">{isAr ? f.labelAr : f.labelEn}</p>
+                            <p className="text-xs text-gray-700 truncate">{String(sub.data?.[f.id] || '-')}</p>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -577,7 +880,7 @@ export const FormBuilderView = ({ isAr }: Props) => {
           <h2 className="text-xl font-bold text-gray-900">{t('تعديل النموذج', 'Edit Form')}</h2>
         </div>
         <div className="flex gap-2">
-          <a href={FORM_URLS[selectedProduct] || `/forms/${slug || selectedProduct}`} target="_blank" rel="noopener noreferrer">
+          <a href={getFormUrl(slug || selectedProduct, selectedProduct, customDomain)} target="_blank" rel="noopener noreferrer">
             <Button variant="outline">
               <Eye className="w-4 h-4 mr-1" />
               {t('معاينة', 'Preview')}
@@ -598,7 +901,7 @@ export const FormBuilderView = ({ isAr }: Props) => {
               <label className="text-xs text-gray-500">{t('المنتج', 'Product')}</label>
               <div className="flex gap-2 flex-wrap">
                 {PRODUCTS.map(product => (
-                  <button key={product.id} onClick={() => { setSelectedProduct(product.id); const c = configs.find(cc => cc.productId === product.id); setFields(c?.fields || (product.id === 'whatsapp' ? DEFAULT_WHATSAPP_FIELDS : [])); setSlug(c?.slug || FORM_URLS[product.id]?.replace('/products/', '').replace('/form', '').replace('/request', '') || product.id); setNotificationEmails(c?.notificationEmails || ''); setIsActive(c?.isActive !== false); }}
+                  <button key={product.id} onClick={() => loadProductConfig(product.id)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedProduct === product.id ? 'bg-[#7A1E2E] text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-[#7A1E2E]/30'}`}
                   >{isAr ? product.nameAr : product.nameEn}</button>
                 ))}
@@ -610,11 +913,19 @@ export const FormBuilderView = ({ isAr }: Props) => {
               </div>
             </div>
             <div>
+              <label className="text-xs text-gray-500">{t('النطاق المخصص (اختياري)', 'Custom Domain (Optional)')}</label>
+              <input type="text" value={customDomain} onChange={(e) => setCustomDomain(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="survey.yourdomain.com" dir="ltr" />
+              <p className="text-[10px] text-gray-400 mt-0.5">{t('اتركه فارغاً لاستخدام الدومين الأساسي', 'Leave empty to use primary domain')}</p>
+            </div>
+            <div>
               <label className="text-xs text-gray-500">{t('رابط الفورم (Slug)', 'Form URL Slug')}</label>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">/forms/</span>
-                <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="flex-1 border rounded px-3 py-1.5 text-sm" placeholder="whatsapp-request" />
+                <span className="text-xs text-gray-400">{customDomain ? `https://${customDomain}/` : '/'}</span>
+                <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="flex-1 border rounded px-3 py-1.5 text-sm" placeholder="feedback/customer-survey" dir="ltr" />
               </div>
+              <p className="text-[10px] text-[#7A1E2E] mt-0.5 font-medium">
+                {t('يمكنك استخدام مسارات متعددة مثل marketing/survey', 'You can use nested paths like marketing/survey')}
+              </p>
             </div>
             <div>
               <label className="text-xs text-gray-500">{t('إيميلات الإشعار (مفصولة بفاصلة)', 'Notification Emails (comma separated)')}</label>
@@ -625,6 +936,37 @@ export const FormBuilderView = ({ isAr }: Props) => {
               <button onClick={() => setIsActive(!isActive)} className="text-2xl">
                 {isActive ? <ToggleRight className="w-8 h-8 text-green-500" /> : <ToggleLeft className="w-8 h-8 text-gray-400" />}
               </button>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500">{t('نوع النموذج', 'Form Type')}</label>
+              <select 
+                value={formType} 
+                onChange={(e) => setFormType(e.target.value as 'service' | 'survey')}
+                className="w-full border rounded px-3 py-1.5 text-sm bg-white"
+              >
+                <option value="service">{t('طلب خدمة', 'Service Request')}</option>
+                <option value="survey">{t('استبيان / استطلاع', 'Survey / Questionnaire')}</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-500">{t('عنوان النموذج (عربي)', 'Form Title (AR)')}</label>
+                <input type="text" value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="أخبرنا برأيك" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">{t('عنوان النموذج (إنجليزي)', 'Form Title (EN)')}</label>
+                <input type="text" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="Give us your feedback" dir="ltr" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-500">{t('رسالة الشكر (عربي)', 'Thank You Message (AR)')}</label>
+                <textarea value={thankYouMessageAr} onChange={(e) => setThankYouMessageAr(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" rows={2} placeholder="شكراً لك على وقتك" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">{t('رسالة الشكر (إنجليزي)', 'Thank You Message (EN)')}</label>
+                <textarea value={thankYouMessageEn} onChange={(e) => setThankYouMessageEn(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" rows={2} placeholder="Thank you for your time" dir="ltr" />
+              </div>
             </div>
           </CardContent>
         </Card>
