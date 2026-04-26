@@ -16,22 +16,46 @@ const SHOW_NAV_ABOUT = true;
 const SHOW_NAV_OFFERS = false;
 
 // Solutions from ProductsShowcase - Current solutions on landing page
-const solutionsList = [
-  { slug: 'sms-platform', nameEn: 'SMS Messaging', nameAr: 'الرسائل النصية SMS', href: '/products/sms' },
-  { slug: 'whatsapp-business-api', nameEn: 'WhatsApp Business API', nameAr: 'واتساب أعمال API', href: '/products/whatsapp' },
-  { slug: 'otime', nameEn: 'O-Time HR Software', nameAr: 'O-Time برنامج الموارد البشرية', href: '/products/o-time' },
-  { slug: 'gov-gate', nameEn: 'Gov Gate', nameAr: 'Gov Gate', href: '/products/gov-gate' },
+const DEFAULT_SOLUTIONS = [
+  { slug: 'sms-platform', nameEn: 'SMS Messaging', nameAr: 'الرسائل النصية SMS', href: '/products/sms', id: 'sms' },
+  { slug: 'whatsapp-business-api', nameEn: 'WhatsApp Business API', nameAr: 'واتساب أعمال API', href: '/products/whatsapp', id: 'whatsapp' },
+  { slug: 'otime', nameEn: 'O-Time HR Software', nameAr: 'O-Time برنامج الموارد البشرية', href: '/products/o-time', id: 'otime' },
+  { slug: 'gov-gate', nameEn: 'Gov Gate', nameAr: 'Gov Gate', href: '/products/gov-gate', id: 'govgate' },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [isInDarkSection, setIsInDarkSection] = useState(false);
+  const [solutionsList, setSolutionsList] = useState(DEFAULT_SOLUTIONS);
   const pathname = usePathname();
   const router = useRouter();
   const { t, isRTL } = useLanguage();
   const { isDark } = useTheme();
   const solutionsRef = useRef<HTMLDivElement>(null);
+
+  // Fetch visibility from CMS
+  useEffect(() => {
+    const fetchVisibility = async () => {
+      try {
+        const res = await fetch('/api/cms/site');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.site?.pages) {
+            const pages = data.site.pages;
+            const filtered = DEFAULT_SOLUTIONS.filter(sol => {
+              const page = pages.find((p: any) => p.id === sol.id);
+              return page ? page.visible !== false : true;
+            });
+            setSolutionsList(filtered);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch navbar visibility:', e);
+      }
+    };
+    fetchVisibility();
+  }, []);
 
   // Detect if we're in a dark section (WhyOrbit) using Intersection Observer
   useEffect(() => {

@@ -12,6 +12,7 @@ export interface CmsSection {
 export interface CmsPage {
   id: string;
   path: string;
+  visible?: boolean;
   sections: CmsSection[];
   seo?: {
     title?: string;

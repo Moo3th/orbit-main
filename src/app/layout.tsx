@@ -8,6 +8,7 @@ import GoogleTagManager from "@/components/GoogleTagManager";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import MetaPixel from "@/components/analytics/MetaPixel";
 import PrivacyConsent from "@/components/PrivacyConsent";
+import { Toaster } from "react-hot-toast";
 import { OrganizationJsonLd } from "@/components/JsonLd";
 import { getCachedSeoSettings, generateOrganizationJsonLd, generateWebsiteJsonLd } from "@/lib/seo";
 import { WebsiteJsonLd } from "@/components/JsonLd";
@@ -109,6 +110,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             {(analyticsEnabled && (hasGtm || hasPixel || hasClarity)) ? <PrivacyConsent /> : null}
+            <Toaster position="top-right" />
 
             {children}
           </LanguageProvider>

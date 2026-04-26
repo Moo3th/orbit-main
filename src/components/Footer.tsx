@@ -111,11 +111,21 @@ export default function Footer() {
     triggerOnce: true,
     threshold: 0.1,
   });
+  const [visiblePageIds, setVisiblePageIds] = React.useState<Set<string>>(new Set(['sms', 'whatsapp', 'otime', 'govgate']));
+
   const fetchFooterData = React.useCallback(async (): Promise<FooterCmsData | null> => {
     try {
       const res = await fetch('/api/cms/site', { cache: 'no-store' });
       if (!res.ok) return null;
       const data = await res.json();
+      if (data.success && data.site?.pages) {
+        const visible = new Set<string>(
+          data.site.pages
+            .filter((p: any) => p.visible !== false)
+            .map((p: any) => String(p.id))
+        );
+        setVisiblePageIds(visible);
+      }
       return (data?.site?.footerData as FooterCmsData) || null;
     } catch (error) {
       console.error('Failed to load footer CMS:', error);
@@ -182,6 +192,13 @@ export default function Footer() {
     socialItems: Array.isArray(footerData?.socialItems) && footerData.socialItems.length ? footerData.socialItems : cmsFooterDefaults.socialItems,
   } as Required<FooterCmsData>;
 
+  const solutionMapping: Record<string, string> = {
+    '/products/sms': 'sms',
+    '/products/whatsapp': 'whatsapp',
+    '/products/o-time': 'otime',
+    '/products/gov-gate': 'govgate',
+  };
+
   const footerLinks = resolvedFooterData.quickLinks.map((link) => ({
       id: link.id === 'ql-solutions' ? 'ql-products' : link.id,
       name: isRTL
@@ -192,7 +209,12 @@ export default function Footer() {
         : normalizeQuickLinkHref(link.id === 'ql-solutions' ? 'ql-products' : link.id, link.href || '/'),
     }));
 
-  const solutions = resolvedFooterData.solutions.map((link) => ({ name: isRTL ? link.labelAr : link.labelEn, href: link.href }));
+  const solutions = resolvedFooterData.solutions
+    .filter(link => {
+      const pageId = solutionMapping[link.href];
+      return pageId ? visiblePageIds.has(pageId) : true;
+    })
+    .map((link) => ({ name: isRTL ? link.labelAr : link.labelEn, href: link.href }));
 
   const resolveFooterLogo = (value?: string) => {
     if (!value?.trim()) return '';

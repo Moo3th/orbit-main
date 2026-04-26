@@ -23,6 +23,8 @@ export async function GET() {
         thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
         thankYouMessageEn: 'Request submitted successfully!',
         formType: 'service',
+        displayMode: 'wizard',
+        acceptingResponses: true,
         ...config,
         totalSubmissions,
         todaySubmissions,

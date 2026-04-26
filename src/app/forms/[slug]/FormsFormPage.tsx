@@ -7,6 +7,7 @@ import { Textarea } from '@/components/business/ui/textarea';
 import { ArrowRight, ArrowLeft, CheckCircle, Loader2, Ban, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FormField {
   id: string;
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export const FormsFormPage = ({ slug }: Props) => {
+  const { isRTL } = useLanguage();
   const [fields, setFields] = useState<FormField[]>([]);
   const [formData, setFormData] = useState<Record<string, string | string[]>>({});
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,12 +37,32 @@ export const FormsFormPage = ({ slug }: Props) => {
   const [isComplete, setIsComplete] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [isRTL, setIsRTL] = useState(true);
   const [isFormInactive, setIsFormInactive] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const [formType, setFormType] = useState<'service' | 'survey'>('service');
+  const [displayMode, setDisplayMode] = useState<'wizard' | 'single'>('wizard');
+  const [closedMessage, setClosedMessage] = useState({ ar: '', en: '' });
   const [productId, setProductId] = useState<string>('');
   const [formNotFound, setFormNotFound] = useState(false);
   const [title, setTitle] = useState({ ar: '', en: '' });
   const [thankYouMessage, setThankYouMessage] = useState({ ar: '', en: '' });
+
+  // Theme configuration
+  const theme = formType === 'survey' 
+    ? {
+        primary: 'bg-[#8B5CF6]', // Purple for survey
+        text: 'text-[#8B5CF6]',
+        border: 'border-[#8B5CF6]',
+        focus: 'focus:border-[#8B5CF6] focus:ring-[#8B5CF6]',
+        accent: 'accent-[#8B5CF6]'
+      }
+    : {
+        primary: 'bg-[#7A1E2E]', // Original Red for service
+        text: 'text-[#7A1E2E]',
+        border: 'border-[#7A1E2E]',
+        focus: 'focus:border-[#7A1E2E] focus:ring-[#7A1E2E]',
+        accent: 'accent-[#7A1E2E]'
+      };
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -53,7 +75,14 @@ export const FormsFormPage = ({ slug }: Props) => {
               setIsFormInactive(true);
               return;
             }
+            if (data.config.acceptingResponses === false) {
+              setIsClosed(true);
+              setClosedMessage({ ar: data.config.closedMessageAr || '', en: data.config.closedMessageEn || '' });
+              return;
+            }
             setProductId(data.config.productId);
+            setFormType(data.config.formType || 'service');
+            setDisplayMode(data.config.displayMode || 'wizard');
             setTitle({ ar: data.config.titleAr || '', en: data.config.titleEn || '' });
             setThankYouMessage({ ar: data.config.thankYouMessageAr || '', en: data.config.thankYouMessageEn || '' });
             if (data.config.fields && data.config.fields.length > 0) {
@@ -77,7 +106,6 @@ export const FormsFormPage = ({ slug }: Props) => {
       }
     };
     fetchConfig();
-    setIsRTL(typeof window !== 'undefined' && document.documentElement.dir === 'rtl');
   }, [slug]);
 
   const stepNumbers = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
@@ -143,31 +171,31 @@ export const FormsFormPage = ({ slug }: Props) => {
     const fieldContent = (() => {
       switch (field.type) {
         case 'textarea':
-          return <Textarea value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} rows={3} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Textarea value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} rows={3} className={`border-gray-300 ${theme.focus}`} />;
         case 'email':
-          return <Input type="email" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Input type="email" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
         case 'tel':
-          return <Input type="tel" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" dir="ltr" />;
+          return <Input type="tel" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} dir="ltr" />;
         case 'number':
-          return <Input type="number" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Input type="number" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
         case 'select':
-          return <select value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:border-[#7A1E2E] focus:ring-[#7A1E2E]"><option value="">{placeholder}</option>{field.options.map((opt, i) => <option key={i} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>)}</select>;
+          return <select value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`w-full border border-gray-300 rounded-lg p-3 text-sm ${theme.focus}`}><option value="">{placeholder}</option>{field.options.map((opt, i) => <option key={i} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>)}</select>;
         case 'multiselect':
-          return <div className="space-y-2">{field.options.map((opt, i) => { const selected = Array.isArray(value) ? value.includes(opt.value) : false; return <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-[#7A1E2E] bg-[#7A1E2E]/5' : 'border-gray-200 hover:border-[#7A1E2E]/30'}`}><input type="checkbox" checked={selected} onChange={() => { const arr = Array.isArray(value) ? [...value] : []; handleChange(field.id, selected ? arr.filter((v: string) => v !== opt.value) : [...arr, opt.value]); }} className="w-4 h-4 accent-[#7A1E2E]" /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>; })}</div>;
+          return <div className="space-y-2">{field.options.map((opt, i) => { const selected = Array.isArray(value) ? value.includes(opt.value) : false; return <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${selected ? `${theme.border} bg-opacity-5 ${theme.primary.replace('bg-', 'bg-opacity-5 bg-')}` : 'border-gray-200 hover:border-opacity-30'}`}><input type="checkbox" checked={selected} onChange={() => { const arr = Array.isArray(value) ? [...value] : []; handleChange(field.id, selected ? arr.filter((v: string) => v !== opt.value) : [...arr, opt.value]); }} className={`w-4 h-4 ${theme.accent}`} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>; })}</div>;
         case 'radio':
-          return <div className="space-y-2">{field.options.map((opt, i) => <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${value === opt.value ? 'border-[#7A1E2E] bg-[#7A1E2E]/5' : 'border-gray-200 hover:border-[#7A1E2E]/30'}`}><input type="radio" name={field.id} value={opt.value} checked={value === opt.value} onChange={() => handleChange(field.id, opt.value)} className="w-4 h-4 accent-[#7A1E2E]" /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>)}</div>;
+          return <div className="space-y-2">{field.options.map((opt, i) => <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${value === opt.value ? `${theme.border} bg-opacity-5 ${theme.primary.replace('bg-', 'bg-opacity-5 bg-')}` : 'border-gray-200 hover:border-opacity-30'}`}><input type="radio" name={field.id} value={opt.value} checked={value === opt.value} onChange={() => handleChange(field.id, opt.value)} className={`w-4 h-4 ${theme.accent}`} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>)}</div>;
         case 'rating':
-          return <div className="flex gap-1">{Array.from({ length: field.max || 10 }, (_, i) => <button key={i} type="button" onClick={() => handleChange(field.id, String(i + 1))} className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all ${Number(value) === i + 1 ? 'border-[#7A1E2E] bg-[#7A1E2E] text-white' : 'border-gray-200 hover:border-[#7A1E2E]/50 text-gray-600'}`}>{i + 1}</button>)}</div>;
+          return <div className="flex gap-1">{Array.from({ length: field.max || 10 }, (_, i) => <button key={i} type="button" onClick={() => handleChange(field.id, String(i + 1))} className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all ${Number(value) === i + 1 ? `${theme.border} ${theme.primary} text-white` : 'border-gray-200 hover:border-opacity-50 text-gray-600'}`}>{i + 1}</button>)}</div>;
         case 'scale':
-          return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className="w-full accent-[#7A1E2E]" /><div className="flex justify-between text-xs text-gray-500"><span>{field.min || 1}</span><span className="font-bold text-[#7A1E2E] text-lg">{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
+          return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className={`w-full ${theme.accent}`} /><div className="flex justify-between text-xs text-gray-500"><span>{field.min || 1}</span><span className={`font-bold ${theme.text.replace('text-', 'text-')} text-lg`}>{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
         case 'date':
-          return <Input type="date" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Input type="date" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`border-gray-300 ${theme.focus}`} />;
         case 'time':
-          return <Input type="time" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Input type="time" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`border-gray-300 ${theme.focus}`} />;
         case 'file':
           return <Input type="file" onChange={e => { const f = (e.target as HTMLInputElement).files?.[0]; handleChange(field.id, f?.name || ''); }} className="border-gray-300" />;
         default:
-          return <Input type="text" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="border-gray-300 focus:border-[#7A1E2E] focus:ring-[#7A1E2E]" />;
+          return <Input type="text" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
       }
     })();
 
@@ -198,6 +226,23 @@ export const FormsFormPage = ({ slug }: Props) => {
           <Mail className="w-4 h-4" /> {isRTL ? 'راسلنا' : 'Email Us'}
         </a>
       </div>
+    </div>
+  );
+
+  if (isClosed) return (
+    <div className={`min-h-[60vh] flex flex-col items-center justify-center gap-6 text-center p-8 ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2">
+        <Ban className="w-10 h-10" />
+      </div>
+      <h2 className="text-2xl font-bold text-gray-900">
+        {isRTL ? 'توقف استقبال الردود' : 'Accepting Responses Stopped'}
+      </h2>
+      <p className="text-gray-600 max-w-md text-lg">
+        {isRTL 
+          ? (closedMessage.ar || 'نعتذر منك، لقد تم الانتهاء من جمع الردود لهذا الاستبيان. شكراً لاهتمامك.') 
+          : (closedMessage.en || 'Sorry, we are no longer accepting responses for this survey. Thank you for your interest.')}
+      </p>
+      <Link href="/" className="mt-4 text-[#7A1E2E] hover:underline font-medium">{isRTL ? 'العودة للرئيسية' : 'Go to Home'}</Link>
     </div>
   );
 
@@ -245,36 +290,53 @@ export const FormsFormPage = ({ slug }: Props) => {
             <div className="w-20 h-1.5 bg-[#7A1E2E] mx-auto mt-4 rounded-full" />
           </div>
         )}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {stepNumbers.map((step, i) => (
-            <div key={step} className="flex items-center gap-2">
-              <button onClick={() => { if (step <= currentStep) setCurrentStep(step); }} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${currentStep === step ? 'bg-[#7A1E2E] text-white' : step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                {step < currentStep ? <CheckCircle className="w-4 h-4" /> : stepNumbers.indexOf(step) + 1}
-              </button>
-              {i < stepNumbers.length - 1 && <div className={`w-8 h-0.5 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'}`} />}
+
+        {displayMode === 'wizard' ? (
+          <>
+            <div className="flex items-center justify-center gap-2 mb-8">
+              {stepNumbers.map((step, i) => (
+                <div key={step} className="flex items-center gap-2">
+                  <button onClick={() => { if (step <= currentStep) setCurrentStep(step); }} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${currentStep === step ? `${theme.primary} text-white` : step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    {step < currentStep ? <CheckCircle className="w-4 h-4" /> : stepNumbers.indexOf(step) + 1}
+                  </button>
+                  {i < stepNumbers.length - 1 && <div className={`w-8 h-0.5 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'}`} />}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-5">
-          {stepFields(currentStep).map(field => renderField(field))}
+            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-5">
+              {stepFields(currentStep).map(field => renderField(field))}
 
-          <div className="flex justify-between pt-6">
-            <Button variant="outline" onClick={handleBack} disabled={currentStep <= Math.min(...stepNumbers)} className="px-6">
-              <ArrowLeft className={`w-4 h-4 ${isRTL ? 'mr-1' : 'mr-1'}`} /> {isRTL ? 'السابق' : 'Back'}
-            </Button>
-            {currentStep >= maxStep ? (
-              <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-[#7A1E2E] hover:bg-[#601824] text-white px-8">
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
-                {isRTL ? 'إرسال' : 'Submit'}
+              <div className="flex justify-between pt-6">
+                <Button variant="outline" onClick={handleBack} disabled={currentStep <= Math.min(...stepNumbers)} className="px-6">
+                  <ArrowLeft className={`w-4 h-4 ${isRTL ? 'mr-1' : 'mr-1'}`} /> {isRTL ? 'السابق' : 'Back'}
+                </Button>
+                {currentStep >= maxStep ? (
+                  <Button onClick={handleSubmit} disabled={isSubmitting} className={`${theme.primary} hover:opacity-90 text-white px-8`}>
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                    {isRTL ? 'إرسال' : 'Submit'}
+                  </Button>
+                ) : (
+                  <Button onClick={handleNext} className={`${theme.primary} hover:opacity-90 text-white px-6`}>
+                    {isRTL ? 'التالي' : 'Next'} <ArrowRight className={`w-4 h-4 ${isRTL ? 'mr-1' : 'ml-1'}`} />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-8">
+            <div className="space-y-6">
+              {fields.map(field => renderField(field))}
+            </div>
+            <div className="pt-6 border-t">
+              <Button onClick={handleSubmit} disabled={isSubmitting} className={`w-full ${theme.primary} hover:opacity-90 text-white h-14 text-lg font-bold`}>
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                {isRTL ? 'إرسال البيانات' : 'Submit Response'}
               </Button>
-            ) : (
-              <Button onClick={handleNext} className="bg-[#7A1E2E] hover:bg-[#601824] text-white px-6">
-                {isRTL ? 'التالي' : 'Next'} <ArrowRight className={`w-4 h-4 ${isRTL ? 'mr-1' : 'ml-1'}`} />
-              </Button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

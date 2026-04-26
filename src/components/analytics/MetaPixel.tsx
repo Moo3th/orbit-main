@@ -32,6 +32,7 @@ function getConsentLevel(): string {
 export default function MetaPixel({ pixelId }: MetaPixelProps) {
   const [adsConsent, setAdsConsent] = useState(getConsentLevel() === 'accepted');
   const initializedRef = useRef(false);
+  const isValidPixelId = /^\d+$/.test(pixelId);
 
   useEffect(() => {
     const level = getConsentLevel();
@@ -50,7 +51,7 @@ export default function MetaPixel({ pixelId }: MetaPixelProps) {
   }, []);
 
   useEffect(() => {
-    if (!adsConsent || initializedRef.current || !pixelId) return;
+    if (!adsConsent || initializedRef.current || !pixelId || !isValidPixelId) return;
     if (typeof window === 'undefined') return;
 
     if (window.fbq) {
@@ -59,9 +60,9 @@ export default function MetaPixel({ pixelId }: MetaPixelProps) {
       initializedRef.current = true;
       return;
     }
-  }, [adsConsent, pixelId]);
+  }, [adsConsent, pixelId, isValidPixelId]);
 
-  if (!pixelId) return null;
+  if (!pixelId || !isValidPixelId) return null;
 
   if (!adsConsent) return null;
 

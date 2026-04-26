@@ -1,0 +1,1153 @@
+
+> orbit@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.176:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 2.5s
+○ Compiling / ...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ HEAD / 200 in 9.9s (compile: 9.0s, render: 816ms)
+✅ MongoDB Connected
+○ Compiling /admin ...
+ GET /admin 200 in 5.2s (compile: 4.7s, render: 506ms)
+ GET /api/cms/site 200 in 2.1s (compile: 1351ms, render: 773ms)
+ POST /api/auth/create-admin 200 in 1876ms (compile: 1361ms, render: 515ms)
+ GET /api/whatsapp-request 200 in 1745ms (compile: 1513ms, render: 233ms)
+ GET /api/whatsapp-request 200 in 169ms (compile: 3ms, render: 166ms)
+ POST /api/auth/login 200 in 1326ms (compile: 1062ms, render: 264ms)
+ GET /admin 200 in 146ms (compile: 81ms, render: 65ms)
+ GET /admin 200 in 467ms (compile: 5ms, render: 461ms)
+ GET /api/cms/site 200 in 1214ms (compile: 504ms, render: 710ms)
+ GET /admin 200 in 482ms (compile: 95ms, render: 386ms)
+ GET /api/cms/site 200 in 722ms (compile: 5ms, render: 717ms)
+ GET /api/whatsapp-request 200 in 327ms (compile: 58ms, render: 268ms)
+ GET /api/whatsapp-request 200 in 184ms (compile: 7ms, render: 177ms)
+ GET /admin/cms/pages 200 in 2.6s (compile: 2.6s, render: 74ms)
+ GET /api/whatsapp-request 200 in 1050ms (compile: 754ms, render: 297ms)
+ GET /api/whatsapp-request 200 in 197ms (compile: 5ms, render: 192ms)
+ GET /api/cms/site 200 in 1745ms (compile: 828ms, render: 917ms)
+ GET /api/cms/site 200 in 507ms (compile: 5ms, render: 502ms)
+Cache tags and paths revalidated
+ PUT /api/cms/site 200 in 2.0s (compile: 2ms, render: 2.0s)
+ GET /api/cms/site 200 in 399ms (compile: 7ms, render: 392ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 4.2s (compile: 2.1s, render: 2.1s)
+ GET /admin/cms/pages 200 in 540ms (compile: 115ms, render: 425ms)
+ GET /api/cms/site 200 in 673ms (compile: 15ms, render: 658ms)
+ GET /api/cms/site 200 in 821ms (compile: 5ms, render: 817ms)
+ GET /api/cms/site 200 in 403ms (compile: 3ms, render: 401ms)
+ GET /api/cms/site 200 in 196ms (compile: 6ms, render: 189ms)
+ GET /api/whatsapp-request 200 in 236ms (compile: 48ms, render: 188ms)
+ GET /api/whatsapp-request 200 in 197ms (compile: 4ms, render: 193ms)
+Cache tags and paths revalidated
+ PUT /api/cms/site 200 in 1461ms (compile: 8ms, render: 1453ms)
+ GET /api/cms/site 200 in 375ms (compile: 9ms, render: 366ms)
+ GET / 200 in 1916ms (compile: 7ms, render: 1909ms)
+ GET /api/cms/site 200 in 1156ms (compile: 5ms, render: 1152ms)
+ GET /api/cms/site 200 in 1191ms (compile: 4ms, render: 1187ms)
+ GET /api/cms/site 200 in 947ms (compile: 2ms, render: 945ms)
+ GET /admin/form-builder 200 in 116ms (compile: 79ms, render: 37ms)
+ GET /api/whatsapp-request 200 in 196ms (compile: 4ms, render: 192ms)
+ GET /api/cms/site 200 in 1119ms (compile: 3ms, render: 1116ms)
+ GET /api/whatsapp-request 200 in 3.4s (compile: 1971ms, render: 1417ms)
+ GET /api/cms/site 200 in 2.7s (compile: 1093ms, render: 1598ms)
+ GET /api/form-configs 200 in 4.0s (compile: 2.1s, render: 1819ms)
+ GET /api/form-configs 200 in 624ms (compile: 5ms, render: 620ms)
+ GET /api/form-submit?productId=jjkjkj&limit=50 200 in 1180ms (compile: 792ms, render: 388ms)
+ GET / 200 in 423ms (compile: 173ms, render: 250ms)
+ GET /admin/form-builder 200 in 421ms (compile: 361ms, render: 60ms)
+ GET / 200 in 178ms (compile: 17ms, render: 161ms)
+ GET /admin/form-builder 200 in 170ms (compile: 102ms, render: 67ms)
+ GET / 200 in 153ms (compile: 15ms, render: 138ms)
+ GET /admin/form-builder 200 in 146ms (compile: 92ms, render: 54ms)
+ GET / 200 in 260ms (compile: 60ms, render: 200ms)
+ GET /admin/form-builder 200 in 257ms (compile: 210ms, render: 46ms)
+ GET /api/form-configs 200 in 2.1s (compile: 1435ms, render: 619ms)
+ GET /admin/form-builder 200 in 283ms (compile: 229ms, render: 54ms)
+ GET / 200 in 291ms (compile: 100ms, render: 191ms)
+ GET /api/form-configs 200 in 639ms (compile: 22ms, render: 617ms)
+ GET /admin/form-builder 200 in 201ms (compile: 160ms, render: 41ms)
+ GET / 200 in 209ms (compile: 40ms, render: 168ms)
+ GET /api/form-configs 200 in 1158ms (compile: 569ms, render: 588ms)
+ GET / 200 in 236ms (compile: 63ms, render: 172ms)
+ GET /admin/form-builder 200 in 231ms (compile: 189ms, render: 42ms)
+ GET /api/form-configs 200 in 770ms (compile: 14ms, render: 755ms)
+ GET / 200 in 251ms (compile: 39ms, render: 212ms)
+ GET /admin/form-builder 200 in 252ms (compile: 195ms, render: 57ms)
+ GET /api/form-configs 200 in 2.6s (compile: 598ms, render: 1963ms)
+ GET / 200 in 161ms (compile: 11ms, render: 150ms)
+ GET /admin/form-builder 200 in 156ms (compile: 88ms, render: 68ms)
+ GET / 200 in 166ms (compile: 12ms, render: 154ms)
+ GET /admin/form-builder 200 in 162ms (compile: 101ms, render: 61ms)
+ GET / 200 in 158ms (compile: 21ms, render: 137ms)
+ GET /admin/form-builder 200 in 151ms (compile: 101ms, render: 50ms)
+ GET /admin/form-builder 200 in 161ms (compile: 103ms, render: 58ms)
+ GET / 200 in 166ms (compile: 10ms, render: 156ms)
+ GET / 200 in 158ms (compile: 13ms, render: 145ms)
+ GET /admin/form-builder 200 in 154ms (compile: 85ms, render: 69ms)
+ GET /admin/form-builder 200 in 163ms (compile: 107ms, render: 56ms)
+ GET / 200 in 173ms (compile: 17ms, render: 156ms)
+ GET / 200 in 269ms (compile: 66ms, render: 203ms)
+ GET /admin/form-builder 200 in 268ms (compile: 222ms, render: 46ms)
+ GET /api/form-configs 200 in 2.2s (compile: 1475ms, render: 711ms)
+ GET / 200 in 262ms (compile: 59ms, render: 203ms)
+ GET /admin/form-builder 200 in 257ms (compile: 213ms, render: 44ms)
+ GET /api/form-configs 200 in 1279ms (compile: 657ms, render: 623ms)
+ PUT /api/form-configs/whatsapp 200 in 3.3s (compile: 2.5s, render: 822ms)
+ GET /api/form-configs 200 in 1406ms (compile: 555ms, render: 851ms)
+ GET /whatsapp 200 in 3.8s (compile: 3.3s, render: 500ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 775ms (compile: 23ms, render: 752ms)
+ GET /admin/form-builder 200 in 571ms (compile: 102ms, render: 469ms)
+ GET /api/form-configs/whatsapp 200 in 1836ms (compile: 1637ms, render: 199ms)
+ GET /api/cms/site 200 in 2.8s (compile: 1597ms, render: 1172ms)
+ GET /api/cms/site 200 in 3.0s (compile: 1599ms, render: 1376ms)
+ GET /api/cms/site 200 in 1194ms (compile: 8ms, render: 1187ms)
+ GET /api/whatsapp-request 200 in 2.1s (compile: 1864ms, render: 208ms)
+ GET /api/whatsapp-request 200 in 198ms (compile: 3ms, render: 195ms)
+ GET /api/cms/site 200 in 1338ms (compile: 823ms, render: 515ms)
+ GET /api/form-configs 200 in 2.4s (compile: 1765ms, render: 587ms)
+ GET /api/cms/site 200 in 190ms (compile: 3ms, render: 187ms)
+ GET /api/cms/site 200 in 2.6s (compile: 1609ms, render: 1015ms)
+ GET /api/form-configs 200 in 602ms (compile: 5ms, render: 597ms)
+ GET /otime 404 in 2.5s (compile: 149ms, render: 2.4s)
+ GET /gov-gate 200 in 434ms (compile: 80ms, render: 354ms)
+ GET /api/form-configs/govgate 200 in 218ms (compile: 92ms, render: 127ms)
+ GET /api/cms/site 200 in 429ms (compile: 8ms, render: 421ms)
+ GET /api/cms/site 200 in 433ms (compile: 13ms, render: 419ms)
+ GET /admin/form-builder 200 in 468ms (compile: 389ms, render: 79ms)
+ GET / 200 in 485ms (compile: 72ms, render: 413ms)
+ GET /otime 200 in 642ms (compile: 208ms, render: 434ms)
+ GET /whatsapp 200 in 1250ms (compile: 210ms, render: 1040ms)
+ GET /gov-gate 200 in 1261ms (compile: 209ms, render: 1052ms)
+Email sent successfully via SMTP: <24f9d406-ce2d-a288-3d3a-4b6d74bc1d2b@corbit.sa>
+ POST /api/form-submit 201 in 3.7s (compile: 1813ms, render: 1897ms)
+ GET / 200 in 58ms (compile: 5ms, render: 53ms)
+ GET /api/cms/site 200 in 473ms (compile: 9ms, render: 464ms)
+ GET /api/cms/site 200 in 242ms (compile: 2ms, render: 240ms)
+ GET /api/cms/site 200 in 149ms (compile: 4ms, render: 145ms)
+ GET /api/cms/site 200 in 218ms (compile: 32ms, render: 186ms)
+ GET / 200 in 81ms (compile: 11ms, render: 70ms)
+ GET /api/cms/site 200 in 1597ms (compile: 4ms, render: 1593ms)
+ GET /api/cms/site 200 in 1521ms (compile: 5ms, render: 1516ms)
+ GET /api/cms/site 200 in 302ms (compile: 4ms, render: 299ms)
+ GET /api/cms/site 200 in 180ms (compile: 13ms, render: 167ms)
+ GET /api/cms/site 200 in 202ms (compile: 2ms, render: 200ms)
+ GET /products/whatsapp 200 in 2.8s (compile: 2.7s, render: 81ms)
+ GET /api/cms/site 200 in 388ms (compile: 26ms, render: 362ms)
+ GET /api/cms/site 200 in 1007ms (compile: 4ms, render: 1004ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /products/whatsapp/request 200 in 2.7s (compile: 2.4s, render: 364ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 1148ms (compile: 30ms, render: 1118ms)
+ GET /admin/form-builder 200 in 916ms (compile: 380ms, render: 537ms)
+ GET / 200 in 923ms (compile: 154ms, render: 769ms)
+ GET /otime 404 in 948ms (compile: 102ms, render: 846ms)
+ GET /api/cms/site 200 in 368ms (compile: 15ms, render: 353ms)
+ GET /api/cms/site 200 in 1067ms (compile: 96ms, render: 971ms)
+ GET /api/form-configs/whatsapp 200 in 1392ms (compile: 1210ms, render: 182ms)
+ GET /api/cms/site 200 in 375ms (compile: 22ms, render: 353ms)
+ GET /api/cms/site 200 in 375ms (compile: 9ms, render: 365ms)
+ GET /api/whatsapp-request 200 in 3.0s (compile: 2.8s, render: 205ms)
+ GET /api/whatsapp-request 200 in 113ms (compile: 4ms, render: 108ms)
+ GET /api/cms/site 200 in 2.7s (compile: 2.3s, render: 425ms)
+ GET /api/cms/site 200 in 3.0s (compile: 2.5s, render: 453ms)
+ GET /api/cms/site 200 in 241ms (compile: 3ms, render: 238ms)
+ GET /api/cms/site 200 in 137ms (compile: 6ms, render: 131ms)
+ GET /api/cms/site 200 in 137ms (compile: 5ms, render: 132ms)
+ GET /api/form-configs 200 in 4.0s (compile: 2.8s, render: 1199ms)
+ GET /api/form-configs 200 in 341ms (compile: 3ms, render: 339ms)
+ GET /admin/form-builder 200 in 686ms (compile: 165ms, render: 521ms)
+ GET /api/whatsapp-request 200 in 139ms (compile: 4ms, render: 135ms)
+ GET /api/whatsapp-request 200 in 116ms (compile: 3ms, render: 113ms)
+ GET /api/cms/site 200 in 433ms (compile: 3ms, render: 430ms)
+ GET /api/form-configs 200 in 1776ms (compile: 4ms, render: 1772ms)
+ GET /api/form-configs 200 in 459ms (compile: 7ms, render: 452ms)
+ GET /sss 200 in 424ms (compile: 77ms, render: 347ms)
+ GET /api/form-configs/jjkjkj 200 in 184ms (compile: 66ms, render: 118ms)
+ GET /api/cms/site 200 in 377ms (compile: 4ms, render: 373ms)
+ GET /api/cms/site 200 in 468ms (compile: 8ms, render: 460ms)
+ PUT /api/form-configs/test2 200 in 356ms (compile: 83ms, render: 272ms)
+ GET /api/form-configs 200 in 564ms (compile: 4ms, render: 560ms)
+ GET /test2 200 in 457ms (compile: 89ms, render: 368ms)
+ GET /api/form-configs/test2 200 in 217ms (compile: 86ms, render: 132ms)
+ GET /api/cms/site 200 in 345ms (compile: 4ms, render: 341ms)
+ GET /api/cms/site 200 in 347ms (compile: 6ms, render: 341ms)
+ GET /api/form-configs/test2 200 in 121ms (compile: 8ms, render: 112ms)
+ GET /api/cms/site 200 in 334ms (compile: 3ms, render: 332ms)
+Email sent successfully via SMTP: <9d5a4e59-60dc-dd52-d17b-64c6d1788e02@corbit.sa>
+ POST /api/form-submit 201 in 3.4s (compile: 2.1s, render: 1251ms)
+ GET /api/form-submit?productId=test2&limit=50 200 in 245ms (compile: 4ms, render: 240ms)
+ GET /whatsapp 200 in 606ms (compile: 123ms, render: 483ms)
+ GET /api/form-configs/whatsapp 200 in 207ms (compile: 68ms, render: 139ms)
+ GET /api/cms/site 200 in 348ms (compile: 9ms, render: 339ms)
+ GET /api/cms/site 200 in 340ms (compile: 5ms, render: 335ms)
+ GET /api/form-configs/whatsapp 200 in 123ms (compile: 4ms, render: 119ms)
+ GET /api/cms/site 200 in 427ms (compile: 4ms, render: 423ms)
+○ Compiling /products/sms ...
+ GET /products/sms 200 in 4.2s (compile: 4.1s, render: 89ms)
+ GET /api/cms/site 200 in 145ms (compile: 17ms, render: 128ms)
+ GET /api/cms/site 200 in 137ms (compile: 3ms, render: 134ms)
+ GET /api/cms/site 200 in 343ms (compile: 3ms, render: 340ms)
+ GET /products/whatsapp 200 in 1173ms (compile: 1101ms, render: 72ms)
+ GET /api/cms/site 200 in 363ms (compile: 25ms, render: 339ms)
+ GET /api/cms/site 200 in 142ms (compile: 6ms, render: 136ms)
+ GET /products/whatsapp/request 200 in 358ms (compile: 34ms, render: 323ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 1270ms (compile: 246ms, render: 1024ms)
+ GET /otime 404 in 1279ms (compile: 109ms, render: 1171ms)
+ GET /admin/form-builder 200 in 809ms (compile: 306ms, render: 503ms)
+ GET /sss 200 in 1279ms (compile: 82ms, render: 1196ms)
+ GET /test2 200 in 942ms (compile: 146ms, render: 796ms)
+ GET /whatsapp 200 in 1233ms (compile: 417ms, render: 815ms)
+ GET /products/whatsapp/request 200 in 299ms (compile: 38ms, render: 261ms)
+ GET /api/form-configs/whatsapp 200 in 182ms (compile: 70ms, render: 113ms)
+ GET /api/cms/site 200 in 348ms (compile: 7ms, render: 341ms)
+ GET /api/cms/site 200 in 361ms (compile: 8ms, render: 353ms)
+ GET /api/form-configs/whatsapp 200 in 141ms (compile: 23ms, render: 118ms)
+ GET /api/cms/site 200 in 140ms (compile: 11ms, render: 129ms)
+ GET /favicon.ico 404 in 543ms (compile: 119ms, render: 423ms)
+ GET /api/form-configs/whatsapp 200 in 273ms (compile: 121ms, render: 151ms)
+ GET /api/cms/site 200 in 369ms (compile: 9ms, render: 360ms)
+ GET /api/cms/site 200 in 376ms (compile: 21ms, render: 355ms)
+ GET /api/cms/site 200 in 488ms (compile: 134ms, render: 354ms)
+ GET /api/cms/site 200 in 344ms (compile: 9ms, render: 335ms)
+ GET /api/form-configs/jjkjkj 200 in 184ms (compile: 39ms, render: 144ms)
+ GET /api/form-configs/whatsapp 200 in 187ms (compile: 54ms, render: 133ms)
+ GET /api/cms/site 200 in 206ms (compile: 50ms, render: 156ms)
+ GET /api/cms/site 200 in 624ms (compile: 135ms, render: 488ms)
+ GET /favicon.ico 404 in 1667ms (compile: 12ms, render: 1655ms)
+ GET /api/form-configs/jjkjkj 200 in 1924ms (compile: 1713ms, render: 211ms)
+ GET /api/form-configs/whatsapp 200 in 783ms (compile: 567ms, render: 216ms)
+ GET /api/whatsapp-request 200 in 2.0s (compile: 1715ms, render: 304ms)
+ GET /api/form-configs/test2 200 in 1559ms (compile: 1317ms, render: 242ms)
+ GET /api/form-configs/whatsapp 200 in 135ms (compile: 5ms, render: 130ms)
+ GET /api/whatsapp-request 200 in 159ms (compile: 3ms, render: 156ms)
+ GET /api/form-configs/test2 200 in 119ms (compile: 2ms, render: 117ms)
+ GET /api/cms/site 200 in 407ms (compile: 59ms, render: 348ms)
+ GET /api/cms/site 200 in 604ms (compile: 60ms, render: 544ms)
+ GET /favicon.ico 404 in 344ms (compile: 8ms, render: 336ms)
+ GET /favicon.ico 404 in 2.8s (compile: 1723ms, render: 1069ms)
+ GET /api/form-configs 200 in 2.8s (compile: 1471ms, render: 1283ms)
+ GET /api/cms/site 200 in 306ms (compile: 8ms, render: 298ms)
+ GET /favicon.ico 404 in 422ms (compile: 20ms, render: 402ms)
+ GET /favicon.ico 404 in 308ms (compile: 71ms, render: 237ms)
+ GET /api/cms/site 200 in 231ms (compile: 16ms, render: 215ms)
+ GET /api/form-configs 200 in 379ms (compile: 7ms, render: 373ms)
+ GET /api/cms/site 200 in 241ms (compile: 4ms, render: 236ms)
+ GET /api/cms/site 200 in 143ms (compile: 3ms, render: 141ms)
+ GET /api/cms/site 200 in 154ms (compile: 4ms, render: 150ms)
+ GET /api/cms/site 200 in 149ms (compile: 3ms, render: 146ms)
+ GET /api/cms/site 200 in 139ms (compile: 5ms, render: 134ms)
+ GET /api/cms/site 200 in 152ms (compile: 6ms, render: 146ms)
+ GET /api/cms/site 200 in 172ms (compile: 3ms, render: 169ms)
+ GET /api/cms/site 200 in 201ms (compile: 6ms, render: 196ms)
+ GET /api/cms/site 200 in 200ms (compile: 4ms, render: 196ms)
+ GET /otime 404 in 401ms (compile: 66ms, render: 335ms)
+ GET /otime 404 in 289ms (compile: 65ms, render: 224ms)
+ GET /admin/form-builder 200 in 689ms (compile: 585ms, render: 103ms)
+ GET /sss 200 in 695ms (compile: 351ms, render: 344ms)
+ GET / 200 in 732ms (compile: 217ms, render: 516ms)
+ GET /test2 200 in 806ms (compile: 347ms, render: 459ms)
+ GET /whatsapp 200 in 819ms (compile: 348ms, render: 472ms)
+ GET /products/whatsapp/request 200 in 209ms (compile: 47ms, render: 162ms)
+ GET /otime 200 in 297ms (compile: 63ms, render: 234ms)
+ GET /products/whatsapp/request 200 in 225ms (compile: 21ms, render: 204ms)
+ GET /otime 200 in 244ms (compile: 13ms, render: 230ms)
+ GET /otime 200 in 1738ms (compile: 349ms, render: 1389ms)
+ GET /api/form-configs/jjkjkj 200 in 1560ms (compile: 1353ms, render: 207ms)
+ GET /api/form-configs/whatsapp 200 in 1576ms (compile: 1364ms, render: 212ms)
+ GET /api/whatsapp-request 200 in 1616ms (compile: 1398ms, render: 218ms)
+ GET /api/whatsapp-request 200 in 121ms (compile: 11ms, render: 110ms)
+ GET /api/form-configs/jjkjkj 200 in 130ms (compile: 13ms, render: 118ms)
+ GET /api/form-configs/whatsapp 200 in 134ms (compile: 12ms, render: 122ms)
+ GET /api/form-configs 200 in 2.4s (compile: 1960ms, render: 486ms)
+ GET /api/cms/site 200 in 2.3s (compile: 1816ms, render: 518ms)
+ GET /api/cms/site 200 in 238ms (compile: 3ms, render: 236ms)
+ GET /api/form-configs 200 in 376ms (compile: 3ms, render: 373ms)
+ GET /api/cms/site 200 in 218ms (compile: 4ms, render: 214ms)
+ GET /api/cms/site 200 in 209ms (compile: 6ms, render: 203ms)
+ GET /api/form-configs 200 in 388ms (compile: 4ms, render: 385ms)
+ GET /api/cms/site 200 in 118ms (compile: 2ms, render: 115ms)
+ GET /api/cms/site 200 in 225ms (compile: 4ms, render: 221ms)
+ GET /api/cms/site 200 in 137ms (compile: 3ms, render: 134ms)
+ GET /api/cms/site 200 in 125ms (compile: 3ms, render: 122ms)
+ GET /api/cms/site 200 in 134ms (compile: 3ms, render: 131ms)
+ GET /api/cms/site 200 in 138ms (compile: 5ms, render: 134ms)
+ GET /admin/form-builder 200 in 628ms (compile: 294ms, render: 334ms)
+ GET /products/whatsapp/request 200 in 669ms (compile: 139ms, render: 530ms)
+ GET /otime 200 in 786ms (compile: 428ms, render: 358ms)
+ GET /whatsapp 200 in 789ms (compile: 428ms, render: 361ms)
+ GET /sss 200 in 810ms (compile: 429ms, render: 381ms)
+ GET /test2 200 in 815ms (compile: 430ms, render: 384ms)
+ GET / 200 in 1641ms (compile: 75ms, render: 1566ms)
+ GET /api/cms/site 200 in 578ms (compile: 156ms, render: 422ms)
+ GET /api/form-configs/test2 200 in 287ms (compile: 103ms, render: 184ms)
+ GET /otime 200 in 809ms (compile: 418ms, render: 391ms)
+ GET /products/whatsapp/request 200 in 1764ms (compile: 1127ms, render: 637ms)
+ GET /api/form-configs/whatsapp 200 in 169ms (compile: 39ms, render: 130ms)
+ GET /api/form-configs/test2 200 in 123ms (compile: 18ms, render: 105ms)
+ GET /otime 200 in 217ms (compile: 50ms, render: 166ms)
+ GET /api/form-configs/whatsapp 200 in 141ms (compile: 19ms, render: 123ms)
+ GET /api/cms/site 200 in 351ms (compile: 15ms, render: 335ms)
+ GET /api/cms/site 200 in 458ms (compile: 34ms, render: 424ms)
+ GET /api/form-configs/whatsapp 200 in 131ms (compile: 10ms, render: 122ms)
+ GET /api/cms/site 200 in 152ms (compile: 5ms, render: 146ms)
+ GET /api/form-configs/whatsapp 200 in 136ms (compile: 3ms, render: 133ms)
+ GET /api/cms/site 200 in 375ms (compile: 19ms, render: 356ms)
+ GET /api/whatsapp-request 200 in 173ms (compile: 60ms, render: 113ms)
+ GET /api/whatsapp-request 200 in 127ms (compile: 11ms, render: 116ms)
+ GET /api/form-configs 200 in 427ms (compile: 65ms, render: 361ms)
+ GET /api/cms/site 200 in 338ms (compile: 6ms, render: 332ms)
+ GET /api/form-configs 200 in 344ms (compile: 3ms, render: 341ms)
+ GET /api/cms/site 200 in 619ms (compile: 4ms, render: 616ms)
+ GET /api/cms/site 200 in 231ms (compile: 4ms, render: 228ms)
+ GET /otime 404 in 351ms (compile: 61ms, render: 290ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 783ms (compile: 28ms, render: 755ms)
+ GET /whatsapp 200 in 1279ms (compile: 118ms, render: 1161ms)
+ GET /products/whatsapp/request 200 in 1322ms (compile: 499ms, render: 823ms)
+ GET /admin/form-builder 200 in 719ms (compile: 74ms, render: 644ms)
+ GET /otime 404 in 1078ms (compile: 142ms, render: 936ms)
+ GET /test2 200 in 803ms (compile: 14ms, render: 789ms)
+ GET /sss 200 in 1115ms (compile: 166ms, render: 949ms)
+ GET /products/whatsapp/request 200 in 315ms (compile: 37ms, render: 278ms)
+ GET /otime 404 in 298ms (compile: 88ms, render: 210ms)
+ GET /otime 404 in 255ms (compile: 18ms, render: 238ms)
+ GET /api/whatsapp-request 200 in 298ms (compile: 45ms, render: 253ms)
+ GET /api/form-configs/whatsapp 200 in 327ms (compile: 179ms, render: 149ms)
+ GET /api/cms/site 200 in 635ms (compile: 31ms, render: 604ms)
+ GET /api/cms/site 200 in 440ms (compile: 15ms, render: 424ms)
+ GET /api/cms/site 200 in 573ms (compile: 27ms, render: 546ms)
+ GET /api/form-configs/jjkjkj 200 in 198ms (compile: 72ms, render: 126ms)
+ GET /api/cms/site 200 in 451ms (compile: 19ms, render: 432ms)
+ GET /api/cms/site 200 in 639ms (compile: 7ms, render: 632ms)
+ GET /api/whatsapp-request 200 in 255ms (compile: 11ms, render: 244ms)
+ GET /api/form-configs/whatsapp 200 in 171ms (compile: 33ms, render: 138ms)
+ GET /api/form-configs/jjkjkj 200 in 168ms (compile: 11ms, render: 158ms)
+ GET /api/form-configs 200 in 655ms (compile: 56ms, render: 599ms)
+ GET /api/form-configs/whatsapp 200 in 201ms (compile: 17ms, render: 185ms)
+ GET /favicon.ico 404 in 788ms (compile: 141ms, render: 647ms)
+ GET /api/cms/site 200 in 595ms (compile: 26ms, render: 568ms)
+ GET /api/form-configs/whatsapp 200 in 153ms (compile: 5ms, render: 148ms)
+ GET /api/form-configs 200 in 758ms (compile: 9ms, render: 748ms)
+ GET /api/cms/site 200 in 594ms (compile: 58ms, render: 536ms)
+ GET /api/form-configs/whatsapp 200 in 286ms (compile: 110ms, render: 176ms)
+ GET /favicon.ico 404 in 1174ms (compile: 61ms, render: 1113ms)
+ GET /favicon.ico 404 in 622ms (compile: 60ms, render: 562ms)
+ GET /api/form-configs/whatsapp 200 in 402ms (compile: 132ms, render: 270ms)
+ GET /api/cms/site 200 in 3.4s (compile: 45ms, render: 3.4s)
+ GET /api/form-configs/test2 200 in 726ms (compile: 460ms, render: 266ms)
+ GET /api/cms/site 200 in 2.2s (compile: 1232ms, render: 963ms)
+ GET /api/cms/site 200 in 1050ms (compile: 74ms, render: 976ms)
+ GET /favicon.ico 404 in 8.1s (compile: 111ms, render: 8.0s)
+ GET /favicon.ico 404 in 904ms (compile: 513ms, render: 391ms)
+ GET /api/form-configs/test2 200 in 221ms (compile: 92ms, render: 129ms)
+ GET /favicon.ico 404 in 363ms (compile: 42ms, render: 320ms)
+ GET /api/cms/site 200 in 1166ms (compile: 53ms, render: 1113ms)
+ GET /api/cms/site 200 in 253ms (compile: 10ms, render: 242ms)
+ GET /api/cms/site 200 in 228ms (compile: 3ms, render: 224ms)
+ GET /api/cms/site 200 in 463ms (compile: 5ms, render: 458ms)
+ GET /api/cms/site 200 in 219ms (compile: 3ms, render: 216ms)
+ GET /api/cms/site 200 in 142ms (compile: 5ms, render: 137ms)
+ GET /api/cms/site 200 in 153ms (compile: 3ms, render: 151ms)
+ GET /api/cms/site 200 in 145ms (compile: 6ms, render: 140ms)
+ GET /api/cms/site 200 in 144ms (compile: 4ms, render: 140ms)
+ GET /api/cms/site 200 in 140ms (compile: 4ms, render: 137ms)
+ GET /api/cms/site 200 in 134ms (compile: 4ms, render: 130ms)
+ GET /api/cms/site 200 in 146ms (compile: 5ms, render: 141ms)
+○ Compiling /products/o-time ...
+ GET /products/o-time 200 in 4.7s (compile: 4.7s, render: 87ms)
+ GET /api/cms/site 200 in 582ms (compile: 114ms, render: 468ms)
+ GET /api/cms/site 200 in 243ms (compile: 5ms, render: 238ms)
+ PUT /api/form-configs/otime 200 in 384ms (compile: 103ms, render: 281ms)
+ GET /api/form-configs 200 in 519ms (compile: 19ms, render: 501ms)
+ GET /otime 200 in 568ms (compile: 99ms, render: 469ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET /admin/form-builder 200 in 1242ms (compile: 330ms, render: 912ms)
+ GET /products/o-time 200 in 1306ms (compile: 16ms, render: 1291ms)
+ GET / 200 in 1061ms (compile: 598ms, render: 463ms)
+ GET /products/whatsapp/request 200 in 1442ms (compile: 799ms, render: 643ms)
+ GET /test2 200 in 1462ms (compile: 899ms, render: 563ms)
+ GET /otime 200 in 957ms (compile: 391ms, render: 566ms)
+ GET /sss 200 in 411ms (compile: 13ms, render: 398ms)
+ GET /products/whatsapp/request 200 in 277ms (compile: 72ms, render: 205ms)
+ GET /api/form-configs/otime 200 in 209ms (compile: 69ms, render: 140ms)
+ GET /otime 200 in 374ms (compile: 13ms, render: 361ms)
+ GET /api/form-configs/otime 200 in 139ms (compile: 5ms, render: 134ms)
+ GET /api/cms/site 200 in 443ms (compile: 4ms, render: 438ms)
+ GET /api/cms/site 200 in 432ms (compile: 8ms, render: 424ms)
+ GET /otime 200 in 319ms (compile: 9ms, render: 310ms)
+ GET /api/cms/site 200 in 240ms (compile: 5ms, render: 235ms)
+ GET /api/cms/site 200 in 451ms (compile: 19ms, render: 432ms)
+ GET /api/cms/site 200 in 521ms (compile: 27ms, render: 494ms)
+ GET /api/form-configs/whatsapp 200 in 605ms (compile: 477ms, render: 128ms)
+ GET /api/whatsapp-request 200 in 255ms (compile: 120ms, render: 136ms)
+ GET /api/cms/site 200 in 529ms (compile: 168ms, render: 361ms)
+ GET /favicon.ico 404 in 1079ms (compile: 155ms, render: 924ms)
+ GET /api/form-configs/test2 200 in 126ms (compile: 11ms, render: 116ms)
+ GET /api/form-configs/whatsapp 200 in 161ms (compile: 6ms, render: 155ms)
+ GET /api/cms/site 200 in 365ms (compile: 10ms, render: 354ms)
+ GET /api/form-configs 200 in 505ms (compile: 60ms, render: 445ms)
+ GET /api/cms/site 200 in 475ms (compile: 44ms, render: 431ms)
+ GET /api/whatsapp-request 200 in 119ms (compile: 6ms, render: 113ms)
+ GET /api/form-configs/test2 200 in 208ms (compile: 29ms, render: 180ms)
+ GET /api/form-configs/whatsapp 200 in 172ms (compile: 15ms, render: 157ms)
+ GET /favicon.ico 404 in 516ms (compile: 6ms, render: 510ms)
+ GET /favicon.ico 404 in 390ms (compile: 103ms, render: 287ms)
+ GET /api/form-configs/otime 200 in 191ms (compile: 85ms, render: 106ms)
+ GET /api/form-configs 200 in 437ms (compile: 7ms, render: 430ms)
+ GET /api/form-configs/whatsapp 200 in 131ms (compile: 18ms, render: 113ms)
+ GET /api/cms/site 200 in 376ms (compile: 8ms, render: 368ms)
+ GET /api/form-configs/otime 200 in 170ms (compile: 57ms, render: 113ms)
+ GET /api/cms/site 200 in 529ms (compile: 18ms, render: 511ms)
+ GET /favicon.ico 404 in 404ms (compile: 15ms, render: 389ms)
+ GET /api/cms/site 200 in 327ms (compile: 27ms, render: 300ms)
+ GET /favicon.ico 404 in 443ms (compile: 23ms, render: 420ms)
+ GET /api/cms/site 200 in 409ms (compile: 24ms, render: 385ms)
+ GET /api/cms/site 200 in 641ms (compile: 24ms, render: 616ms)
+ GET /favicon.ico 404 in 478ms (compile: 100ms, render: 377ms)
+ GET /api/form-configs/jjkjkj 200 in 300ms (compile: 102ms, render: 198ms)
+ GET /api/form-configs/otime 200 in 151ms (compile: 4ms, render: 147ms)
+ GET /api/cms/site 200 in 395ms (compile: 47ms, render: 348ms)
+ GET /api/cms/site 200 in 474ms (compile: 72ms, render: 402ms)
+ GET /api/cms/site 200 in 630ms (compile: 48ms, render: 581ms)
+ GET /api/form-configs/jjkjkj 200 in 171ms (compile: 12ms, render: 159ms)
+ GET /api/form-configs/otime 200 in 169ms (compile: 5ms, render: 164ms)
+ GET /favicon.ico 404 in 271ms (compile: 35ms, render: 235ms)
+ GET /api/form-configs/otime 200 in 160ms (compile: 46ms, render: 114ms)
+ GET /api/cms/site 200 in 289ms (compile: 4ms, render: 285ms)
+ GET /api/cms/site 200 in 583ms (compile: 38ms, render: 544ms)
+ GET /api/form-configs/otime 200 in 139ms (compile: 10ms, render: 129ms)
+ GET /favicon.ico 404 in 286ms (compile: 6ms, render: 280ms)
+ GET /api/cms/site 200 in 246ms (compile: 10ms, render: 235ms)
+ GET /api/cms/site 200 in 354ms (compile: 12ms, render: 342ms)
+ GET /api/cms/site 200 in 140ms (compile: 22ms, render: 118ms)
+ GET /api/cms/site 200 in 147ms (compile: 4ms, render: 143ms)
+ GET /api/cms/site 200 in 140ms (compile: 6ms, render: 134ms)
+ GET /api/cms/site 200 in 142ms (compile: 6ms, render: 136ms)
+ GET /api/cms/site 200 in 134ms (compile: 2ms, render: 132ms)
+ GET /api/cms/site 200 in 146ms (compile: 4ms, render: 141ms)
+ GET /api/cms/site 200 in 145ms (compile: 7ms, render: 139ms)
+ GET /api/cms/site 200 in 166ms (compile: 5ms, render: 161ms)
+ GET /api/cms/site 200 in 131ms (compile: 6ms, render: 125ms)
+ GET /api/cms/site 200 in 159ms (compile: 4ms, render: 155ms)
+ GET /api/cms/site 200 in 204ms (compile: 3ms, render: 201ms)
+ GET /api/cms/site 200 in 145ms (compile: 6ms, render: 139ms)
+ GET /api/cms/site 200 in 138ms (compile: 6ms, render: 131ms)
+ GET /api/cms/site 200 in 135ms (compile: 2ms, render: 133ms)
+ GET /api/form-configs/test2 200 in 1466ms (compile: 1095ms, render: 371ms)
+ GET /api/form-configs/jjkjkj 200 in 2.9s (compile: 2.5s, render: 379ms)
+ GET /api/form-configs/otime 200 in 2.4s (compile: 2.0s, render: 386ms)
+ GET /sss 200 in 785ms (compile: 151ms, render: 634ms)
+ GET /test2 200 in 793ms (compile: 153ms, render: 640ms)
+ GET / 200 in 506ms (compile: 38ms, render: 468ms)
+ GET /admin/form-builder 200 in 501ms (compile: 340ms, render: 161ms)
+ GET /products/o-time 200 in 527ms (compile: 186ms, render: 342ms)
+ GET /api/form-configs/otime 200 in 277ms (compile: 133ms, render: 144ms)
+ GET /products/whatsapp/request 200 in 481ms (compile: 82ms, render: 399ms)
+ GET /otime 200 in 481ms (compile: 264ms, render: 217ms)
+ GET /products/whatsapp/request 200 in 356ms (compile: 190ms, render: 166ms)
+ GET /api/form-configs/otime 200 in 208ms (compile: 27ms, render: 180ms)
+ GET /otime 200 in 1770ms (compile: 151ms, render: 1619ms)
+ GET /api/form-configs/otime 200 in 172ms (compile: 23ms, render: 149ms)
+ GET /otime 200 in 456ms (compile: 141ms, render: 316ms)
+ GET /otime 200 in 297ms (compile: 98ms, render: 199ms)
+ GET /admin/form-builder 200 in 397ms (compile: 300ms, render: 97ms)
+ GET /otime 200 in 406ms (compile: 80ms, render: 326ms)
+ GET /sss 200 in 411ms (compile: 82ms, render: 329ms)
+ GET /products/o-time 200 in 442ms (compile: 228ms, render: 213ms)
+ GET /test2 200 in 423ms (compile: 79ms, render: 344ms)
+ GET /products/whatsapp/request 200 in 459ms (compile: 201ms, render: 259ms)
+ GET / 200 in 197ms (compile: 7ms, render: 189ms)
+ GET /products/whatsapp/request 200 in 238ms (compile: 89ms, render: 149ms)
+ GET /otime 200 in 262ms (compile: 31ms, render: 231ms)
+ GET /otime 200 in 195ms (compile: 19ms, render: 176ms)
+ GET /otime 200 in 191ms (compile: 11ms, render: 180ms)
+ GET /otime 200 in 568ms (compile: 89ms, render: 479ms)
+ GET /admin/form-builder 200 in 963ms (compile: 509ms, render: 453ms)
+ GET /otime 200 in 1179ms (compile: 88ms, render: 1090ms)
+ GET /products/o-time 200 in 1196ms (compile: 444ms, render: 752ms)
+ GET /test2 200 in 1209ms (compile: 111ms, render: 1099ms)
+ GET /products/whatsapp/request 200 in 1215ms (compile: 236ms, render: 979ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 515ms (compile: 21ms, render: 494ms)
+ GET /sss 200 in 1448ms (compile: 829ms, render: 619ms)
+ GET /products/whatsapp/request 200 in 587ms (compile: 263ms, render: 324ms)
+ GET /otime 200 in 531ms (compile: 200ms, render: 331ms)
+ GET /api/form-configs/otime 200 in 3.1s (compile: 2.9s, render: 214ms)
+ GET /api/form-configs/otime 200 in 252ms (compile: 6ms, render: 246ms)
+ GET /api/cms/site 200 in 3.4s (compile: 2.9s, render: 486ms)
+ GET /otime 200 in 3.3s (compile: 2.8s, render: 546ms)
+ GET /api/cms/site 200 in 3.5s (compile: 2.8s, render: 698ms)
+ GET /otime 200 in 233ms (compile: 15ms, render: 218ms)
+ GET /api/cms/site 200 in 474ms (compile: 55ms, render: 419ms)
+ GET /api/cms/site 200 in 369ms (compile: 18ms, render: 351ms)
+ GET /api/cms/site 200 in 401ms (compile: 12ms, render: 389ms)
+ GET /api/form-configs/whatsapp 200 in 422ms (compile: 130ms, render: 292ms)
+ GET /favicon.ico 404 in 499ms (compile: 201ms, render: 298ms)
+ GET /api/cms/site 200 in 292ms (compile: 34ms, render: 258ms)
+ GET /api/cms/site 200 in 580ms (compile: 17ms, render: 563ms)
+○ Compiling /api/form-configs ...
+ GET /api/whatsapp-request 200 in 3.8s (compile: 3.5s, render: 323ms)
+ GET /api/form-configs/otime 200 in 1678ms (compile: 1418ms, render: 260ms)
+ GET /api/form-configs/whatsapp 200 in 3.8s (compile: 3.5s, render: 265ms)
+ GET /favicon.ico 404 in 3.1s (compile: 2.7s, render: 402ms)
+ GET /api/cms/site 200 in 3.4s (compile: 2.9s, render: 460ms)
+ GET /api/form-configs/test2 200 in 120ms (compile: 3ms, render: 117ms)
+ GET /api/form-configs 200 in 4.1s (compile: 3.5s, render: 592ms)
+ GET /api/whatsapp-request 200 in 147ms (compile: 2ms, render: 145ms)
+ GET /api/form-configs/otime 200 in 129ms (compile: 4ms, render: 125ms)
+ GET /api/form-configs/whatsapp 200 in 122ms (compile: 2ms, render: 119ms)
+ GET /api/cms/site 200 in 380ms (compile: 23ms, render: 357ms)
+ GET /api/form-configs/test2 200 in 137ms (compile: 5ms, render: 132ms)
+ GET /api/form-configs/whatsapp 200 in 126ms (compile: 3ms, render: 123ms)
+ GET /api/cms/site 200 in 434ms (compile: 21ms, render: 412ms)
+ GET /favicon.ico 404 in 319ms (compile: 4ms, render: 314ms)
+ GET /api/cms/site 200 in 241ms (compile: 16ms, render: 225ms)
+ GET /api/form-configs 200 in 411ms (compile: 10ms, render: 401ms)
+ GET /api/cms/site 200 in 188ms (compile: 5ms, render: 183ms)
+ GET /favicon.ico 404 in 454ms (compile: 11ms, render: 442ms)
+ GET /api/cms/site 200 in 172ms (compile: 7ms, render: 165ms)
+ GET /favicon.ico 404 in 456ms (compile: 105ms, render: 351ms)
+ GET /api/cms/site 200 in 148ms (compile: 10ms, render: 137ms)
+ GET /api/cms/site 200 in 199ms (compile: 13ms, render: 186ms)
+ GET /api/form-configs/jjkjkj 200 in 271ms (compile: 144ms, render: 127ms)
+ GET /api/cms/site 200 in 486ms (compile: 15ms, render: 471ms)
+ GET /api/cms/site 200 in 295ms (compile: 10ms, render: 285ms)
+ GET /api/form-configs/jjkjkj 200 in 121ms (compile: 11ms, render: 111ms)
+ GET /api/cms/site 200 in 409ms (compile: 21ms, render: 388ms)
+ GET /api/form-configs/otime 200 in 158ms (compile: 7ms, render: 151ms)
+ GET /api/cms/site 200 in 423ms (compile: 100ms, render: 324ms)
+ GET /api/cms/site 200 in 359ms (compile: 107ms, render: 253ms)
+ GET /favicon.ico 404 in 748ms (compile: 73ms, render: 675ms)
+ GET /api/form-configs/otime 200 in 279ms (compile: 157ms, render: 123ms)
+ GET /api/cms/site 200 in 360ms (compile: 13ms, render: 347ms)
+ GET /favicon.ico 404 in 460ms (compile: 137ms, render: 323ms)
+ GET /api/form-configs/otime 200 in 138ms (compile: 14ms, render: 123ms)
+ GET /api/cms/site 200 in 149ms (compile: 11ms, render: 138ms)
+ GET /api/cms/site 200 in 399ms (compile: 18ms, render: 381ms)
+ GET /favicon.ico 404 in 371ms (compile: 13ms, render: 358ms)
+ GET /api/form-configs/otime 200 in 230ms (compile: 120ms, render: 109ms)
+ GET /api/form-configs/otime 200 in 124ms (compile: 3ms, render: 121ms)
+ GET /api/cms/site 200 in 475ms (compile: 54ms, render: 421ms)
+ GET /favicon.ico 404 in 358ms (compile: 9ms, render: 349ms)
+ GET /api/form-configs/otime 200 in 142ms (compile: 14ms, render: 128ms)
+ GET /favicon.ico 404 in 280ms (compile: 15ms, render: 266ms)
+ GET /api/cms/site 200 in 230ms (compile: 10ms, render: 220ms)
+ GET /api/cms/site 200 in 215ms (compile: 13ms, render: 202ms)
+ GET /api/cms/site 200 in 415ms (compile: 3ms, render: 412ms)
+ GET /api/cms/site 200 in 211ms (compile: 2ms, render: 209ms)
+ GET /api/cms/site 200 in 232ms (compile: 3ms, render: 229ms)
+ GET /api/cms/site 200 in 232ms (compile: 3ms, render: 229ms)
+ GET /whatsapp 200 in 572ms (compile: 78ms, render: 493ms)
+ GET /api/cms/site 200 in 270ms (compile: 6ms, render: 264ms)
+ GET /api/cms/site 200 in 226ms (compile: 3ms, render: 223ms)
+ GET /api/cms/site 200 in 307ms (compile: 3ms, render: 304ms)
+ GET /api/cms/site 200 in 226ms (compile: 6ms, render: 220ms)
+ GET /api/cms/site 200 in 264ms (compile: 4ms, render: 260ms)
+ GET /api/cms/site 200 in 391ms (compile: 5ms, render: 386ms)
+ GET /api/form-configs/whatsapp 200 in 190ms (compile: 74ms, render: 117ms)
+ GET /api/cms/site 200 in 224ms (compile: 3ms, render: 221ms)
+ GET /api/form-configs/whatsapp 200 in 139ms (compile: 5ms, render: 135ms)
+ GET /api/cms/site 200 in 471ms (compile: 2ms, render: 469ms)
+ GET /api/cms/site 200 in 371ms (compile: 2ms, render: 369ms)
+ GET /api/cms/site 200 in 320ms (compile: 5ms, render: 315ms)
+ GET /products/whatsapp 200 in 3.5s (compile: 2.9s, render: 629ms)
+ GET /whatsapp 200 in 560ms (compile: 156ms, render: 404ms)
+ GET /admin/form-builder 200 in 558ms (compile: 430ms, render: 128ms)
+ GET /otime 200 in 569ms (compile: 160ms, render: 409ms)
+ GET / 200 in 573ms (compile: 31ms, render: 542ms)
+ GET /products/whatsapp/request 200 in 582ms (compile: 289ms, render: 293ms)
+ GET /products/o-time 200 in 614ms (compile: 91ms, render: 523ms)
+ GET /test2 200 in 602ms (compile: 157ms, render: 444ms)
+ GET /otime 200 in 327ms (compile: 19ms, render: 308ms)
+ GET /sss 200 in 363ms (compile: 40ms, render: 323ms)
+ GET /products/whatsapp 200 in 528ms (compile: 274ms, render: 254ms)
+ GET /products/whatsapp/request 200 in 440ms (compile: 240ms, render: 200ms)
+ GET /otime 200 in 402ms (compile: 133ms, render: 269ms)
+ GET /otime 200 in 227ms (compile: 25ms, render: 202ms)
+ GET /api/cms/site 200 in 1162ms (compile: 694ms, render: 468ms)
+ GET /api/cms/site 200 in 2.2s (compile: 829ms, render: 1368ms)
+ GET /products/whatsapp/request 200 in 349ms (compile: 84ms, render: 265ms)
+ GET /api/cms/site 200 in 1010ms (compile: 3ms, render: 1007ms)
+ GET /api/cms/site 200 in 510ms (compile: 6ms, render: 504ms)
+ GET /api/cms/site 200 in 786ms (compile: 3ms, render: 784ms)
+ GET /api/form-configs/whatsapp 200 in 938ms (compile: 758ms, render: 180ms)
+ GET /api/form-configs/whatsapp 200 in 179ms (compile: 3ms, render: 176ms)
+ GET /api/cms/site 200 in 977ms (compile: 12ms, render: 966ms)
+○ Compiling /api/form-configs ...
+ GET /admin/form-builder 200 in 590ms (compile: 474ms, render: 115ms)
+ GET /products/whatsapp/request 200 in 628ms (compile: 348ms, render: 280ms)
+ GET /whatsapp 200 in 869ms (compile: 158ms, render: 711ms)
+ GET /otime 200 in 876ms (compile: 160ms, render: 716ms)
+ GET / 200 in 249ms (compile: 71ms, render: 178ms)
+ GET /sss 200 in 469ms (compile: 9ms, render: 460ms)
+ GET /products/o-time 200 in 226ms (compile: 38ms, render: 187ms)
+ GET /products/whatsapp/request 200 in 240ms (compile: 124ms, render: 116ms)
+ GET /otime 200 in 510ms (compile: 81ms, render: 429ms)
+ GET /products/whatsapp/request 200 in 333ms (compile: 196ms, render: 137ms)
+ GET /otime 200 in 377ms (compile: 94ms, render: 283ms)
+ GET /otime 200 in 285ms (compile: 10ms, render: 276ms)
+ GET /test2 200 in 2.3s (compile: 157ms, render: 2.2s)
+ GET /api/form-configs 200 in 5.7s (compile: 3.2s, render: 2.5s)
+ GET /products/whatsapp/request 200 in 395ms (compile: 10ms, render: 385ms)
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET /admin/form-builder 200 in 1330ms (compile: 388ms, render: 942ms)
+ GET / 200 in 1112ms (compile: 675ms, render: 437ms)
+ GET /products/whatsapp/request 200 in 1369ms (compile: 24ms, render: 1345ms)
+ GET /otime 200 in 1363ms (compile: 189ms, render: 1174ms)
+ GET /sss 200 in 1329ms (compile: 153ms, render: 1177ms)
+ GET /products/o-time 200 in 468ms (compile: 28ms, render: 440ms)
+ GET /whatsapp 200 in 1523ms (compile: 950ms, render: 573ms)
+ GET /products/whatsapp/request 200 in 478ms (compile: 266ms, render: 212ms)
+ GET /test2 200 in 563ms (compile: 208ms, render: 355ms)
+ GET /otime 200 in 405ms (compile: 15ms, render: 390ms)
+ GET /products/whatsapp/request 200 in 381ms (compile: 91ms, render: 290ms)
+ GET /api/form-configs/whatsapp 200 in 3.1s (compile: 2.9s, render: 214ms)
+ GET /api/form-configs/whatsapp 200 in 210ms (compile: 5ms, render: 205ms)
+ GET /api/cms/site 200 in 3.6s (compile: 3.1s, render: 454ms)
+ GET /api/cms/site 200 in 3.6s (compile: 2.9s, render: 695ms)
+ GET /otime 200 in 3.6s (compile: 3.0s, render: 588ms)
+ GET /otime 200 in 282ms (compile: 23ms, render: 259ms)
+ GET /api/cms/site 200 in 248ms (compile: 12ms, render: 236ms)
+ GET /api/cms/site 200 in 489ms (compile: 32ms, render: 457ms)
+ GET /api/cms/site 200 in 374ms (compile: 11ms, render: 363ms)
+ GET /api/form-configs/whatsapp 200 in 274ms (compile: 127ms, render: 147ms)
+ GET /api/cms/site 200 in 691ms (compile: 44ms, render: 646ms)
+ GET /api/cms/site 200 in 1054ms (compile: 84ms, render: 970ms)
+ GET /favicon.ico 404 in 1400ms (compile: 252ms, render: 1149ms)
+ GET /api/form-configs/otime 200 in 1907ms (compile: 1725ms, render: 182ms)
+ GET /api/whatsapp-request 200 in 3.1s (compile: 2.9s, render: 197ms)
+ GET /api/form-configs/whatsapp 200 in 3.1s (compile: 2.9s, render: 200ms)
+ GET /api/form-configs/otime 200 in 279ms (compile: 5ms, render: 275ms)
+ GET /api/whatsapp-request 200 in 283ms (compile: 13ms, render: 270ms)
+ GET /api/cms/site 200 in 2.4s (compile: 1872ms, render: 509ms)
+ GET /api/cms/site 200 in 2.3s (compile: 1658ms, render: 622ms)
+ GET /api/form-configs 200 in 2.7s (compile: 2.1s, render: 610ms)
+ GET /favicon.ico 404 in 446ms (compile: 151ms, render: 295ms)
+ GET /api/form-configs/whatsapp 200 in 216ms (compile: 7ms, render: 209ms)
+ GET /api/form-configs/whatsapp 200 in 124ms (compile: 4ms, render: 120ms)
+ GET /favicon.ico 404 in 230ms (compile: 6ms, render: 224ms)
+ GET /api/cms/site 200 in 409ms (compile: 35ms, render: 374ms)
+ GET /api/form-configs 200 in 470ms (compile: 6ms, render: 464ms)
+ GET /favicon.ico 404 in 266ms (compile: 9ms, render: 256ms)
+ GET /api/cms/site 200 in 279ms (compile: 4ms, render: 275ms)
+ GET /api/cms/site 200 in 311ms (compile: 12ms, render: 299ms)
+ GET /api/cms/site 200 in 462ms (compile: 13ms, render: 448ms)
+ GET /api/form-configs/jjkjkj 200 in 402ms (compile: 112ms, render: 290ms)
+ GET /favicon.ico 404 in 383ms (compile: 138ms, render: 245ms)
+ GET /api/form-configs/jjkjkj 200 in 128ms (compile: 12ms, render: 116ms)
+ GET /api/form-configs/whatsapp 200 in 128ms (compile: 8ms, render: 120ms)
+ GET /api/cms/site 200 in 638ms (compile: 218ms, render: 419ms)
+ GET /api/cms/site 200 in 380ms (compile: 18ms, render: 362ms)
+ GET /api/form-configs/whatsapp 200 in 144ms (compile: 12ms, render: 131ms)
+ GET /api/cms/site 200 in 389ms (compile: 21ms, render: 368ms)
+ GET /api/form-configs/test2 200 in 182ms (compile: 31ms, render: 151ms)
+ GET /api/cms/site 200 in 292ms (compile: 26ms, render: 267ms)
+ GET /api/cms/site 200 in 539ms (compile: 5ms, render: 534ms)
+ GET /api/form-configs/test2 200 in 493ms (compile: 166ms, render: 327ms)
+ GET /api/cms/site 200 in 572ms (compile: 47ms, render: 525ms)
+ GET /api/form-configs/whatsapp 200 in 205ms (compile: 85ms, render: 120ms)
+ GET /favicon.ico 404 in 693ms (compile: 385ms, render: 308ms)
+ GET /api/form-configs/otime 200 in 126ms (compile: 15ms, render: 111ms)
+ GET /api/cms/site 200 in 531ms (compile: 293ms, render: 238ms)
+ GET /api/cms/site 200 in 471ms (compile: 9ms, render: 462ms)
+ GET /api/cms/site 200 in 374ms (compile: 12ms, render: 362ms)
+ GET /api/cms/site 200 in 260ms (compile: 7ms, render: 253ms)
+ GET /api/cms/site 200 in 421ms (compile: 9ms, render: 412ms)
+ GET /api/form-configs/whatsapp 200 in 152ms (compile: 4ms, render: 148ms)
+ GET /api/form-configs/otime 200 in 152ms (compile: 3ms, render: 149ms)
+ GET /favicon.ico 404 in 456ms (compile: 7ms, render: 449ms)
+ GET /api/form-configs/otime 200 in 213ms (compile: 90ms, render: 123ms)
+ GET /api/cms/site 200 in 289ms (compile: 17ms, render: 272ms)
+ GET /api/form-configs/otime 200 in 257ms (compile: 20ms, render: 236ms)
+ GET /favicon.ico 404 in 525ms (compile: 103ms, render: 422ms)
+ GET /api/form-configs/otime 200 in 139ms (compile: 5ms, render: 135ms)
+ GET /api/cms/site 200 in 387ms (compile: 23ms, render: 363ms)
+ GET /favicon.ico 404 in 378ms (compile: 88ms, render: 291ms)
+ GET /api/cms/site 200 in 404ms (compile: 5ms, render: 398ms)
+ GET /api/form-configs/otime 200 in 123ms (compile: 9ms, render: 114ms)
+ GET /api/cms/site 200 in 239ms (compile: 4ms, render: 236ms)
+ GET /api/cms/site 200 in 271ms (compile: 8ms, render: 262ms)
+ GET /api/cms/site 200 in 230ms (compile: 8ms, render: 222ms)
+ GET /api/cms/site 200 in 219ms (compile: 4ms, render: 215ms)
+ GET /api/cms/site 200 in 237ms (compile: 4ms, render: 232ms)
+ GET /api/cms/site 200 in 218ms (compile: 5ms, render: 213ms)
+ GET /api/cms/site 200 in 228ms (compile: 6ms, render: 222ms)
+ GET /api/cms/site 200 in 133ms (compile: 2ms, render: 131ms)
+ GET /api/cms/site 200 in 144ms (compile: 3ms, render: 141ms)
+ GET /api/cms/site 200 in 140ms (compile: 5ms, render: 135ms)
+ GET /api/cms/site 200 in 153ms (compile: 4ms, render: 149ms)
+ GET /api/cms/site 200 in 206ms (compile: 6ms, render: 201ms)
+ GET /api/cms/site 200 in 157ms (compile: 4ms, render: 154ms)
+ GET /api/cms/site 200 in 136ms (compile: 4ms, render: 132ms)
+ GET /api/cms/site 200 in 150ms (compile: 2ms, render: 148ms)
+ GET /api/cms/site 200 in 132ms (compile: 2ms, render: 130ms)
+ GET /admin/form-builder 200 in 527ms (compile: 138ms, render: 389ms)
+ GET /api/whatsapp-request 200 in 127ms (compile: 18ms, render: 109ms)
+ GET /favicon.ico 404 in 359ms (compile: 88ms, render: 271ms)
+ GET /api/whatsapp-request 200 in 111ms (compile: 6ms, render: 105ms)
+ GET /api/cms/site 200 in 350ms (compile: 12ms, render: 338ms)
+ GET /api/form-configs 200 in 444ms (compile: 12ms, render: 432ms)
+ GET /api/cms/site 200 in 297ms (compile: 4ms, render: 293ms)
+ GET /api/form-configs 200 in 353ms (compile: 3ms, render: 350ms)
+ GET /products/o-time 200 in 578ms (compile: 504ms, render: 73ms)
+ GET /products/whatsapp/request 200 in 670ms (compile: 408ms, render: 261ms)
+ GET /test2 200 in 664ms (compile: 199ms, render: 464ms)
+ GET /otime 200 in 675ms (compile: 202ms, render: 473ms)
+ GET /whatsapp 200 in 674ms (compile: 199ms, render: 476ms)
+ GET /sss 200 in 677ms (compile: 198ms, render: 479ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/form-builder 200 in 450ms (compile: 195ms, render: 255ms)
+ GET / 200 in 464ms (compile: 37ms, render: 427ms)
+ GET /otime 200 in 459ms (compile: 254ms, render: 205ms)
+ GET /products/whatsapp/request 200 in 774ms (compile: 299ms, render: 474ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /otime 200 in 406ms (compile: 32ms, render: 374ms)
+ GET /products/whatsapp/request 200 in 689ms (compile: 340ms, render: 349ms)
+ GET /otime 200 in 1204ms (compile: 129ms, render: 1075ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /otime 200 in 590ms (compile: 22ms, render: 568ms)
+ GET /admin/form-builder 200 in 533ms (compile: 99ms, render: 434ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /products/whatsapp/request 200 in 302ms (compile: 22ms, render: 279ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 310ms (compile: 46ms, render: 264ms)
+ GET /otime 200 in 540ms (compile: 93ms, render: 448ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /test2 200 in 237ms (compile: 10ms, render: 227ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /whatsapp 200 in 318ms (compile: 91ms, render: 227ms)
+ GET /sss 200 in 302ms (compile: 11ms, render: 291ms)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /otime 200 in 105ms (compile: 20ms, render: 85ms)
+ GET /products/o-time 200 in 568ms (compile: 61ms, render: 507ms)
+ GET /products/whatsapp/request 200 in 588ms (compile: 28ms, render: 559ms)
+ GET /otime 200 in 372ms (compile: 44ms, render: 329ms)
+ GET /products/whatsapp/request 200 in 230ms (compile: 16ms, render: 215ms)
+ GET /otime 200 in 341ms (compile: 130ms, render: 211ms)
+ GET /api/form-configs/otime 200 in 250ms (compile: 87ms, render: 163ms)
+ GET /api/cms/site 200 in 440ms (compile: 31ms, render: 409ms)
+ GET /api/whatsapp-request 200 in 156ms (compile: 44ms, render: 112ms)
+ GET /api/cms/site 200 in 543ms (compile: 30ms, render: 514ms)
+ GET /api/form-configs/whatsapp 200 in 116ms (compile: 4ms, render: 113ms)
+ GET /api/whatsapp-request 200 in 123ms (compile: 5ms, render: 119ms)
+ GET /api/cms/site 200 in 252ms (compile: 5ms, render: 247ms)
+ GET /api/form-configs 200 in 394ms (compile: 11ms, render: 383ms)
+ GET /api/cms/site 200 in 366ms (compile: 4ms, render: 362ms)
+ GET /api/cms/site 200 in 329ms (compile: 5ms, render: 324ms)
+ GET /api/form-configs 200 in 406ms (compile: 7ms, render: 399ms)
+ GET /api/cms/site 200 in 478ms (compile: 12ms, render: 465ms)
+ GET /api/cms/site 200 in 688ms (compile: 12ms, render: 675ms)
+ GET /api/form-configs/otime 200 in 263ms (compile: 114ms, render: 149ms)
+ GET /api/cms/site 200 in 533ms (compile: 181ms, render: 352ms)
+ GET /api/form-configs/test2 200 in 126ms (compile: 9ms, render: 117ms)
+ GET /api/form-configs/whatsapp 200 in 122ms (compile: 5ms, render: 117ms)
+ GET /api/cms/site 200 in 251ms (compile: 12ms, render: 240ms)
+ GET /api/form-configs/whatsapp 200 in 134ms (compile: 14ms, render: 121ms)
+ GET /api/cms/site 200 in 377ms (compile: 5ms, render: 372ms)
+ GET /api/cms/site 200 in 551ms (compile: 6ms, render: 545ms)
+ GET /api/cms/site 200 in 574ms (compile: 16ms, render: 558ms)
+ GET /api/form-configs/jjkjkj 200 in 257ms (compile: 140ms, render: 117ms)
+ GET /api/cms/site 200 in 388ms (compile: 11ms, render: 377ms)
+ GET /api/cms/site 200 in 479ms (compile: 10ms, render: 469ms)
+ GET /api/cms/site 200 in 331ms (compile: 5ms, render: 327ms)
+ GET /api/cms/site 200 in 459ms (compile: 17ms, render: 441ms)
+ GET /api/form-configs/whatsapp 200 in 113ms (compile: 7ms, render: 106ms)
+ GET /api/form-configs/otime 200 in 117ms (compile: 4ms, render: 113ms)
+ GET /api/form-configs/otime 200 in 133ms (compile: 13ms, render: 120ms)
+ GET /api/cms/site 200 in 434ms (compile: 8ms, render: 426ms)
+ GET /api/cms/site 200 in 429ms (compile: 11ms, render: 419ms)
+ GET /api/cms/site 200 in 327ms (compile: 4ms, render: 323ms)
+ GET /api/cms/site 200 in 439ms (compile: 9ms, render: 430ms)
+ GET /api/cms/site 200 in 345ms (compile: 6ms, render: 339ms)
+ GET /api/cms/site 200 in 920ms (compile: 9ms, render: 912ms)
+ GET /api/cms/site 200 in 327ms (compile: 4ms, render: 323ms)
+ GET /api/cms/site 200 in 334ms (compile: 4ms, render: 330ms)
+ GET /api/cms/site 200 in 345ms (compile: 5ms, render: 341ms)
+ GET /api/cms/site 200 in 349ms (compile: 6ms, render: 343ms)
+ GET /sss 200 in 524ms (compile: 149ms, render: 375ms)
+ GET /otime 200 in 530ms (compile: 150ms, render: 379ms)
+ GET /whatsapp 200 in 538ms (compile: 149ms, render: 388ms)
+ GET /products/o-time 200 in 569ms (compile: 404ms, render: 165ms)
+ GET /products/whatsapp/request 200 in 588ms (compile: 311ms, render: 277ms)
+ GET /admin/form-builder 200 in 521ms (compile: 263ms, render: 258ms)
+ GET /otime 200 in 497ms (compile: 6ms, render: 491ms)
+ GET /test2 200 in 539ms (compile: 40ms, render: 499ms)
+ GET / 200 in 539ms (compile: 338ms, render: 202ms)
+ GET /products/whatsapp/request 200 in 559ms (compile: 442ms, render: 117ms)
+ GET /products/whatsapp/request 200 in 290ms (compile: 26ms, render: 264ms)
+ GET /otime 200 in 341ms (compile: 142ms, render: 199ms)
+ GET /otime 200 in 192ms (compile: 14ms, render: 178ms)
+ GET /api/form-configs 200 in 3.9s (compile: 1973ms, render: 1915ms)
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+○ Compiling /_error ...
+⨯ ./src/app/admin/newAdmin/views/FormBuilderView.tsx
+Error:   x Expression expected
+     ,-[/home/moo3th/سطح المكتب/apps/orbit-main/src/app/admin/newAdmin/views/FormBuilderView.tsx:555:1]
+ 552 |                   setNewFormNameEn('');
+ 553 |                   setNewFormSlug('');
+ 554 |                   setViewMode('edit');
+ 555 |                 }}>
+     :                  ^
+ 556 |                   {t('إنشاء', 'Create')}
+ 557 |                 </Button>
+ 558 |                 <Button variant="outline" className="flex-1" onClick={() => setShowNewFormDialog(false)}>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/admin/newAdmin/views/FormBuilderView.tsx
+./src/app/admin/newAdmin/AdminDashboard.tsx
+./src/app/admin/page.tsx
+ GET /admin/form-builder 500 in 10.7s (compile: 10.6s, render: 167ms)
+ GET /admin/form-builder 500 in 4.6s (compile: 4.4s, render: 150ms)
+ GET /whatsapp 500 in 4.6s (compile: 4.4s, render: 150ms)
+ GET /otime 500 in 4.6s (compile: 4.4s, render: 150ms)
+ GET /sss 500 in 4.6s (compile: 4.4s, render: 150ms)
+ GET /products/whatsapp/request 500 in 4.6s (compile: 4.5s, render: 150ms)
+ GET / 500 in 89ms (compile: 43ms, render: 46ms)
+ GET /otime 500 in 62ms (compile: 16ms, render: 46ms)
+ GET /test2 500 in 69ms (compile: 22ms, render: 47ms)
+ GET /whatsapp 500 in 60ms (compile: 13ms, render: 47ms)
+ GET /otime 500 in 59ms (compile: 12ms, render: 47ms)
+ GET /products/o-time 500 in 93ms (compile: 45ms, render: 47ms)
+ GET /sss 500 in 72ms (compile: 28ms, render: 43ms)
+ GET /whatsapp 500 in 68ms (compile: 25ms, render: 44ms)
+ GET /sss 500 in 68ms (compile: 24ms, render: 44ms)
+ GET /products/whatsapp/request 500 in 89ms (compile: 44ms, render: 44ms)
+ GET /products/whatsapp/request 500 in 79ms (compile: 34ms, render: 45ms)
+ GET /test2 500 in 71ms (compile: 38ms, render: 33ms)
+ GET /otime 500 in 47ms (compile: 14ms, render: 34ms)
+ GET / 500 in 62ms (compile: 29ms, render: 34ms)
+ GET / 500 in 58ms (compile: 24ms, render: 34ms)
+ GET /test2 500 in 51ms
+ GET /products/o-time 500 in 109ms (compile: 78ms, render: 31ms)
+ GET /products/whatsapp/request 500 in 95ms (compile: 62ms, render: 33ms)
+ GET /products/whatsapp/request 500 in 59ms (compile: 26ms, render: 34ms)
+ GET /otime 500 in 57ms (compile: 23ms, render: 34ms)
+ GET /products/whatsapp/request 500 in 71ms (compile: 42ms, render: 29ms)
+ GET /products/whatsapp/request 500 in 49ms (compile: 20ms, render: 29ms)
+ GET /otime 500 in 56ms (compile: 27ms, render: 29ms)
+ GET /otime 500 in 41ms (compile: 12ms, render: 29ms)
+ GET /otime 500 in 40ms (compile: 24ms, render: 16ms)
+ GET /otime 500 in 25ms (compile: 9ms, render: 16ms)
+ GET /favicon.ico 500 in 21ms
+ GET /favicon.ico 500 in 15ms
+ GET /favicon.ico 500 in 15ms
+ GET /favicon.ico 500 in 22ms
+ GET /favicon.ico 500 in 8ms
+ GET /favicon.ico 500 in 9ms
+ GET /favicon.ico 500 in 20ms
+ GET /favicon.ico 500 in 8ms
+ GET /favicon.ico 500 in 4ms
+ GET /favicon.ico 500 in 12ms
+ GET /favicon.ico 500 in 5ms
+ GET /favicon.ico 500 in 4ms
+ GET /favicon.ico 500 in 5ms
+Image with src "/TrustedLogos/%D8%A7%D9%84%D9%85%D9%88%D8%A7%D8%B1%D8%AF%20%D8%A7%D9%84%D8%A8%D8%B4%D8%B1%D9%8A%D8%A9.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%A5%D9%85%D8%A7%D8%B1%D8%A9%20%D9%85%D9%86%D8%B7%D9%82%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B3%D8%B9%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+Image with src "/TrustedLogos/%D8%AD%D8%B1%D8%B3%20%D8%A7%D9%84%D8%AD%D8%AF%D9%88%D8%AF.png" is using quality "100" which is not configured in images.qualities [75, 95]. Please update your config to [100, 75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /products/whatsapp/request 200 in 1280ms (compile: 1196ms, render: 84ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /admin/form-builder 200 in 1560ms (compile: 575ms, render: 985ms)
+ GET / 200 in 1571ms (compile: 33ms, render: 1538ms)
+ GET /_next/static/webpack/46866149e1ce3b3a.webpack.hot-update.json 404 in 9.2s (compile: 7.4s, render: 1756ms)
+ GET /test2 200 in 1784ms (compile: 1035ms, render: 749ms)
+ GET /otime 200 in 1824ms (compile: 1038ms, render: 786ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /products/o-time 200 in 544ms (compile: 80ms, render: 464ms)
+ GET /sss 200 in 726ms (compile: 103ms, render: 623ms)
+ GET /whatsapp 200 in 547ms (compile: 14ms, render: 534ms)
+ GET /products/whatsapp/request 200 in 262ms (compile: 46ms, render: 216ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /products/whatsapp/request 200 in 518ms (compile: 33ms, render: 485ms)
+ GET /otime 200 in 614ms (compile: 14ms, render: 600ms)
+ GET /_next/static/webpack/46866149e1ce3b3a.webpack.hot-update.json 404 in 426ms (compile: 87ms, render: 339ms)
+ GET /products/whatsapp/request 200 in 376ms (compile: 84ms, render: 292ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /_next/static/webpack/46866149e1ce3b3a.webpack.hot-update.json 200 in 111ms (compile: 16ms, render: 95ms)
+ GET /otime 200 in 528ms (compile: 156ms, render: 373ms)
+ GET /otime 200 in 291ms (compile: 25ms, render: 266ms)
+○ Compiling /api/form-configs ...
+ GET /api/form-configs/test2 200 in 3.0s (compile: 2.8s, render: 178ms)
+ GET /api/whatsapp-request 200 in 6.5s (compile: 6.2s, render: 287ms)
+ GET /api/form-configs/otime 200 in 129ms (compile: 15ms, render: 114ms)
+ GET /api/whatsapp-request 200 in 142ms (compile: 21ms, render: 121ms)
+ GET /api/form-configs 200 in 4.4s (compile: 3.9s, render: 521ms)
+ GET /api/cms/site 200 in 5.6s (compile: 5.1s, render: 535ms)
+ GET /api/cms/site 200 in 2.1s (compile: 1531ms, render: 605ms)
+ GET /api/cms/site 200 in 6.9s (compile: 6.4s, render: 518ms)
+ GET /api/form-configs 200 in 415ms (compile: 12ms, render: 403ms)
+ GET /api/cms/site 200 in 482ms (compile: 18ms, render: 465ms)
+ GET /api/form-configs/whatsapp 200 in 298ms (compile: 174ms, render: 124ms)
+ GET /api/cms/site 200 in 458ms (compile: 14ms, render: 445ms)
+ GET /api/form-configs/whatsapp 200 in 139ms (compile: 19ms, render: 120ms)
+ GET /api/form-configs/jjkjkj 200 in 141ms (compile: 10ms, render: 132ms)
+ GET /api/cms/site 200 in 412ms (compile: 13ms, render: 399ms)
+ GET /api/cms/site 200 in 413ms (compile: 42ms, render: 371ms)
+ GET /api/form-configs/whatsapp 200 in 148ms (compile: 15ms, render: 133ms)
+ GET /api/cms/site 200 in 1309ms (compile: 42ms, render: 1267ms)
+ GET /api/form-configs/otime 200 in 148ms (compile: 32ms, render: 116ms)
+ GET /api/cms/site 200 in 157ms (compile: 12ms, render: 146ms)
+ GET /api/cms/site 200 in 274ms (compile: 10ms, render: 264ms)
+ GET /api/cms/site 200 in 556ms (compile: 82ms, render: 474ms)
+ GET /api/cms/site 200 in 289ms (compile: 48ms, render: 242ms)
+ GET /api/form-configs/whatsapp 200 in 129ms (compile: 12ms, render: 117ms)
+ GET /api/cms/site 200 in 380ms (compile: 23ms, render: 357ms)
+ GET /api/form-configs/otime 200 in 189ms (compile: 9ms, render: 180ms)
+ GET /api/cms/site 200 in 303ms (compile: 15ms, render: 287ms)
+ GET /api/cms/site 200 in 293ms (compile: 14ms, render: 279ms)
+ GET /api/cms/site 200 in 253ms (compile: 8ms, render: 245ms)
+ GET /api/form-configs/otime 200 in 146ms (compile: 20ms, render: 125ms)
+ GET /api/cms/site 200 in 281ms (compile: 42ms, render: 240ms)
+ GET /api/cms/site 200 in 258ms (compile: 18ms, render: 240ms)
+ GET /api/cms/site 200 in 232ms (compile: 9ms, render: 223ms)
+ GET /api/cms/site 200 in 448ms (compile: 10ms, render: 439ms)
+ GET /api/cms/site 200 in 253ms (compile: 23ms, render: 230ms)
+ GET /api/cms/site 200 in 237ms (compile: 5ms, render: 232ms)
+ GET /api/cms/site 200 in 239ms (compile: 3ms, render: 236ms)
+ GET /api/cms/site 200 in 225ms (compile: 5ms, render: 219ms)
+ GET /api/cms/site 200 in 228ms (compile: 5ms, render: 223ms)
+ GET /api/cms/site 200 in 260ms (compile: 4ms, render: 256ms)
+ GET /admin/form-builder 200 in 636ms (compile: 195ms, render: 440ms)
+ GET /api/whatsapp-request 200 in 131ms (compile: 2ms, render: 129ms)
+ GET /api/cms/site 200 in 333ms (compile: 6ms, render: 326ms)
+ GET /api/whatsapp-request 200 in 110ms (compile: 3ms, render: 107ms)
+ GET /api/form-configs 200 in 375ms (compile: 2ms, render: 373ms)
+ GET /api/form-configs 200 in 369ms (compile: 2ms, render: 366ms)

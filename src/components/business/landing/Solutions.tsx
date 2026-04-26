@@ -15,6 +15,34 @@ interface SolutionsProps {
 
 export const Solutions = ({ pageData = null }: SolutionsProps) => {
   const { t, isRTL } = useLanguage();
+  const [visibleSolutions, setVisibleSolutions] = React.useState({
+    whatsapp: true,
+    sms: true,
+    otime: true,
+    govgate: true
+  });
+
+  React.useEffect(() => {
+    const fetchVisibility = async () => {
+      try {
+        const res = await fetch('/api/cms/site');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.site?.pages) {
+            const pages = data.site.pages;
+            setVisibleSolutions({
+              whatsapp: pages.find((p: any) => p.id === 'whatsapp')?.visible !== false,
+              sms: pages.find((p: any) => p.id === 'sms')?.visible !== false,
+              otime: pages.find((p: any) => p.id === 'otime')?.visible !== false,
+              govgate: pages.find((p: any) => p.id === 'govgate')?.visible !== false,
+            });
+          }
+        }
+      } catch (e) { console.error(e); }
+    };
+    fetchVisibility();
+  }, []);
+
   const getLocalizedField = (fieldKey: string, fallback: string): string => {
     if (!pageData) return fallback;
     const section = pageData.sections?.find((s) => s.id === 'home-solutions');
@@ -66,136 +94,144 @@ export const Solutions = ({ pageData = null }: SolutionsProps) => {
 
         <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {/* WhatsApp Card */}
-          <Card className="h-full border-2 border-transparent hover:border-green-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+          {visibleSolutions.whatsapp && (
+            <Card className="h-full border-2 border-transparent hover:border-green-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
 
-            <CardHeader className="relative pb-2">
-              <div className="h-14 w-14 bg-green-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 group-hover:rotate-6 transition-transform">
-                <MessageCircle className="h-8 w-8" />
-              </div>
-              <CardTitle className="text-2xl font-bold">{waTitle}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 relative flex-1">
-              <p className="text-slate-600 mb-4">
-                {waDesc}
-              </p>
-              <ul className="space-y-3">
-                {waItems.map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="pt-6 relative mt-auto">
-              <Button className="w-full bg-slate-900 hover:bg-green-600 text-white transition-colors group-hover:shadow-lg" asChild>
-                <Link href="/products/whatsapp">
-                  {t.landing.keySolutions.whatsapp.cta}
-                  {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+              <CardHeader className="relative pb-2">
+                <div className="h-14 w-14 bg-green-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 group-hover:rotate-6 transition-transform">
+                  <MessageCircle className="h-8 w-8" />
+                </div>
+                <CardTitle className="text-2xl font-bold">{waTitle}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 relative flex-1">
+                <p className="text-slate-600 mb-4">
+                  {waDesc}
+                </p>
+                <ul className="space-y-3">
+                  {waItems.map((item, index) => (
+                    <li key={index} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="pt-6 relative mt-auto">
+                <Button className="w-full bg-slate-900 hover:bg-green-600 text-white transition-colors group-hover:shadow-lg" asChild>
+                  <Link href="/products/whatsapp">
+                    {t.landing.keySolutions.whatsapp.cta}
+                    {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
 
           {/* SMS Card */}
-          <Card className="h-full border-2 border-transparent hover:border-primary/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+          {visibleSolutions.sms && (
+            <Card className="h-full border-2 border-transparent hover:border-primary/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
 
-            <CardHeader className="relative pb-2">
-              <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:-rotate-6 transition-transform">
-                <MessageSquare className="h-8 w-8" />
-              </div>
-              <CardTitle className="text-2xl font-bold">{smsTitle}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 relative flex-1">
-              <p className="text-slate-600 mb-4">
-                {smsDesc}
-              </p>
-              <ul className="space-y-3">
-                {smsItems.map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="pt-6 relative mt-auto">
-              <Button className="w-full bg-slate-900 hover:bg-primary text-white transition-colors group-hover:shadow-lg" asChild>
-                <Link href="/products/sms">
-                  {t.landing.keySolutions.sms.cta}
-                  {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+              <CardHeader className="relative pb-2">
+                <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:-rotate-6 transition-transform">
+                  <MessageSquare className="h-8 w-8" />
+                </div>
+                <CardTitle className="text-2xl font-bold">{smsTitle}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 relative flex-1">
+                <p className="text-slate-600 mb-4">
+                  {smsDesc}
+                </p>
+                <ul className="space-y-3">
+                  {smsItems.map((item, index) => (
+                    <li key={index} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="pt-6 relative mt-auto">
+                <Button className="w-full bg-slate-900 hover:bg-primary text-white transition-colors group-hover:shadow-lg" asChild>
+                  <Link href="/products/sms">
+                    {t.landing.keySolutions.sms.cta}
+                    {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
 
           {/* O-Time Card */}
-          <Card className="h-full border-2 border-transparent hover:border-blue-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+          {visibleSolutions.otime && (
+            <Card className="h-full border-2 border-transparent hover:border-blue-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
 
-            <CardHeader className="relative pb-2">
-              <div className="h-14 w-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:rotate-6 transition-transform">
-                <Users className="h-8 w-8" />
-              </div>
-              <CardTitle className="text-2xl font-bold">{otimeTitle}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 relative flex-1">
-              <p className="text-slate-600 mb-4">
-                {otimeDesc}
-              </p>
-              <ul className="space-y-3">
-                {otimeItems.map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="pt-6 relative mt-auto">
-              <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors group-hover:shadow-lg" asChild>
-                <Link href="/products/o-time">
-                  {t.landing.keySolutions.otime.cta}
-                  {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+              <CardHeader className="relative pb-2">
+                <div className="h-14 w-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:rotate-6 transition-transform">
+                  <Users className="h-8 w-8" />
+                </div>
+                <CardTitle className="text-2xl font-bold">{otimeTitle}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 relative flex-1">
+                <p className="text-slate-600 mb-4">
+                  {otimeDesc}
+                </p>
+                <ul className="space-y-3">
+                  {otimeItems.map((item, index) => (
+                    <li key={index} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="pt-6 relative mt-auto">
+                <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors group-hover:shadow-lg" asChild>
+                  <Link href="/products/o-time">
+                    {t.landing.keySolutions.otime.cta}
+                    {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
 
           {/* Gov Gate Card */}
-          <Card className="h-full border-2 border-transparent hover:border-amber-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+          {visibleSolutions.govgate && (
+            <Card className="h-full border-2 border-transparent hover:border-amber-500/20 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative flex flex-col">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
 
-            <CardHeader className="relative pb-2">
-              <div className="h-14 w-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 text-amber-600 group-hover:-rotate-6 transition-transform">
-                <ShieldCheck className="h-8 w-8" />
-              </div>
-              <CardTitle className="text-2xl font-bold">{govgateTitle}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 relative flex-1">
-              <p className="text-slate-600 mb-4">
-                {govgateDesc}
-              </p>
-              <ul className="space-y-3">
-                {govgateItems.map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="pt-6 relative mt-auto">
-              <Button className="w-full bg-slate-900 hover:bg-amber-600 text-white transition-colors group-hover:shadow-lg" asChild>
-                <Link href="/products/gov-gate">
-                  {t.landing.keySolutions.govgate.cta}
-                  {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+              <CardHeader className="relative pb-2">
+                <div className="h-14 w-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 text-amber-600 group-hover:-rotate-6 transition-transform">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
+                <CardTitle className="text-2xl font-bold">{govgateTitle}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 relative flex-1">
+                <p className="text-slate-600 mb-4">
+                  {govgateDesc}
+                </p>
+                <ul className="space-y-3">
+                  {govgateItems.map((item, index) => (
+                    <li key={index} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="h-5 w-5 text-amber-500 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="pt-6 relative mt-auto">
+                <Button className="w-full bg-slate-900 hover:bg-amber-600 text-white transition-colors group-hover:shadow-lg" asChild>
+                  <Link href="/products/gov-gate">
+                    {t.landing.keySolutions.govgate.cta}
+                    {isRTL ? <ArrowLeft className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
         </div>
       </div>
     </section>

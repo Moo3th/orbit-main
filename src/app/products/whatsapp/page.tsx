@@ -6,6 +6,7 @@ import { getCmsPageById, extractPageSeo } from '@/lib/cms/helpers';
 import { getCachedSeoSettings, generatePageMetadata } from '@/lib/seo';
 import type { CmsPage } from '@/lib/cms/types';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata(): Promise<Metadata> {
   const [snapshot, settings] = await Promise.all([
@@ -14,6 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
   ]);
   
   const page = getCmsPageById(snapshot, 'whatsapp');
+  if (page && page.visible === false) return {};
+
   const seo = extractPageSeo(page, page?.path || '/products/whatsapp');
   
   const normalizedPage = page ? {
@@ -36,6 +39,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function WhatsAppProductPage() {
   const snapshot = await getSiteCmsSnapshot();
   const cmsPage: CmsPage | null = getCmsPageById(snapshot, 'whatsapp') || null;
+
+  if (cmsPage && cmsPage.visible === false) {
+    notFound();
+  }
 
   return (
     <>

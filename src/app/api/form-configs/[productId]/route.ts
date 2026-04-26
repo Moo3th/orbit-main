@@ -23,6 +23,8 @@ export async function GET(
         thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
         thankYouMessageEn: 'Request submitted successfully!',
         formType: 'service',
+        displayMode: 'wizard',
+        acceptingResponses: true,
         ...bySlug
       };
       return NextResponse.json({ config: enrichedConfig });
@@ -35,6 +37,8 @@ export async function GET(
       thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
       thankYouMessageEn: 'Request submitted successfully!',
       formType: 'service',
+      displayMode: 'wizard',
+      acceptingResponses: true,
       ...config
     };
 
@@ -68,6 +72,10 @@ export async function PUT(
     if (data.thankYouMessageAr !== undefined) updateData.thankYouMessageAr = data.thankYouMessageAr;
     if (data.thankYouMessageEn !== undefined) updateData.thankYouMessageEn = data.thankYouMessageEn;
     if (data.formType !== undefined) updateData.formType = data.formType;
+    if (data.displayMode !== undefined) updateData.displayMode = data.displayMode;
+    if (data.acceptingResponses !== undefined) updateData.acceptingResponses = data.acceptingResponses;
+    if (data.closedMessageAr !== undefined) updateData.closedMessageAr = data.closedMessageAr;
+    if (data.closedMessageEn !== undefined) updateData.closedMessageEn = data.closedMessageEn;
 
     const config = await FormConfig.findOneAndUpdate(
       { productId },

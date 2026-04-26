@@ -15,6 +15,31 @@ export function CmsPagesView({ isAr, onNavigate }: Props) {
   const { pages, refreshData } = useSiteData();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const handleToggleVisibility = async (pageId: string, currentVisible: boolean) => {
+    if (pageId === 'home') return; // Don't allow hiding home page
+    setUpdatingId(pageId);
+    try {
+      const res = await fetch("/api/cms/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pages: pages.map(p => p.id === pageId ? { ...p, visible: !currentVisible } : p),
+        }),
+      });
+      if (res.ok) {
+        await refreshData();
+      } else {
+        alert(isAr ? 'حدث خطأ أثناء تحديث الحالة' : 'Error updating status');
+      }
+    } catch (error) {
+      console.error('Failed to update visibility:', error);
+      alert(isAr ? 'حدث خطأ أثناء تحديث الحالة' : 'Error updating status');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -105,6 +130,7 @@ export function CmsPagesView({ isAr, onNavigate }: Props) {
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">ID</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">{isAr ? 'الرابط' : 'Path'}</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">{isAr ? 'العنوان' : 'Title'}</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">{isAr ? 'الحالة' : 'Status'}</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">{isAr ? 'الأقسام' : 'Sections'}</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">{isAr ? 'آخر تعديل' : 'Last Edited'}</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">{isAr ? 'الإجراءات' : 'Actions'}</th>
@@ -127,6 +153,23 @@ export function CmsPagesView({ isAr, onNavigate }: Props) {
                 </td>
                 <td className="px-4 py-3 text-sm">
                   <div className="text-gray-900">{isAr ? page.title : page.titleEn}</div>
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <button
+                    onClick={() => handleToggleVisibility(page.id, page.visible !== false)}
+                    disabled={updatingId === page.id || page.id === 'home'}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                      page.visible !== false
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                    } disabled:opacity-50`}
+                  >
+                    {page.visible !== false ? (
+                      <><Eye className="w-3 h-3" /> {isAr ? 'ظاهرة' : 'Visible'}</>
+                    ) : (
+                      <><EyeOff className="w-3 h-3" /> {isAr ? 'مخفية' : 'Hidden'}</>
+                    )}
+                  </button>
                 </td>
                 <td className="px-4 py-3 text-sm">
                   <span className="bg-gray-100 px-2 py-1 rounded-full text-xs">

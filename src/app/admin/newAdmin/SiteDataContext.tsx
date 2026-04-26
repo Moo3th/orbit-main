@@ -152,6 +152,7 @@ export interface PageData {
   title: string;
   titleEn: string;
   path: string;
+  visible?: boolean;
   sections: PageSection[];
   lastEdited: string;
   seo?: PageSeo;
@@ -1344,6 +1345,7 @@ const ensureMissingPages = (pages: PageData[]): PageData[] => {
     title: bp.title,
     titleEn: bp.titleEn,
     path: bp.path,
+    visible: true,
     lastEdited: today,
     sections: [],
     seo: DEFAULT_SEO[bp.id] ? {
@@ -1369,6 +1371,7 @@ const buildDefaultContactPage = (): PageData => ({
   title: "تواصل معنا",
   titleEn: "Contact Us",
   path: "/contact",
+  visible: true,
   lastEdited: new Date().toISOString().split("T")[0],
   sections: defaultContactSections.map(cloneSection),
 });

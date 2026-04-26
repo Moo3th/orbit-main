@@ -49,6 +49,10 @@ export interface FormConfigData {
   thankYouMessageAr?: string;
   thankYouMessageEn?: string;
   formType: 'service' | 'survey';
+  displayMode: 'wizard' | 'single';
+  acceptingResponses: boolean;
+  closedMessageAr?: string;
+  closedMessageEn?: string;
   slug: string;
   customDomain?: string;
   notificationEmails: string;
@@ -75,8 +79,8 @@ const getFormUrl = (slug: string, productId: string, customDomain?: string) => {
     const path = slug.startsWith('/') ? slug : `/${slug}`;
     return `https://${customDomain}${path}`;
   }
-  // Standard products have fixed URLs unless custom slug is used for custom forms
-  if (FORM_URLS[productId] && !slug) return FORM_URLS[productId];
+  // Standard products have fixed URLs
+  if (FORM_URLS[productId]) return FORM_URLS[productId];
   
   return slug.startsWith('/') ? slug : `/${slug}`;
 };
@@ -151,9 +155,14 @@ export const FormBuilderView = ({ isAr }: Props) => {
   const [thankYouMessageAr, setThankYouMessageAr] = useState('');
   const [thankYouMessageEn, setThankYouMessageEn] = useState('');
   const [formType, setFormType] = useState<'service' | 'survey'>('service');
+  const [displayMode, setDisplayMode] = useState<'wizard' | 'single'>('wizard');
+  const [acceptingResponses, setAcceptingResponses] = useState(true);
+  const [closedMessageAr, setClosedMessageAr] = useState('');
+  const [closedMessageEn, setClosedMessageEn] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [activeTab, setActiveTab] = useState<'service' | 'survey'>('service');
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [newFormMode, setNewFormMode] = useState(false);
@@ -196,6 +205,10 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setThankYouMessageAr(config.thankYouMessageAr || '');
       setThankYouMessageEn(config.thankYouMessageEn || '');
       setFormType(config.formType || 'service');
+      setDisplayMode(config.displayMode || 'wizard');
+      setAcceptingResponses(config.acceptingResponses !== false);
+      setClosedMessageAr(config.closedMessageAr || '');
+      setClosedMessageEn(config.closedMessageEn || '');
     } else {
       setFields(productId === 'whatsapp' ? DEFAULT_WHATSAPP_FIELDS : []);
       setSlug(FORM_URLS[productId]?.replace('/products/', '').replace('/form', '').replace('/request', '') || productId);
@@ -207,6 +220,10 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setThankYouMessageAr('');
       setThankYouMessageEn('');
       setFormType('service');
+      setDisplayMode('wizard');
+      setAcceptingResponses(true);
+      setClosedMessageAr('');
+      setClosedMessageEn('');
     }
     setViewMode('edit');
   }, [configs]);
@@ -281,6 +298,10 @@ export const FormBuilderView = ({ isAr }: Props) => {
         thankYouMessageAr,
         thankYouMessageEn,
         formType,
+        displayMode,
+        acceptingResponses,
+        closedMessageAr,
+        closedMessageEn,
         fields,
       };
 
@@ -385,21 +406,69 @@ export const FormBuilderView = ({ isAr }: Props) => {
     return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 animate-spin text-[#7A1E2E]" /></div>;
   }
 
+const toggleFormActive = async (productId: string, currentActive: boolean) => {
+    try {
+      const res = await fetch(`/api/form-configs/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentActive }),
+      });
+      if (!res.ok) throw new Error('Failed to update');
+      toast.success(isAr ? (!currentActive ? 'تم تفعيل النموذج' : 'تم تعطيل النموذج') : (!currentActive ? 'Form activated' : 'Form disabled'));
+      fetchConfigs();
+    } catch {
+      toast.error(isAr ? 'فشل التحديث' : 'Update failed');
+    }
+  };
+
   // --- LIST VIEW ---
   if (viewMode === 'list') {
-    const customConfigs = configs.filter(c => !PRODUCTS.some(p => p.id === c.productId));
+    const serviceConfigs = configs.filter(c => {
+      if (PRODUCTS.some(p => p.id === c.productId)) return true;
+      return c.formType === 'service' || !c.formType;
+    });
+    const surveyConfigs = configs.filter(c => {
+      if (PRODUCTS.some(p => p.id === c.productId)) return false;
+      return c.formType === 'survey';
+    });
+    const displayConfigs = activeTab === 'service' ? serviceConfigs : surveyConfigs;
+    const productConfigs = activeTab === 'service' ? PRODUCTS.filter(p => !serviceConfigs.some(c => c.productId === p.id)) : [];
+    const customConfigs = displayConfigs.filter(c => !PRODUCTS.some(p => p.id === c.productId));
 
     return (
       <div className={`space-y-6 ${isAr ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isAr ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('إنشاء النماذج', 'Service Forms')}</h1>
-            <p className="text-sm text-gray-500 mt-1">{t('إدارة نماذج طلب الخدمة والاستبيانات', 'Manage service request forms and surveys')}</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {activeTab === 'service' ? t('نماذج الخدمة', 'Service Forms') : t('الاستبيانات', 'Surveys')}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {activeTab === 'service' ? t('إدارة طلبات الخدمة', 'Manage service requests') : t('إدارة الاستبيانات', 'Manage surveys')}
+            </p>
           </div>
-          <Button className="bg-[#7A1E2E] hover:bg-[#601824] text-white" onClick={() => setShowNewFormDialog(true)}>
+          <Button className="bg-[#7A1E2E] hover:bg-[#601824] text-white" onClick={() => {
+            setNewFormMode(true);
+            setFormType(activeTab);
+            setShowNewFormDialog(true);
+          }}>
             <Plus className="w-4 h-4 mr-1" />
-            {t('نموذج جديد', 'New Form')}
+            {t('جديد', 'New')}
           </Button>
+        </div>
+
+        <div className="flex gap-2 border-b">
+          <button
+            onClick={() => setActiveTab('service')}
+            className={`px-4 py-2 font-medium border-b-2 transition-colors ${activeTab === 'service' ? 'border-[#7A1E2E] text-[#7A1E2E]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          >
+            {t('نماذج الخدمة', 'Service Forms')}
+          </button>
+          <button
+            onClick={() => setActiveTab('survey')}
+            className={`px-4 py-2 font-medium border-b-2 transition-colors ${activeTab === 'survey' ? 'border-[#7A1E2E] text-[#7A1E2E]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          >
+            {t('الاستبيانات', 'Surveys')}
+          </button>
         </div>
 
         <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
@@ -407,143 +476,97 @@ export const FormBuilderView = ({ isAr }: Props) => {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">{t('النموذج', 'Form')}</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">{t('المنتج', 'Product')}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">{t('النوع', 'Type')}</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">{t('الرابط', 'URL')}</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('الحقول', 'Fields')}</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('طلبات اليوم', 'Today')}</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('إجمالي الطلبات', 'Total')}</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('إشعارات البريد', 'Notifications')}</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('إجمالي', 'Total')}</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('الحالة', 'Status')}</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('إجراءات', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
-              {PRODUCTS.map(product => {
-                const config = configs.find(c => c.productId === product.id);
-                const total = config?.totalSubmissions || 0;
-                const today = config?.todaySubmissions || 0;
-                const fieldCount = config?.fields?.length || 0;
-                const hasConfig = !!config;
+              {/* Products without config yet - only in service tab */}
+              {productConfigs.map(product => (
+                <tr key={product.id} className="border-b hover:bg-gray-50 transition-colors opacity-60">
+                  <td className="px-4 py-3 font-medium text-gray-900">{isAr ? product.nameAr : product.nameEn}</td>
+                  <td className="px-4 py-3 text-sm"><Badge className="bg-gray-100 text-gray-400 text-xs">{t('غير منشأ', 'Not Created')}</Badge></td>
+                  <td className="px-4 py-3 text-sm text-gray-400">-</td>
+                  <td className="px-4 py-3 text-center text-gray-400">-</td>
+                  <td className="px-4 py-3 text-center text-gray-400">-</td>
+                  <td className="px-4 py-3 text-center text-gray-400">-</td>
+                  <td className="px-4 py-3 text-center"><Badge className="bg-gray-100 text-gray-400 text-[10px]">{t('غير منشأ', 'Not Created')}</Badge></td>
+                  <td className="px-4 py-3 text-center">
+                    <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(product.id); }} title={t('إنشاء', 'Create')}><Plus className="w-4 h-4" /></Button>
+                  </td>
+                </tr>
+              ))}
+              {/* Existing configs for this tab */}
+              {displayConfigs.map(config => {
+                const isProduct = PRODUCTS.some(p => p.id === config.productId);
+                const product = PRODUCTS.find(p => p.id === config.productId);
+                const total = config.totalSubmissions || 0;
+                const today = config.todaySubmissions || 0;
+                const fieldCount = config.fields?.length || 0;
                 return (
-                  <tr key={product.id} className="border-b hover:bg-gray-50 transition-colors">
+                  <tr key={config.productId} className={`border-b hover:bg-gray-50 transition-colors ${!isProduct ? 'bg-purple-50/30' : ''}`}>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{isAr ? product.nameAr : product.nameEn}</div>
-                      {hasConfig && <div className="text-xs text-gray-500">{config?.productName || ''}</div>}
+                      <div className="font-medium text-gray-900">{isAr ? config.productName : config.productNameEn}</div>
+                      {!isProduct && <div className="text-xs text-gray-500">{config.productId}</div>}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{isAr ? product.nameAr : product.nameEn}</td>
-                    <td className="px-4 py-3 text-sm text-blue-600">
-                      {hasConfig ? (
-                        <a href={getFormUrl(config?.slug || product.id, product.id)} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                          {config?.slug || product.id} <ExternalLink className="w-3 h-3 inline" />
-                        </a>
-                      ) : <span className="text-gray-400">-</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge className={`${hasConfig ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'} text-xs`}>{fieldCount}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge className={`${today > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'} text-xs`}>{today}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-center text-sm font-medium text-gray-700">{total}</td>
-                    <td className="px-4 py-3 text-center">
-                      {config?.notificationEmails ? (
-                        <span className="text-xs text-gray-600" title={config.notificationEmails}>
-                          <Mail className="w-4 h-4 inline text-green-500" /> {config.notificationEmails.split(',')[0]}{config.notificationEmails.split(',').length > 1 ? '...' : ''}
-                        </span>
-                      ) : <span className="text-xs text-gray-400">-</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {hasConfig && config?.isActive !== false ? (
-                        <Badge className="bg-green-100 text-green-700 text-xs">{t('نشط', 'Active')}</Badge>
+                    <td className="px-4 py-3 text-sm">
+                      {isProduct ? (
+                        <Badge className="bg-blue-100 text-blue-700 text-xs">{t('خدمة', 'Service')}</Badge>
                       ) : (
-                        <Badge className="bg-red-100 text-red-700 text-xs">{t('معطل', 'Inactive')}</Badge>
+                        <Badge className="bg-purple-100 text-purple-700 text-xs">{t('استبيان', 'Survey')}</Badge>
                       )}
                     </td>
+                    <td className="px-4 py-3 text-sm text-blue-600">
+                      <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                        {config.customDomain ? `${config.customDomain}/` : ''}{config.slug || config.productId} <ExternalLink className="w-3 h-3 inline" />
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 text-center"><Badge className="bg-blue-100 text-blue-700 text-xs">{fieldCount}</Badge></td>
+                    <td className="px-4 py-3 text-center"><Badge className={`${today > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'} text-xs`}>{today}</Badge></td>
+                    <td className="px-4 py-3 text-center text-sm font-medium text-gray-700">{total}</td>
                     <td className="px-4 py-3 text-center">
-                      <div className="flex gap-1 justify-center">
-                        <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(product.id); }} title={t('تعديل', 'Edit')}>
-                          <Edit3 className="w-4 h-4" />
+                      <div className="flex flex-col gap-1 items-center">
+                        {config.isActive !== false ? (
+                          <Badge className="bg-green-100 text-green-700 text-[10px]">{t('نشط', 'Active')}</Badge>
+                        ) : (
+                          <Badge className="bg-red-100 text-red-700 text-[10px]">{t('معطل', 'Disabled')}</Badge>
+                        )}
+                        {config.formType === 'survey' && config.acceptingResponses === false && (
+                          <Badge className="bg-amber-100 text-amber-700 text-[10px]">{t('مغلق', 'Closed')}</Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex gap-1 justify-center flex-wrap">
+                        <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(config.productId); }} title={t('تعديل', 'Edit')}><Edit3 className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => toggleFormActive(config.productId, config.isActive !== false)} title={config.isActive !== false ? t('تعطيل', 'Disable') : t('تفعيل', 'Enable')}>
+                          {config.isActive !== false ? <ToggleRight className="w-4 h-4 text-green-500" /> : <ToggleLeft className="w-4 h-4 text-gray-400" />}
                         </Button>
-                        {hasConfig && (
-                          <>
-                            <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(product.id)} title={t('الطلبات', 'Submissions')}>
-                              <Inbox className="w-4 h-4" />
-                            </Button>
-                            <a href={getFormUrl(config?.slug || product.id, product.id)} target="_blank" rel="noopener noreferrer">
-                              <Button variant="ghost" size="sm" title={t('معاينة', 'Preview')}>
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </a>
-                            <Button variant="ghost" size="sm" onClick={() => handleDeleteConfig(product.id)} title={t('حذف', 'Delete')} className="text-red-500 hover:text-red-700">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </>
+                        <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(config.productId)} title={t('الطلبات', 'Submissions')}><Inbox className="w-4 h-4" /></Button>
+                        {!isProduct && config.formType === 'survey' && (
+                          <Button variant="ghost" size="sm" onClick={() => { setSelectedProduct(config.productId); fetchSubmissions(config.productId); setViewMode('analytics'); }} title={t('التحليلات', 'Analytics')} className="text-purple-600"><BarChart3 className="w-4 h-4" /></Button>
+                        )}
+                        <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm" title={t('معاينة', 'Preview')}><Eye className="w-4 h-4" /></Button></a>
+                        {!isProduct && (
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteConfig(config.productId)} title={t('حذف', 'Delete')} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></Button>
                         )}
                       </div>
                     </td>
                   </tr>
                 );
               })}
-              {customConfigs.map(config => (
-                <tr key={config.productId} className="border-b hover:bg-gray-50 transition-colors bg-yellow-50/30">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{isAr ? config.productName : config.productNameEn}</div>
-                    <div className="text-xs text-gray-500">{config.productId}</div>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <Badge className="bg-amber-100 text-amber-700 text-xs">{t('مخصص', 'Custom')}</Badge>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-blue-600">
-                    <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {config.customDomain ? `${config.customDomain}/` : ''}{config.slug || config.productId} <ExternalLink className="w-3 h-3 inline" />
-                    </a>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Badge className="bg-blue-100 text-blue-700 text-xs">{config.fields?.length || 0}</Badge>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Badge className={`${(config.todaySubmissions || 0) > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'} text-xs`}>{config.todaySubmissions || 0}</Badge>
-                  </td>
-                  <td className="px-4 py-3 text-center text-sm font-medium text-gray-700">{config.totalSubmissions || 0}</td>
-                  <td className="px-4 py-3 text-center">
-                    {config.notificationEmails ? (
-                      <span className="text-xs text-gray-600" title={config.notificationEmails}>
-                        <Mail className="w-4 h-4 inline text-green-500" /> {config.notificationEmails.split(',')[0]}{config.notificationEmails.split(',').length > 1 ? '...' : ''}
-                      </span>
-                    ) : <span className="text-xs text-gray-400">-</span>}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {config.isActive !== false ? (
-                      <Badge className="bg-green-100 text-green-700 text-xs">{t('نشط', 'Active')}</Badge>
-                    ) : (
-                      <Badge className="bg-red-100 text-red-700 text-xs">{t('معطل', 'Inactive')}</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex gap-1 justify-center">
-                      <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(config.productId); }} title={t('تعديل', 'Edit')}>
-                        <Edit3 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(config.productId)} title={t('الطلبات', 'Submissions')}>
-                        <Inbox className="w-4 h-4" />
-                      </Button>
-                      {config.formType === 'survey' && (
-                        <Button variant="ghost" size="sm" onClick={() => { setSelectedProduct(config.productId); fetchSubmissions(config.productId); setViewMode('analytics'); }} title={t('التحليلات', 'Analytics')} className="text-purple-600">
-                          <BarChart3 className="w-4 h-4" />
-                        </Button>
-                      )}
-                      <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="sm" title={t('معاينة', 'Preview')}>
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </a>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteConfig(config.productId)} title={t('حذف', 'Delete')} className="text-red-500 hover:text-red-700">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+              {displayConfigs.length === 0 && productConfigs.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                    {activeTab === 'service' ? t('لا توجد نماذج خدمة بعد', 'No service forms yet') : t('لا توجد استبيانات بعد', 'No surveys yet')}
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -587,7 +610,7 @@ export const FormBuilderView = ({ isAr }: Props) => {
                   setTitleEn(newFormNameEn.trim());
                   setThankYouMessageAr('');
                   setThankYouMessageEn('');
-                  setFormType('service');
+                  setFormType(activeTab);
                   setNewFormMode(true);
                   setShowNewFormDialog(false);
                   setNewFormProductId('');
@@ -948,6 +971,44 @@ export const FormBuilderView = ({ isAr }: Props) => {
                 <option value="survey">{t('استبيان / استطلاع', 'Survey / Questionnaire')}</option>
               </select>
             </div>
+            <div>
+              <label className="text-xs text-gray-500">{t('طريقة العرض', 'Display Mode')}</label>
+              <select 
+                value={displayMode} 
+                onChange={(e) => setDisplayMode(e.target.value as 'wizard' | 'single')}
+                className="w-full border rounded px-3 py-1.5 text-sm bg-white"
+              >
+                <option value="wizard">{t('خطوات متسلسلة (Wizard)', 'Step-by-step Wizard')}</option>
+                <option value="single">{t('صفحة واحدة مستمرة', 'Single Continuous Page')}</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="flex-1">
+                <label className="text-sm font-bold text-gray-700">{t('استقبال الردود', 'Accepting Responses')}</label>
+                <p className="text-[10px] text-gray-500">{t('تعطيل هذا الخيار سيغلق النموذج ويظهر رسالة الإغلاق', 'Disabling this will close the form and show the closed message')}</p>
+              </div>
+              <button onClick={() => setAcceptingResponses(!acceptingResponses)} className="text-2xl">
+                {acceptingResponses ? <ToggleRight className="w-10 h-10 text-[#128C7E]" /> : <ToggleLeft className="w-10 h-10 text-gray-300" />}
+              </button>
+            </div>
+
+            {!acceptingResponses && (
+              <div className="space-y-3 p-3 bg-red-50/50 rounded-lg border border-red-100">
+                <p className="text-xs font-bold text-red-700">{t('رسالة إغلاق النموذج (تظهر عند توقف استقبال الردود)', 'Form Closed Message')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] text-gray-500">{t('بالعربي', 'Arabic')}</label>
+                    <textarea value={closedMessageAr} onChange={(e) => setClosedMessageAr(e.target.value)} className="w-full border rounded px-2 py-1 text-xs" rows={2} placeholder="نعتذر، تم إغلاق الاستبيان" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-500">{t('بالإنجليزي', 'English')}</label>
+                    <textarea value={closedMessageEn} onChange={(e) => setClosedMessageEn(e.target.value)} className="w-full border rounded px-2 py-1 text-xs" rows={2} placeholder="Sorry, this survey is now closed" dir="ltr" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-gray-500">{t('عنوان النموذج (عربي)', 'Form Title (AR)')}</label>
