@@ -76,7 +76,14 @@ export default async function RootLayout({
   const organizationJsonLd = generateOrganizationJsonLd(settings);
   const websiteJsonLd = generateWebsiteJsonLd(settings);
 
-  const gscVerification = settings?.analytics?.gscVerification || '';
+  const rawGscVerification = settings?.analytics?.gscVerification || '';
+  // Extract content value if full tag is provided
+  let gscVerification = rawGscVerification;
+  if (rawGscVerification.includes('content=')) {
+    const match = rawGscVerification.match(/content="([^"]+)"/);
+    if (match) gscVerification = match[1];
+  }
+  
   const gtmIdFromSettings = settings?.analytics?.gtmId || process.env.NEXT_PUBLIC_GTM_ID?.trim() || '';
   const facebookPixelIdFromSettings = settings?.analytics?.facebookPixelId || process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() || '';
   const clarityProjectIdFromSettings = settings?.analytics?.clarityProjectId || process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim() || '';

@@ -107,7 +107,13 @@ export async function POST(request: NextRequest) {
     const notificationEmails: string = formConfig.notificationEmails || '';
     const seoSettings = await SeoSettings.findOne({ key: 'primary' }).lean() as any;
     const fallbackEmail: string = seoSettings?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'sales@orbit.sa';
-    const emailList = parseEmailRecipients(notificationEmails || fallbackEmail);
+    
+    // Combine form emails and general emails
+    const combinedEmails = notificationEmails 
+      ? `${notificationEmails},${fallbackEmail}` 
+      : fallbackEmail;
+    
+    const emailList = parseEmailRecipients(combinedEmails);
 
     if (emailList.length > 0) {
       try {

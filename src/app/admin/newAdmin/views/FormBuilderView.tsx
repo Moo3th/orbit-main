@@ -37,6 +37,7 @@ export interface FormField {
   min: number;
   max: number;
   stepSize: number;
+  ratingType?: 'star' | 'emoji' | 'number';
   options: FormFieldOption[];
 }
 
@@ -53,6 +54,9 @@ export interface FormConfigData {
   acceptingResponses: boolean;
   closedMessageAr?: string;
   closedMessageEn?: string;
+  primaryColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
   slug: string;
   customDomain?: string;
   notificationEmails: string;
@@ -159,6 +163,9 @@ export const FormBuilderView = ({ isAr }: Props) => {
   const [acceptingResponses, setAcceptingResponses] = useState(true);
   const [closedMessageAr, setClosedMessageAr] = useState('');
   const [closedMessageEn, setClosedMessageEn] = useState('');
+  const [primaryColor, setPrimaryColor] = useState('#7A1E2E');
+  const [buttonTextColor, setButtonTextColor] = useState('#FFFFFF');
+  const [buttonHoverColor, setButtonHoverColor] = useState('#601824');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -209,6 +216,9 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setAcceptingResponses(config.acceptingResponses !== false);
       setClosedMessageAr(config.closedMessageAr || '');
       setClosedMessageEn(config.closedMessageEn || '');
+      setPrimaryColor(config.primaryColor || (config.formType === 'survey' ? '#8B5CF6' : '#7A1E2E'));
+      setButtonTextColor(config.buttonTextColor || '#FFFFFF');
+      setButtonHoverColor(config.buttonHoverColor || (config.formType === 'survey' ? '#7C3AED' : '#601824'));
     } else {
       setFields(productId === 'whatsapp' ? DEFAULT_WHATSAPP_FIELDS : []);
       setSlug(FORM_URLS[productId]?.replace('/products/', '').replace('/form', '').replace('/request', '') || productId);
@@ -224,6 +234,9 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setAcceptingResponses(true);
       setClosedMessageAr('');
       setClosedMessageEn('');
+      setPrimaryColor('#7A1E2E');
+      setButtonTextColor('#FFFFFF');
+      setButtonHoverColor('#601824');
     }
     setViewMode('edit');
   }, [configs]);
@@ -302,6 +315,9 @@ export const FormBuilderView = ({ isAr }: Props) => {
         acceptingResponses,
         closedMessageAr,
         closedMessageEn,
+        primaryColor,
+        buttonTextColor,
+        buttonHoverColor,
         fields,
       };
 
@@ -1029,6 +1045,44 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                 <textarea value={thankYouMessageEn} onChange={(e) => setThankYouMessageEn(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" rows={2} placeholder="Thank you for your time" dir="ltr" />
               </div>
             </div>
+
+            <div className="pt-2 space-y-3 border-t">
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('تخصيص الألوان', 'Theme Customization')}</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('اللون الأساسي', 'Primary Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون نص الزر', 'Btn Text')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={buttonTextColor} onChange={(e) => setButtonTextColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={buttonTextColor} onChange={(e) => setButtonTextColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون التمرير', 'Btn Hover')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={buttonHoverColor} onChange={(e) => setButtonHoverColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={buttonHoverColor} onChange={(e) => setButtonHoverColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg border flex items-center justify-center gap-4" style={{ backgroundColor: '#f9fafb' }}>
+                <span className="text-[10px] text-gray-400">{t('معاينة الزر:', 'Button Preview:')}</span>
+                <button 
+                  className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm"
+                  style={{ backgroundColor: primaryColor, color: buttonTextColor }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = buttonHoverColor)}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = primaryColor)}
+                >
+                  {t('زر الإرسال', 'Submit Button')}
+                </button>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card className="border bg-amber-50">
@@ -1078,7 +1132,21 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                       <div className="flex items-end gap-3 pt-1"><label className="flex items-center gap-1.5 text-sm cursor-pointer"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="w-4 h-4 accent-[#7A1E2E]" />{t('نشط', 'Active')}</label></div>
                     </div>
                     {['rating', 'scale'].includes(field.type) && (
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-4 gap-3">
+                        {field.type === 'rating' && (
+                          <div>
+                            <label className="text-xs text-gray-500">{t('شكل التقييم', 'Rating Style')}</label>
+                            <select 
+                              value={field.ratingType || 'number'} 
+                              onChange={e => handleUpdateField(index, { ratingType: e.target.value as any })}
+                              className="w-full border rounded p-1.5 text-sm bg-white"
+                            >
+                              <option value="number">{t('أرقام', 'Numbers')}</option>
+                              <option value="star">{t('نجوم', 'Stars')}</option>
+                              <option value="emoji">{t('إيموجي', 'Emojis')}</option>
+                            </select>
+                          </div>
+                        )}
                         <div><label className="text-xs text-gray-500">{t('الحد الأدنى', 'Min')}</label><input type="number" value={field.min} onChange={e => handleUpdateField(index, { min: parseInt(e.target.value) || 1 })} className="w-full border rounded p-1.5 text-sm" /></div>
                         <div><label className="text-xs text-gray-500">{t('الحد الأقصى', 'Max')}</label><input type="number" value={field.max} onChange={e => handleUpdateField(index, { max: parseInt(e.target.value) || 10 })} className="w-full border rounded p-1.5 text-sm" /></div>
                         <div><label className="text-xs text-gray-500">{t('الخطوة', 'Step Size')}</label><input type="number" value={field.stepSize} onChange={e => handleUpdateField(index, { stepSize: parseInt(e.target.value) || 1 })} className="w-full border rounded p-1.5 text-sm" /></div>

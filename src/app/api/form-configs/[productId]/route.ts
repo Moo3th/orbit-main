@@ -34,11 +34,14 @@ export async function GET(
     const enrichedConfig = {
       titleAr: config.productName || '',
       titleEn: config.productNameEn || '',
-      thankYouMessageAr: 'تم إرسال طلبك بنجاح!',
-      thankYouMessageEn: 'Request submitted successfully!',
-      formType: 'service',
-      displayMode: 'wizard',
-      acceptingResponses: true,
+      thankYouMessageAr: config.thankYouMessageAr || 'تم إرسال طلبك بنجاح!',
+      thankYouMessageEn: config.thankYouMessageEn || 'Request submitted successfully!',
+      formType: config.formType || 'service',
+      displayMode: config.displayMode || 'wizard',
+      acceptingResponses: config.acceptingResponses !== false,
+      primaryColor: config.primaryColor || (config.formType === 'survey' ? '#8B5CF6' : '#7A1E2E'),
+      buttonTextColor: config.buttonTextColor || '#FFFFFF',
+      buttonHoverColor: config.buttonHoverColor || (config.formType === 'survey' ? '#7C3AED' : '#601824'),
       ...config
     };
 
@@ -58,11 +61,11 @@ export async function PUT(
     const { productId } = await params;
     const data = await request.json();
 
-    const updateData: Record<string, unknown> = {
-      productName: data.productName,
-      productNameEn: data.productNameEn,
-      fields: data.fields || [],
-    };
+    const updateData: Record<string, unknown> = {};
+    if (data.productName !== undefined) updateData.productName = data.productName;
+    if (data.productNameEn !== undefined) updateData.productNameEn = data.productNameEn;
+    if (data.fields !== undefined) updateData.fields = data.fields;
+    
     if (data.slug !== undefined) updateData.slug = data.slug.startsWith('/') ? data.slug.substring(1) : data.slug;
     if (data.customDomain !== undefined) updateData.customDomain = data.customDomain;
     if (data.notificationEmails !== undefined) updateData.notificationEmails = data.notificationEmails;
@@ -76,6 +79,11 @@ export async function PUT(
     if (data.acceptingResponses !== undefined) updateData.acceptingResponses = data.acceptingResponses;
     if (data.closedMessageAr !== undefined) updateData.closedMessageAr = data.closedMessageAr;
     if (data.closedMessageEn !== undefined) updateData.closedMessageEn = data.closedMessageEn;
+    
+    // New theme fields
+    if (data.primaryColor !== undefined) updateData.primaryColor = data.primaryColor;
+    if (data.buttonTextColor !== undefined) updateData.buttonTextColor = data.buttonTextColor;
+    if (data.buttonHoverColor !== undefined) updateData.buttonHoverColor = data.buttonHoverColor;
 
     const config = await FormConfig.findOneAndUpdate(
       { productId },

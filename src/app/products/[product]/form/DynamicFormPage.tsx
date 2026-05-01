@@ -22,6 +22,7 @@ interface FormField {
   min: number;
   max: number;
   stepSize: number;
+  ratingType?: 'star' | 'emoji' | 'number';
   options: { value: string; labelAr: string; labelEn: string }[];
 }
 
@@ -46,23 +47,20 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
   const [closedMessage, setClosedMessage] = useState({ ar: '', en: '' });
   const [title, setTitle] = useState({ ar: '', en: '' });
   const [thankYouMessage, setThankYouMessage] = useState({ ar: '', en: '' });
+  const [colors, setColors] = useState({
+    primary: '#7A1E2E',
+    buttonText: '#FFFFFF',
+    buttonHover: '#601824'
+  });
 
-  // Theme configuration
-  const theme = formType === 'survey' 
-    ? {
-        primary: 'bg-[#8B5CF6]', // Purple for survey
-        text: 'text-[#8B5CF6]',
-        border: 'border-[#8B5CF6]',
-        focus: 'focus:border-[#8B5CF6] focus:ring-[#8B5CF6]',
-        accent: 'accent-[#8B5CF6]'
-      }
-    : {
-        primary: 'bg-[#7A1E2E]', // Original Red for service
-        text: 'text-[#7A1E2E]',
-        border: 'border-[#7A1E2E]',
-        focus: 'focus:border-[#7A1E2E] focus:ring-[#7A1E2E]',
-        accent: 'accent-[#7A1E2E]'
-      };
+  // Theme configuration using CSS variables
+  const theme = {
+    primary: 'bg-[var(--primary-color)]',
+    text: 'text-[var(--primary-color)]',
+    border: 'border-[var(--primary-color)]',
+    focus: 'focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]',
+    accent: 'accent-[var(--primary-color)]'
+  };
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -84,6 +82,15 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
             setDisplayMode(data.config.displayMode || 'wizard');
             setTitle({ ar: data.config.titleAr || '', en: data.config.titleEn || '' });
             setThankYouMessage({ ar: data.config.thankYouMessageAr || '', en: data.config.thankYouMessageEn || '' });
+            
+            // Set colors from config or defaults based on form type
+            const isSurvey = data.config.formType === 'survey';
+            setColors({
+              primary: data.config.primaryColor || (isSurvey ? '#8B5CF6' : '#7A1E2E'),
+              buttonText: data.config.buttonTextColor || '#FFFFFF',
+              buttonHover: data.config.buttonHoverColor || (isSurvey ? '#7C3AED' : '#601824')
+            });
+
             if (data.config.fields && data.config.fields.length > 0) {
               setFields(data.config.fields);
               const initial: Record<string, string | string[]> = {};
@@ -100,6 +107,13 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     };
     fetchConfig();
   }, [productId]);
+
+  // Update CSS variables on color change
+  useEffect(() => {
+    document.documentElement.style.setProperty('--primary-color', colors.primary);
+    document.documentElement.style.setProperty('--button-text-color', colors.buttonText);
+    document.documentElement.style.setProperty('--button-hover-color', colors.buttonHover);
+  }, [colors]);
 
   const stepNumbers = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
   const maxStep = stepNumbers.length > 0 ? stepNumbers[stepNumbers.length - 1] : 1;
@@ -178,7 +192,47 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
         case 'radio':
           return <div className="space-y-2">{field.options.map((opt, i) => <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${value === opt.value ? `${theme.border} bg-opacity-5 ${theme.primary.replace('bg-', 'bg-opacity-5 bg-')}` : 'border-gray-200 hover:border-opacity-30'}`}><input type="radio" name={field.id} value={opt.value} checked={value === opt.value} onChange={() => handleChange(field.id, opt.value)} className={`w-4 h-4 ${theme.accent}`} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>)}</div>;
         case 'rating':
-          return <div className="flex gap-1">{Array.from({ length: field.max || 10 }, (_, i) => <button key={i} type="button" onClick={() => handleChange(field.id, String(i + 1))} className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all ${Number(value) === i + 1 ? `${theme.border} ${theme.primary} text-white` : 'border-gray-200 hover:border-opacity-50 text-gray-600'}`}>{i + 1}</button>)}</div>;
+          const ratingType = field.ratingType || 'number';
+          const maxRating = field.max || 5;
+          const emojis = ['😠', '🙁', '😐', '🙂', '🤩'];
+          
+          return (
+            <div className="flex flex-wrap gap-2 justify-center py-2">
+              {Array.from({ length: maxRating }, (_, i) => {
+                const ratingValue = String(i + 1);
+                const isSelected = value === ratingValue;
+                
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleChange(field.id, ratingValue)}
+                    className={`
+                      relative group transition-all duration-200 transform hover:scale-110
+                      ${ratingType === 'number' 
+                        ? `w-12 h-12 rounded-full border-2 flex items-center justify-center text-lg font-bold ${isSelected ? `${theme.border} ${theme.primary} text-[var(--button-text-color)] shadow-md` : 'border-gray-200 hover:border-gray-400 text-gray-600'}` 
+                        : 'p-1'}
+                    `}
+                  >
+                    {ratingType === 'star' && (
+                      <svg 
+                        className={`w-10 h-10 ${isSelected ? 'text-yellow-400 fill-current' : 'text-gray-300 group-hover:text-yellow-200'}`} 
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    )}
+                    {ratingType === 'emoji' && (
+                      <span className={`text-4xl filter grayscale-[0.5] hover:grayscale-0 transition-all ${isSelected ? 'grayscale-0 scale-125 drop-shadow-md' : 'opacity-60'}`}>
+                        {emojis[i] || '⭐'}
+                      </span>
+                    )}
+                    {ratingType === 'number' && ratingValue}
+                  </button>
+                );
+              })}
+            </div>
+          );
         case 'scale':
           return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className={`w-full ${theme.accent}`} /><div className="flex justify-between text-xs text-gray-500"><span>{field.min || 1}</span><span className={`font-bold ${theme.text.replace('text-', 'text-')} text-lg`}>{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
         case 'date':
@@ -211,10 +265,18 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
       <h2 className="text-2xl font-bold text-gray-900">{isRTL ? 'هذه الخدمة غير متاحة حالياً' : 'This service is currently unavailable'}</h2>
       <p className="text-gray-600 max-w-md">{isRTL ? 'عذراً، تم تعطيل هذه الخدمة مؤقتاً. يرجى التواصل معنا للمزيد من المعلومات.' : 'Sorry, this service has been temporarily disabled. Please contact us for more information.'}</p>
       <div className="flex gap-3">
-        <a href={`tel:+966500000000`} className="inline-flex items-center gap-2 px-6 py-3 bg-[#7A1E2E] text-white rounded-lg hover:bg-[#601824] transition-colors">
+        <a 
+          href={`tel:+966500000000`} 
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white transition-all font-medium"
+          style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+        >
           <Phone className="w-4 h-4" /> {isRTL ? 'اتصل بنا' : 'Call Us'}
         </a>
-        <a href={`mailto:info@orbit.sa`} className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#7A1E2E] text-[#7A1E2E] rounded-lg hover:bg-[#7A1E2E]/5 transition-colors">
+        <a 
+          href={`mailto:info@orbit.sa`} 
+          className="inline-flex items-center gap-2 px-6 py-3 border-2 rounded-lg transition-all font-medium"
+          style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
+        >
           <Mail className="w-4 h-4" /> {isRTL ? 'راسلنا' : 'Email Us'}
         </a>
       </div>
@@ -233,7 +295,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
           ? (closedMessage.ar || 'نعتذر منك، لقد تم الانتهاء من جمع الردود لهذا النموذج. شكراً لاهتمامك.') 
           : (closedMessage.en || 'Sorry, we are no longer accepting responses for this form. Thank you for your interest.')}
       </p>
-      <Link href="/" className="mt-4 text-[#7A1E2E] hover:underline font-medium">{isRTL ? 'العودة للرئيسية' : 'Go to Home'}</Link>
+      <Link href="/" className="mt-4 hover:underline font-medium" style={{ color: 'var(--primary-color)' }}>{isRTL ? 'العودة للرئيسية' : 'Go to Home'}</Link>
     </div>
   );
   if (isComplete) return (
@@ -249,7 +311,13 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
       {!thankYouMessage.ar && !thankYouMessage.en && (
         <p className="text-gray-600 text-lg">{isRTL ? 'سنتواصل معك قريباً' : 'We will contact you soon'}</p>
       )}
-      <Link href="/" className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[#7A1E2E] text-white rounded-lg hover:bg-[#601824] transition-colors font-medium">
+      <Link 
+        href="/" 
+        className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium"
+        style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+      >
         {isRTL ? 'العودة للرئيسية' : 'Go to Home'}
       </Link>
     </div>
@@ -269,7 +337,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
             <h1 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
               {isRTL ? (title.ar || title.en) : (title.en || title.ar)}
             </h1>
-            <div className="w-20 h-1.5 bg-[#7A1E2E] mx-auto mt-4 rounded-full" />
+            <div className="w-20 h-1.5 mx-auto mt-4 rounded-full" style={{ backgroundColor: 'var(--primary-color)' }} />
           </div>
         )}
 
@@ -294,12 +362,25 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
                   <ArrowLeft className={`w-4 h-4 ${isRTL ? 'mr-1' : 'mr-1'}`} /> {isRTL ? 'السابق' : 'Back'}
                 </Button>
                 {currentStep >= maxStep ? (
-                  <Button onClick={handleSubmit} disabled={isSubmitting} className={`${theme.primary} hover:opacity-90 text-white px-8`}>
+                  <Button 
+                    onClick={handleSubmit} 
+                    disabled={isSubmitting} 
+                    className={`${theme.primary} text-[var(--button-text-color)] hover:opacity-90 px-8 transition-all`}
+                    style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+                  >
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
                     {isRTL ? 'إرسال' : 'Submit'}
                   </Button>
                 ) : (
-                  <Button onClick={handleNext} className={`${theme.primary} hover:opacity-90 text-white px-6`}>
+                  <Button 
+                    onClick={handleNext} 
+                    className={`${theme.primary} text-[var(--button-text-color)] hover:opacity-90 px-6 transition-all`}
+                    style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+                  >
                     {isRTL ? 'التالي' : 'Next'} <ArrowRight className={`w-4 h-4 ${isRTL ? 'mr-1' : 'ml-1'}`} />
                   </Button>
                 )}
@@ -312,7 +393,14 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
               {fields.map(field => renderField(field))}
             </div>
             <div className="pt-6 border-t">
-              <Button onClick={handleSubmit} disabled={isSubmitting} className={`w-full ${theme.primary} hover:opacity-90 text-white h-14 text-lg font-bold`}>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={isSubmitting} 
+                className={`w-full ${theme.primary} text-[var(--button-text-color)] hover:opacity-90 h-14 text-lg font-bold transition-all`}
+                style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+              >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                 {isRTL ? 'إرسال البيانات' : 'Submit Response'}
               </Button>

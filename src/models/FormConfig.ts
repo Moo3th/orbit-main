@@ -18,6 +18,7 @@ const formFieldSchema = new mongoose.Schema({
   min: { type: Number, default: 1 },
   max: { type: Number, default: 10 },
   stepSize: { type: Number, default: 1 },
+  ratingType: { type: String, enum: ['star', 'emoji', 'number'], default: 'number' },
   options: { type: [formFieldOptionSchema], default: [] },
 }, { _id: false });
 
@@ -37,6 +38,9 @@ const formConfigSchema = new mongoose.Schema({
   slug: { type: String, trim: true, index: true },
   customDomain: { type: String, trim: true, index: true },
   notificationEmails: { type: String, default: '' },
+  primaryColor: { type: String, default: '#7A1E2E' },
+  buttonTextColor: { type: String, default: '#FFFFFF' },
+  buttonHoverColor: { type: String, default: '#601824' },
   isActive: { type: Boolean, default: true },
   fields: { type: [formFieldSchema], default: [] },
 }, { timestamps: true });

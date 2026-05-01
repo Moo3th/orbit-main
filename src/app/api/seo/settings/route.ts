@@ -141,8 +141,8 @@ export async function PUT(request: NextRequest) {
     console.log('Updated settings:', JSON.stringify(settings, null, 2));
 
     try {
-      revalidateTag('seo-settings', 'max');
-      revalidateTag('site-cms', 'max');
+      revalidateTag('seo-settings');
+      revalidateTag('site-cms');
 
       const pathsToRevalidate = ['/', '/contact', '/about-us', '/products/sms', '/products/whatsapp', '/products/o-time', '/products/gov-gate'];
       for (const path of pathsToRevalidate) {

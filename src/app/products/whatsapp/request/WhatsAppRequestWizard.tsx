@@ -42,15 +42,6 @@ interface FormField {
   options: FormFieldOption[];
 }
 
-const steps = [
-  { id: 1, key: 'plan', labelAr: 'اختر الباقة', labelEn: 'Choose Package' },
-  { id: 2, key: 'contact', labelAr: 'بيانات التواصل', labelEn: 'Contact Info' },
-  { id: 3, key: 'company', labelAr: 'بيانات الشركة', labelEn: 'Company Info' },
-  { id: 4, key: 'goal', labelAr: 'الهدف من الخدمة', labelEn: 'Service Goal' },
-  { id: 5, key: 'employees', labelAr: 'عدد الموظفين', labelEn: 'Employees' },
-  { id: 6, key: 'review', labelAr: 'مراجعة وإرسال', labelEn: 'Review & Submit' },
-];
-
 const defaultIndustryOptions = [
   { value: "retail", labelAr: "تجزئة ومبيعات", labelEn: "Retail & Sales" },
   { value: "restaurant", labelAr: "مطاعم وكافيهات", labelEn: "Restaurants & Cafes" },
@@ -174,8 +165,40 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
   }, []);
 
   const hasDynamicFields = dynamicFields.length > 0;
-  const maxDynamicStep = hasDynamicFields ? Math.max(...dynamicFields.map(f => f.step)) : 0;
-  const totalSteps = hasDynamicFields ? maxDynamicStep : 6;
+  
+  const steps = useMemo(() => {
+    const baseSteps = [
+      { id: 1, key: 'plan', labelAr: 'اختر الباقة', labelEn: 'Choose Package' },
+      { id: 2, key: 'contact', labelAr: 'بيانات التواصل', labelEn: 'Contact Info' },
+      { id: 3, key: 'company', labelAr: 'بيانات الشركة', labelEn: 'Company Info' },
+      { id: 4, key: 'goal', labelAr: 'الهدف من الخدمة', labelEn: 'Service Goal' },
+      { id: 5, key: 'employees', labelAr: 'عدد الموظفين', labelEn: 'Employees' },
+    ];
+    
+    // Get all step numbers from dynamic fields that are > 5
+    const dynamicStepNums = hasDynamicFields 
+      ? Array.from(new Set(dynamicFields.map(f => f.step))).filter(s => s > 5).sort((a, b) => a - b)
+      : [];
+
+    const additionalSteps = dynamicStepNums.map(s => ({
+      id: s,
+      key: `extra_${s}`,
+      labelAr: `خطوة إضافية ${s-5}`,
+      labelEn: `Extra Step ${s-5}`
+    }));
+
+    const lastStepId = Math.max(5, ...(additionalSteps.map(s => s.id))) + 1;
+
+    return [
+      ...baseSteps,
+      ...additionalSteps,
+      { id: lastStepId, key: 'review', labelAr: 'مراجعة وإرسال', labelEn: 'Review & Submit' }
+    ];
+  }, [hasDynamicFields, dynamicFields, isRTL]);
+
+  const totalSteps = steps.length;
+  const currentStepData = steps[currentStep - 1] || steps[0];
+  const reviewStepId = steps.find(s => s.key === 'review')?.id || 6;
 
   const defaultPricingPlans = useMemo(() => getDefaultWhatsAppPlans(isRTL), [isRTL]);
   const cmsPricingPlansRaw = useMemo(() => getCmsField(
@@ -320,15 +343,17 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      if (currentStep < totalSteps) {
-        setCurrentStep(currentStep + 1);
+      const currentIndex = steps.findIndex(s => s.id === currentStep);
+      if (currentIndex < steps.length - 1) {
+        setCurrentStep(steps[currentIndex + 1].id);
       }
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    const currentIndex = steps.findIndex(s => s.id === currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1].id);
     }
   };
 
@@ -509,6 +534,141 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
   };
 
   const renderStep = () => {
+    // Check if it's the review step
+    if (currentStep === reviewStepId) {
+      const selectedPlan = pricingPlans.find(p => p.id === formData.planId);
+      const selectedTier = selectedPlan?.tiers.find(t => t.name === formData.tierId);
+
+      const renderDynamicReviewFields = (stepNumber: number) => {
+        const fields = dynamicFields.filter(f => f.step === stepNumber);
+        if (fields.length === 0) return null;
+        return fields.map(field => {
+          const val = dynamicFormData[field.id];
+          const displayVal = Array.isArray(val) ? val.join(', ') : val || '-';
+          const label = isRTL ? field.labelAr : field.labelEn;
+          let displayLabel = label;
+          if (field.type === 'select' || field.type === 'radio') {
+            const opt = field.options.find(o => o.value === val);
+            displayLabel = label;
+            const displayValue = opt ? (isRTL ? opt.labelAr : opt.labelEn) : displayVal;
+            return (
+              <div key={field.id}>
+                <p className="text-sm text-gray-500">{displayLabel}</p>
+                <p className="font-bold text-[#161616]">{displayValue}</p>
+              </div>
+            );
+          }
+          if (field.type === 'multiselect' && Array.isArray(val)) {
+            const labels = val.map(v => {
+              const opt = field.options.find(o => o.value === v);
+              return opt ? (isRTL ? opt.labelAr : opt.labelEn) : v;
+            });
+            return (
+              <div key={field.id}>
+                <p className="text-sm text-gray-500">{displayLabel}</p>
+                <p className="font-bold text-[#161616]">{labels.join(', ')}</p>
+              </div>
+            );
+          }
+          return (
+            <div key={field.id}>
+              <p className="text-sm text-gray-500">{displayLabel}</p>
+              <p className="font-bold text-[#161616]" dir={field.type === 'email' || field.type === 'tel' ? 'ltr' : undefined}>{displayVal}</p>
+            </div>
+          );
+        });
+      };
+
+      const selectedIndustry = industryOptions.find(i => i.value === formData.industry);
+      const displayIndustry = formData.industry === 'other' 
+        ? formData.otherIndustry 
+        : (selectedIndustry ? (isRTL ? selectedIndustry.labelAr : selectedIndustry.labelEn) : '-');
+      
+      const selectedEmployees = employeeCountOptions.find(e => e.value === formData.employeeCount);
+
+      const selectedGoalsLabels = selectedGoals.map(g => {
+        const goal = goalOptions.find(o => o.value === g);
+        return goal ? (isRTL ? goal.labelAr : goal.labelEn) : g;
+      }).join(', ');
+
+      return (
+        <div className="space-y-6">
+          <div className="text-center mb-8">
+            <Badge className="bg-[#F15822] text-white border-none px-4 py-2 text-sm mb-3">
+              <Sparkles className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'ml-2'}`} />
+              {isRTL ? 'مراجعة الطلب' : 'Review Request'}
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
+              {isRTL ? 'مراجعة وإرسال' : 'Review & Submit'}
+            </h2>
+            <p className="text-gray-600 mt-2 text-lg">
+              {isRTL ? 'راجع بيانات طلبك قبل الإرسال' : 'Review your request before submitting'}
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto space-y-4">
+            <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] px-6 py-4">
+                <h3 className="text-white text-xl font-bold flex items-center gap-2">
+                  <MessageCircle className="w-6 h-6" />
+                  {isRTL ? 'الباقة المختارة' : 'Selected Package'}
+                </h3>
+              </div>
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                  <div>
+                    <p className="text-2xl font-extrabold text-[#161616]">
+                      {selectedPlan?.name}
+                    </p>
+                    <p className="text-lg text-gray-600">{selectedTier?.name}</p>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-3xl font-extrabold text-[#25D366]">
+                      {selectedTier?.price}
+                      <span className="text-sm text-gray-500"> {isRTL ? 'ر.س/شهر' : 'SAR/mo'}</span>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Base info review */}
+            <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                <h3 className="text-white text-xl font-bold flex items-center gap-2">
+                  <Users className="w-6 h-6" />
+                  {isRTL ? 'بيانات التواصل' : 'Contact Info'}
+                </h3>
+              </div>
+              <CardContent className="p-6 space-y-3">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">{isRTL ? 'الاسم' : 'Name'}</p>
+                    <p className="font-bold text-[#161616]">{formData.name || dynamicFormData.name || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">{isRTL ? 'البريد' : 'Email'}</p>
+                    <p className="font-bold text-[#161616]" dir="ltr">{formData.email || dynamicFormData.email || '-'}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-500">{isRTL ? 'الهاتف' : 'Phone'}</p>
+                    <p className="font-bold text-[#161616]" dir="ltr">{formData.phone || dynamicFormData.phone || '-'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Render any additional dynamic fields by step */}
+            {Array.from(new Set(dynamicFields.map(f => f.step))).sort((a,b)=>a-b).map(stepNum => (
+              <div key={stepNum} className="mt-4">
+                {renderDynamicReviewFields(stepNum)}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Default step rendering
     switch (currentStep) {
       case 1:
         return (
@@ -593,10 +753,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 2:
-        if (hasDynamicFields) {
-          const stepFields = dynamicFields.filter(f => f.step === 2);
-          if (stepFields.length > 0) return renderDynamicStepFields(2);
-        }
+        if (hasDynamicFields && dynamicFields.some(f => f.step === 2)) return renderDynamicStepFields(2);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -661,10 +818,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 3:
-        if (hasDynamicFields) {
-          const stepFields = dynamicFields.filter(f => f.step === 3);
-          if (stepFields.length > 0) return renderDynamicStepFields(3);
-        }
+        if (hasDynamicFields && dynamicFields.some(f => f.step === 3)) return renderDynamicStepFields(3);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -733,10 +887,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 4:
-        if (hasDynamicFields) {
-          const stepFields = dynamicFields.filter(f => f.step === 4);
-          if (stepFields.length > 0) return renderDynamicStepFields(4);
-        }
+        if (hasDynamicFields && dynamicFields.some(f => f.step === 4)) return renderDynamicStepFields(4);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -783,10 +934,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         );
 
       case 5:
-        if (hasDynamicFields) {
-          const stepFields = dynamicFields.filter(f => f.step === 5);
-          if (stepFields.length > 0) return renderDynamicStepFields(5);
-        }
+        if (hasDynamicFields && dynamicFields.some(f => f.step === 5)) return renderDynamicStepFields(5);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -832,243 +980,11 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
           </div>
         );
 
-      case 6:
-        const selectedPlan = pricingPlans.find(p => p.id === formData.planId);
-        const selectedTier = selectedPlan?.tiers.find(t => t.name === formData.tierId);
-
-        const renderDynamicReviewFields = (stepNumber: number) => {
-          const fields = dynamicFields.filter(f => f.step === stepNumber);
-          if (fields.length === 0) return null;
-          return fields.map(field => {
-            const val = dynamicFormData[field.id];
-            const displayVal = Array.isArray(val) ? val.join(', ') : val || '-';
-            const label = isRTL ? field.labelAr : field.labelEn;
-            let displayLabel = label;
-            if (field.type === 'select' || field.type === 'radio') {
-              const opt = field.options.find(o => o.value === val);
-              displayLabel = label;
-              const displayValue = opt ? (isRTL ? opt.labelAr : opt.labelEn) : displayVal;
-              return (
-                <div key={field.id}>
-                  <p className="text-sm text-gray-500">{displayLabel}</p>
-                  <p className="font-bold text-[#161616]">{displayValue}</p>
-                </div>
-              );
-            }
-            if (field.type === 'multiselect' && Array.isArray(val)) {
-              const labels = val.map(v => {
-                const opt = field.options.find(o => o.value === v);
-                return opt ? (isRTL ? opt.labelAr : opt.labelEn) : v;
-              });
-              return (
-                <div key={field.id}>
-                  <p className="text-sm text-gray-500">{displayLabel}</p>
-                  <p className="font-bold text-[#161616]">{labels.join(', ')}</p>
-                </div>
-              );
-            }
-            return (
-              <div key={field.id}>
-                <p className="text-sm text-gray-500">{displayLabel}</p>
-                <p className="font-bold text-[#161616]" dir={field.type === 'email' || field.type === 'tel' ? 'ltr' : undefined}>{displayVal}</p>
-              </div>
-            );
-          });
-        };
-
-        if (hasDynamicFields) {
-          const dynamicSteps = [2, 3, 4, 5].filter(s => dynamicFields.some(f => f.step === s));
-          const stepColors: Record<number, string> = { 2: 'from-blue-500 to-blue-600', 3: 'from-purple-500 to-purple-600', 4: 'from-orange-500 to-orange-600', 5: 'from-teal-500 to-teal-600' };
-          const stepIcons: Record<number, React.ElementType> = { 2: Users, 3: Building2, 4: Target, 5: Users };
-
-          return (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <Badge className="bg-[#F15822] text-white border-none px-4 py-2 text-sm mb-3">
-                  <Sparkles className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'ml-2'}`} />
-                  {isRTL ? 'مراجعة الطلب' : 'Review Request'}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
-                  {isRTL ? 'مراجعة وإرسال' : 'Review & Submit'}
-                </h2>
-                <p className="text-gray-600 mt-2 text-lg">
-                  {isRTL ? 'راجع بيانات طلبك قبل الإرسال' : 'Review your request before submitting'}
-                </p>
-              </div>
-              <div className="max-w-2xl mx-auto space-y-4">
-                <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                  <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] px-6 py-4">
-                    <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                      <MessageCircle className="w-6 h-6" />
-                      {isRTL ? 'الباقة المختارة' : 'Selected Package'}
-                    </h3>
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-center flex-wrap gap-4">
-                      <div>
-                        <p className="text-2xl font-extrabold text-[#161616]">
-                          {selectedPlan?.name}
-                        </p>
-                        <p className="text-lg text-gray-600">{selectedTier?.name}</p>
-                      </div>
-                      <div className="text-left">
-                        <p className="text-3xl font-extrabold text-[#25D366]">
-                          {selectedTier?.price}
-                          <span className="text-sm text-gray-500"> {isRTL ? 'ر.س/شهر' : 'SAR/mo'}</span>
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {dynamicSteps.map(step => {
-                  const StepIcon = stepIcons[step] || Users;
-                  const stepLabelAr = { 2: 'بيانات التواصل', 3: 'بيانات الشركة', 4: 'الهدف من الخدمة', 5: 'تفاصيل إضافية' }[step] || `الخطوة ${step}`;
-                  const stepLabelEn = { 2: 'Contact Info', 3: 'Company Info', 4: 'Service Goal', 5: 'Additional Details' }[step] || `Step ${step}`;
-                  return (
-                    <Card key={step} className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                      <div className={`bg-gradient-to-r ${stepColors[step] || 'from-gray-500 to-gray-600'} px-6 py-4`}>
-                        <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                          <StepIcon className="w-6 h-6" />
-                          {isRTL ? stepLabelAr : stepLabelEn}
-                        </h3>
-                      </div>
-                      <CardContent className="p-6 space-y-3">
-                        <div className="grid grid-cols-2 gap-4">
-                          {renderDynamicReviewFields(step)}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        }
-
-        const selectedIndustry = industryOptions.find(i => i.value === formData.industry);
-        const displayIndustry = formData.industry === 'other' 
-          ? formData.otherIndustry 
-          : (selectedIndustry ? (isRTL ? selectedIndustry.labelAr : selectedIndustry.labelEn) : '-');
-        
-        const selectedEmployees = employeeCountOptions.find(e => e.value === formData.employeeCount);
-
-        const selectedGoalsLabels = selectedGoals.map(g => {
-          const goal = goalOptions.find(o => o.value === g);
-          return goal ? (isRTL ? goal.labelAr : goal.labelEn) : g;
-        }).join(', ');
-
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <Badge className="bg-[#F15822] text-white border-none px-4 py-2 text-sm mb-3">
-                <Sparkles className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'ml-2'}`} />
-                {isRTL ? 'مراجعة الطلب' : 'Review Request'}
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
-                {isRTL ? 'مراجعة وإرسال' : 'Review & Submit'}
-              </h2>
-              <p className="text-gray-600 mt-2 text-lg">
-                {isRTL ? 'راجع بيانات طلبك قبل الإرسال' : 'Review your request before submitting'}
-              </p>
-            </div>
-            <div className="max-w-2xl mx-auto space-y-4">
-              <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] px-6 py-4">
-                  <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                    <MessageCircle className="w-6 h-6" />
-                    {isRTL ? 'الباقة المختارة' : 'Selected Package'}
-                  </h3>
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-center flex-wrap gap-4">
-                    <div>
-                      <p className="text-2xl font-extrabold text-[#161616]">
-                        {selectedPlan?.name}
-                      </p>
-                      <p className="text-lg text-gray-600">{selectedTier?.name}</p>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-3xl font-extrabold text-[#25D366]">
-                        {selectedTier?.price}
-                        <span className="text-sm text-gray-500"> {isRTL ? 'ر.س/شهر' : 'SAR/mo'}</span>
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-                  <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                    <Users className="w-6 h-6" />
-                    {isRTL ? 'بيانات التواصل' : 'Contact Info'}
-                  </h3>
-                </div>
-                <CardContent className="p-6 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">{isRTL ? 'الاسم' : 'Name'}</p>
-                      <p className="font-bold text-[#161616]">{formData.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">{isRTL ? 'البريد' : 'Email'}</p>
-                      <p className="font-bold text-[#161616]" dir="ltr">{formData.email}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500">{isRTL ? 'الهاتف' : 'Phone'}</p>
-                      <p className="font-bold text-[#161616]" dir="ltr">{formData.phone}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
-                  <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                    <Building2 className="w-6 h-6" />
-                    {isRTL ? 'بيانات الشركة' : 'Company Info'}
-                  </h3>
-                </div>
-                <CardContent className="p-6 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">{isRTL ? 'الشركة' : 'Company'}</p>
-                      <p className="font-bold text-[#161616]">{formData.companyName || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">{isRTL ? 'الصناعة' : 'Industry'}</p>
-                      <p className="font-bold text-[#161616]">{displayIndustry}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 border-gray-100 shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
-                  <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                    <Target className="w-6 h-6" />
-                    {isRTL ? 'الهدف والموظفين' : 'Goal & Employees'}
-                  </h3>
-                </div>
-                <CardContent className="p-6 space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">{isRTL ? 'الأهداف' : 'Goals'}</p>
-                    <p className="font-bold text-[#161616]">{selectedGoalsLabels}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">{isRTL ? 'عدد الموظفين' : 'Employees'}</p>
-                    <p className="font-bold text-[#161616]">
-                      {selectedEmployees ? (isRTL ? selectedEmployees.labelAr : selectedEmployees.labelEn) : '-'}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        );
-
       default:
+        // Render dynamic step if it matches
+        if (hasDynamicFields && dynamicFields.some(f => f.step === currentStep)) {
+          return renderDynamicStepFields(currentStep);
+        }
         return null;
     }
   };
@@ -1186,12 +1102,12 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
         </div>
 
         {/* Navigation Buttons */}
-        {currentStep < totalSteps && (
+        {currentStep !== reviewStepId && (
           <div className="flex justify-between mt-10 max-w-2xl mx-auto">
             <Button 
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 1}
+              disabled={currentStep === steps[0]?.id}
               className="px-8 h-12 text-lg border-2 border-gray-300 hover:border-gray-400"
             >
               <ArrowLeft className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
@@ -1207,8 +1123,18 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
           </div>
         )}
 
-        {currentStep === 6 && (
-          <div className="flex justify-center mt-10">
+        {currentStep === reviewStepId && (
+          <div className="flex flex-col items-center gap-4 mt-10">
+            <div className="flex justify-between w-full max-w-2xl mx-auto mb-4">
+               <Button 
+                variant="outline"
+                onClick={handleBack}
+                className="px-8 h-12 text-lg border-2 border-gray-300 hover:border-gray-400"
+              >
+                <ArrowLeft className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'السابق' : 'Back'}
+              </Button>
+            </div>
             <Button 
               onClick={handleSubmit}
               disabled={isSubmitting}
