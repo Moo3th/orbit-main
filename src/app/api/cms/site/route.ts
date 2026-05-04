@@ -125,8 +125,8 @@ export async function PUT(request: NextRequest) {
     
     try {
       // Revalidate cache tags for getSiteCmsSnapshot
-      revalidateTag('site-cms', 'max');
-      revalidateTag('seo-settings', 'max');
+      revalidateTag('site-cms');
+      revalidateTag('seo-settings');
       
       // Revalidate all page paths
       for (const path of pathsToRevalidate) {

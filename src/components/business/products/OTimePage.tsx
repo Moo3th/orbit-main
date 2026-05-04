@@ -11,8 +11,9 @@ import {
   FileText, Briefcase, Award, Clock, Settings, ChevronLeft, ChevronRight,
   ArrowRight, Play, Download, Star, Building2, BarChart3, Sparkles,
   MessageCircle, Bell, FileSpreadsheet, GraduationCap, Server, Monitor,
-  CheckSquare, CreditCard, MapPin, Mail, Phone, Video
+  CheckSquare, CreditCard, MapPin, Mail, Phone, Video, ArrowLeft
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import type { CmsPage } from '@/lib/cms/types';
 import { getCmsField } from '@/lib/cms/helpers';
@@ -32,33 +33,50 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   const [currentModule, setCurrentModule] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const heroBadge = getCmsField(cmsPage, 'ot-hero', 'badge', isRTL, isRTL ? "نظام الموارد البشرية السحابي المتكامل" : "Integrated Cloud HR System");
-  const heroTitle = getCmsField(
-    cmsPage,
-    'ot-hero',
-    'title',
-    isRTL,
-    isRTL ? "مركز قيادة متكامل" : "Comprehensive Command Center"
-  );
-  const heroDescription = getCmsField(
-    cmsPage,
-    'ot-hero',
-    'description',
-    isRTL,
-    isRTL
-      ? "من التوظيف إلى التقاعد، O-Time يمنحك السيطرة الكاملة على الرواتب، الحضور، الأداء، والتوظيف في منصة سحابية واحدة آمنة وقابلة للتوسع."
-      : "From recruitment to retirement, O-Time gives you full control over payroll, attendance, performance, and recruitment in a single, secure, and scalable cloud platform."
-  );
-  const heroHighlight = getCmsField(cmsPage, 'ot-hero', 'highlight', isRTL, isRTL ? "لإدارة الموارد البشرية" : "For Human Resources Management");
-  const primaryCtaText = getCmsField(cmsPage, 'ot-hero', 'cta_primary_text', isRTL, isRTL ? "احجز ديمو الآن" : "Book a Demo Now");
-  const primaryCtaType = getCmsField(cmsPage, 'ot-hero', 'cta_primary_type', isRTL, "external");
-  const primaryCtaUrlRaw = getCmsField(cmsPage, 'ot-hero', 'cta_primary_url', isRTL, "https://wa.me/966920006900");
-  const primaryCtaUrl = primaryCtaType === 'form' ? '/products/o-time/form' : primaryCtaUrlRaw;
 
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const slidesJson = getCmsField(cmsPage, 'ot-hero', 'slides_json', isRTL, '');
+  const slides = useMemo(() => {
+    try {
+      if (slidesJson) {
+        return JSON.parse(slidesJson);
+      }
+    } catch (e) {
+      console.error("Error parsing ot slides", e);
+    }
+    // Fallback to single static slide
+    return [{
+      id: 'default',
+      titleAr: getCmsField(cmsPage, 'ot-hero', 'title', true, "مركز قيادة متكامل"),
+      titleEn: getCmsField(cmsPage, 'ot-hero', 'title', false, "Comprehensive Command Center"),
+      descAr: getCmsField(cmsPage, 'ot-hero', 'description', true, "من التوظيف إلى التقاعد..."),
+      descEn: getCmsField(cmsPage, 'ot-hero', 'description', false, "From recruitment to retirement..."),
+      ctaTextAr: getCmsField(cmsPage, 'ot-hero', 'cta_primary_text', true, "احجز ديمو الآن"),
+      ctaTextEn: getCmsField(cmsPage, 'ot-hero', 'cta_primary_text', false, "Book a Demo Now"),
+      ctaUrl: getCmsField(cmsPage, 'ot-hero', 'cta_primary_url', isRTL, "https://wa.me/966920006900"),
+      badgeAr: getCmsField(cmsPage, 'ot-hero', 'badge', true, "نظام الموارد البشرية السحابي المتكامل"),
+      badgeEn: getCmsField(cmsPage, 'ot-hero', 'badge', false, "Integrated Cloud HR System"),
+      image: "", // Use dashboard mockup if empty
+    }];
+  }, [slidesJson, cmsPage, isRTL]);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const timer = setInterval(() => setCurrentSlideIndex(p => (p + 1) % slides.length), 6000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const currentSlide = slides[currentSlideIndex] || slides[0];
+  const heroBadge = isRTL ? currentSlide.badgeAr : currentSlide.badgeEn;
+  const heroTitle = isRTL ? currentSlide.titleAr : currentSlide.titleEn;
+  const heroDescription = isRTL ? currentSlide.descAr : currentSlide.descEn;
+  const primaryCtaText = isRTL ? currentSlide.ctaTextAr : currentSlide.ctaTextEn;
+  const primaryCtaUrl = currentSlide.ctaUrl || "https://wa.me/966920006900";
+
+  const heroHighlight = getCmsField(cmsPage, 'ot-hero', 'highlight', isRTL, isRTL ? "لإدارة الموارد البشرية" : "For Human Resources Management");
   const secondaryCtaText = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_text', isRTL, isRTL ? "جرب النظام مجاناً" : "Try the System for Free");
-  const secondaryCtaType = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_type', isRTL, "external");
   const secondaryCtaUrlRaw = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_url', isRTL, "https://otime.mobile.sa/register");
-  const secondaryCtaUrl = secondaryCtaType === 'form' ? '/products/o-time/form' : secondaryCtaUrlRaw;
+  const secondaryCtaUrl = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_type', isRTL, "external") === 'form' ? '/products/o-time/form' : secondaryCtaUrlRaw;
   const valueSectionTitle = getCmsField(cmsPage, 'ot-features', 'title', isRTL, isRTL ? "لماذا O-Time؟" : "Why O-Time?");
   const valueSectionSubtitle = getCmsField(cmsPage, 'ot-features', 'subtitle', isRTL, isRTL ? "منصة موحدة تجمع كل ما تحتاجه لإدارة الموارد البشرية بكفاءة عالية." : "A unified platform covering everything you need to manage HR efficiently.");
   const modulesSectionTitle = getCmsField(cmsPage, 'ot-features', 'modules_title', isRTL, isRTL ? "وحدات متكاملة لإدارة الموارد البشرية" : "Integrated HR Management Modules");
@@ -109,29 +127,198 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
     }
   };
 
-  const valueProps = [
+  const valueProps = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'value_props_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        const icons = [TrendingUp, BarChart3, Shield];
+        const colors = ["bg-blue-50", "bg-green-50", "bg-purple-50"];
+        const iconColors = ["text-blue-600", "text-green-600", "text-purple-600"];
+        return items.map((item: any, i: number) => ({
+          icon: icons[i % 3],
+          title: isRTL ? item.titleAr : item.titleEn,
+          description: isRTL ? item.descAr : item.descEn,
+          color: colors[i % 3],
+          iconColor: iconColors[i % 3],
+          customIcon: item.icon
+        }));
+      }
+    } catch (e) {}
+    return [
+      {
+        icon: TrendingUp,
+        title: isRTL ? "التميز التشغيلي" : "Operational Excellence",
+        description: isRTL ? "توحيد عمليات الموارد البشرية وتقليل العمل اليدوي والأخطاء بنسبة تصل إلى 80%" : "Unify HR operations and reduce manual work and errors by up to 80%",
+        color: "bg-blue-50",
+        iconColor: "text-blue-600"
+      },
+      {
+        icon: BarChart3,
+        title: isRTL ? "قرارات مبنية على البيانات" : "Data-Driven Decisions",
+        description: isRTL ? "لوحات تحكم تعرض تحليلات فورية للرواتب، الحضور، والأداء لدعم اتخاذ القرار" : "Dashboards showing real-time analytics for payroll, attendance, and performance to support decision making",
+        color: "bg-green-50",
+        iconColor: "text-green-600"
+      },
+      {
+        icon: Shield,
+        title: isRTL ? "أمان وسهولة" : "Secure & Simple",
+        description: isRTL ? "نظام سحابي مشفر، متوافق مع كافة الأجهزة، ويدعم الامتثال للأنظمة المحلية" : "Encrypted cloud system, compatible with all devices, and supports compliance with local regulations",
+        color: "bg-purple-50",
+        iconColor: "text-purple-600"
+      }
+    ];
+  }, [cmsPage, isRTL]);
+
+  const modules = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'modules_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        const icons = [Users, DollarSign, Clock, Target, Briefcase, CreditCard, Smartphone, GraduationCap];
+        const colors = [
+          "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
+          "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
+          "bg-gradient-to-br from-[#00BCD4] to-[#0097a7]",
+        ];
+        return items.map((item: any, i: number) => ({
+          icon: icons[i % 8],
+          title: isRTL ? item.titleAr : item.titleEn,
+          description: isRTL ? item.descAr : item.descEn,
+          color: colors[i % 3],
+          features: (isRTL ? item.listAr : item.listEn)?.split(',') || [],
+          customIcon: item.icon
+        }));
+      }
+    } catch (e) {}
+    return [
     {
-      icon: TrendingUp,
-      title: isRTL ? "التميز التشغيلي" : "Operational Excellence",
-      description: isRTL ? "توحيد عمليات الموارد البشرية وتقليل العمل اليدوي والأخطاء بنسبة تصل إلى 80%" : "Unify HR operations and reduce manual work and errors by up to 80%",
-      color: "bg-blue-50",
-      iconColor: "text-blue-600"
+      icon: Users,
+      title: isRTL ? "إدارة الموظفين والملفات" : "Employee & File Management",
+      description: isRTL ? "سجلات رقمية شاملة لدورة حياة الموظف الكاملة، إدارة العقود، الوثائق، والهيكل التنظيمي الديناميكي" : "Comprehensive digital records for the entire employee lifecycle, contract and document management, and dynamic organizational structure",
+      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
+      features: isRTL ? ["ملفات رقمية شاملة", "إدارة العقود والوثائق", "الهيكل التنظيمي", "المسار المهني"] : ["Comprehensive digital files", "Contract and document management", "Organizational structure", "Career path"]
     },
     {
-      icon: BarChart3,
-      title: isRTL ? "قرارات مبنية على البيانات" : "Data-Driven Decisions",
-      description: isRTL ? "لوحات تحكم تعرض تحليلات فورية للرواتب، الحضور، والأداء لدعم اتخاذ القرار" : "Dashboards showing real-time analytics for payroll, attendance, and performance to support decision making",
-      color: "bg-green-50",
-      iconColor: "text-green-600"
+      icon: DollarSign,
+      title: isRTL ? "نظام الرواتب الذكي" : "Smart Payroll System",
+      description: isRTL ? "إعداد مسيرات الرواتب تلقائياً، حساب البدلات والخصومات، وإصدار قسائم الدفع بما يتوافق مع نظام حماية الأجور" : "Automate payroll generation, calculate allowances and deductions, and issue payslips in compliance with the Wage Protection System",
+      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
+      features: isRTL ? ["حساب آلي للرواتب", "نظام حماية الأجور", "قسائم الراتب", "تقارير مالية"] : ["Automated salary calculation", "Wage protection system", "Payslips", "Financial reports"]
     },
     {
-      icon: Shield,
-      title: isRTL ? "أمان وسهولة" : "Secure & Simple",
-      description: isRTL ? "نظام سحابي مشفر، متوافق مع كافة الأجهزة، ويدعم الامتثال للأنظمة المحلية" : "Encrypted cloud system, compatible with all devices, and supports compliance with local regulations",
-      color: "bg-purple-50",
-      iconColor: "text-purple-600"
+      icon: Clock,
+      title: isRTL ? "الحضور والانصراف" : "Attendance & Departure",
+      description: isRTL ? "تتبع دقيق لساعات العمل عبر الأجهزة البيومترية أو الموقع الجغرافي، مع إدارة سهلة للإجازات والمغادرات" : "Accurate tracking of working hours via biometric devices or GPS, with easy management of leaves and early departures",
+      color: "bg-gradient-to-br from-[#00BCD4] to-[#0097a7]",
+      features: isRTL ? ["تتبع البصمة", "الموقع الجغرافي", "إدارة الإجازات", "نظام الورديات"] : ["Biometric tracking", "Geolocation", "Leave management", "Shift management"]
+    },
+    {
+      icon: Target,
+      title: isRTL ? "إدارة الأداء والتقييم" : "Performance & Evaluation Management",
+      description: isRTL ? "نظام KPIs متطور، تقييمات دورية، ومتابعة أهداف الموظفين لرفع الإنتاجية وتحقيق التميز" : "Advanced KPIs system, periodic evaluations, and tracking employee goals to increase productivity and achieve excellence",
+      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
+      features: isRTL ? ["نظام KPIs", "تقييمات دورية", "متابعة الأهداف", "تقارير الأداء"] : ["KPIs system", "Periodic evaluations", "Goal tracking", "Performance reports"]
+    },
+    {
+      icon: Briefcase,
+      title: isRTL ? "التوظيف والتهيئة" : "Recruitment & Onboarding",
+      description: isRTL ? "إدارة دورة التوظيف الكاملة من نشر الوظائف، فرز السير الذاتية، وحتى تهيئة الموظف الجديد (Onboarding)" : "Manage the entire recruitment cycle from job posting, resume screening, to new employee onboarding",
+      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
+      features: isRTL ? ["نظام ATS", "نشر الوظائف", "إدارة المقابلات", "Onboarding"] : ["ATS system", "Job posting", "Interview management", "Onboarding"]
+    },
+    {
+      icon: CreditCard,
+      title: isRTL ? "الإدارة المالية والعهدة" : "Financial & Custody Management",
+      description: isRTL ? "تتبع المصروفات، العهد العينية (Assets)، السلف والقروض، وإدارة ميزانية الموارد البشرية بدقة" : "Track expenses, physical assets, advances and loans, and accurately manage the HR budget",
+      color: "bg-gradient-to-br from-[#00BCD4] to-[#0097a7]",
+      features: isRTL ? ["إدارة العهد", "السلف والقروض", "المصروفات", "الميزانية"] : ["Custody management", "Advances and loans", "Expenses", "Budgeting"]
+    },
+    {
+      icon: Smartphone,
+      title: isRTL ? "الخدمة الذاتية للموظف" : "Employee Self-Service",
+      description: isRTL ? "تطبيق وبوابة تتيح للموظف تقديم الطلبات (إجازات، خطابات، سلف) ومتابعتها دون الرجوع لموظف HR" : "An application and portal that allows employees to submit requests (leaves, letters, advances) and track them without returning to the HR employee",
+      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
+      features: isRTL ? ["بوابة الموظف", "تقديم الطلبات", "قسائم الراتب", "السجل الوظيفي"] : ["Employee portal", "Submit requests", "Payslips", "Employment record"]
+    },
+    {
+      icon: GraduationCap,
+      title: isRTL ? "التدريب والتطوير" : "Training & Development",
+      description: isRTL ? "جدولة الدورات التدريبية، تتبع سجلات التدريب، وإدارة الشهادات لضمان النمو المستمر للموظفين" : "Schedule training courses, track training records, and manage certificates to ensure continuous employee growth",
+      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
+      features: isRTL ? ["إدارة الدورات", "سجلات التدريب", "الشهادات", "خطط التطوير"] : ["Course management", "Training records", "Certificates", "Development plans"]
     }
   ];
+  }, [cmsPage, isRTL]);
+
+  const uxFeatures = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'ux_features_json', isRTL, '');
+    try {
+       if (json) {
+         const items = JSON.parse(json);
+         const icons = [Bell, MessageCircle, FileSpreadsheet, Languages];
+         return items.map((item: any, i: number) => ({
+           icon: icons[i % 4],
+           title: isRTL ? item.titleAr : item.titleEn,
+           description: isRTL ? item.descAr : item.descEn,
+           customIcon: item.icon
+         }));
+       }
+    } catch (e) {}
+    return [
+    {
+      icon: Bell,
+      title: isRTL ? "تنبيهات فورية" : "Instant Notifications",
+      description: isRTL ? "قوالب إشعارات جاهزة للرواتب، الإجازات، والقرارات الإدارية" : "Ready-made notification templates for payroll, leaves, and administrative decisions"
+    },
+    {
+      icon: MessageCircle,
+      title: isRTL ? "تواصل فعال" : "Effective Communication",
+      description: isRTL ? "نظام رسائل داخلي متكامل وتكامل مع Zoom للاجتماعات" : "Integrated internal messaging system and integration with Zoom for meetings"
+    },
+    {
+      icon: FileSpreadsheet,
+      title: isRTL ? "تقارير بضغطة زر" : "One-Click Reports",
+      description: isRTL ? "أكثر من 20 تقرير جاهز للتصدير (Excel/PDF) لدعم اتخاذ القرار" : "More than 20 ready-to-export reports (Excel/PDF) to support decision making"
+    },
+    {
+      icon: Languages,
+      title: isRTL ? "واجهة متعددة اللغات" : "Multilingual Interface",
+      description: isRTL ? "دعم كامل للعربية والإنجليزية مع إمكانية التبديل الفوري" : "Full support for Arabic and English with instant switching capability"
+    }
+  ];
+  }, [cmsPage, isRTL]);
+
+  const screenshots = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'screenshots_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        return items.map((item: any) => ({
+          title: isRTL ? item.titleAr : item.titleEn,
+          description: isRTL ? item.descAr : item.descEn,
+          image: item.image
+        }));
+      }
+    } catch (e) {}
+    return [
+    {
+      title: isRTL ? "لوحة التحكم - مركز القيادة" : "Dashboard - Command Center",
+      description: isRTL ? "نظرة شاملة على جميع عمليات الموارد البشرية في لوحة واحدة" : "Comprehensive overview of all HR operations in a single dashboard",
+      image: dashboardImg
+    },
+    {
+      title: isRTL ? "نظام الرواتب الذكي" : "Smart Payroll System",
+      description: isRTL ? "حساب وإصدار الرواتب تلقائياً مع التوافق الكامل مع نظام حماية الأجور" : "Automated salary calculation and issuance, fully compliant with the Wage Protection System (WPS)",
+      image: payrollImg
+    },
+    {
+      title: isRTL ? "الحضور والانصراف" : "Attendance & Departure",
+      description: isRTL ? "تتبع دقيق لساعات العمل مع دعم البصمة والموقع الجغرافي" : "Accurate tracking of working hours with biometric and GPS support",
+      image: attendanceImg
+    }
+  ];
+  }, [cmsPage, isRTL]);
 
   const modules = [
     {
@@ -258,147 +445,166 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Hero Section */}
-      <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 bg-gradient-to-br from-[#E8DCCB] via-white to-[#D4CEC0] overflow-hidden">
+      <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 bg-gradient-to-br from-[#E8DCCB] via-white to-[#D4CEC0] overflow-hidden min-h-[600px] flex items-center">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdBMUUyRSIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
         
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            {/* النص - اليمين */}
-            <div className="text-right space-y-4 md:space-y-6">
-              <Badge className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] text-white border-none px-4 py-2 text-sm">
-                <Sparkles className="w-4 h-4 ml-2 inline" />
-                {heroBadge}
-              </Badge>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#161616] leading-tight">
-                {heroTitle}
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#104E8B] to-[#00BCD4]">{heroHighlight}</span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-[#606161] leading-relaxed max-w-xl">
-                {heroDescription}
-              </p>
-              
-              <div className="flex gap-4 flex-wrap">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] hover:from-[#0d3d6e] hover:to-[#0a2f56] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#104E8B]/30"
-                  onClick={() => {
-                    if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');
-                    else window.location.href = primaryCtaUrl;
-                  }}
-                >
-                  {primaryCtaText}
-                  <Play className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-2 border-[#FFA502] text-[#FFA502] hover:bg-[#FFA502] hover:text-white font-bold px-8 h-14 text-lg"
-                  onClick={() => {
-                    if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
-                    else window.location.href = secondaryCtaUrl;
-                  }}
-                >
-                  {secondaryCtaText}
-                  <ArrowRight className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
-                </Button>
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={currentSlideIndex}
+              initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRTL ? -30 : 30 }}
+              transition={{ duration: 0.5 }}
+              className="grid md:grid-cols-2 gap-8 md:gap-12 items-center"
+            >
+              {/* النص - اليمين */}
+              <div className="text-right space-y-4 md:space-y-6">
+                <Badge className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] text-white border-none px-4 py-2 text-sm">
+                  <Sparkles className="w-4 h-4 ml-2 inline" />
+                  {heroBadge}
+                </Badge>
+                
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#161616] leading-tight">
+                  {heroTitle}
+                  {heroHighlight && (
+                    <>
+                      <br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#104E8B] to-[#00BCD4]">{heroHighlight}</span>
+                    </>
+                  )}
+                </h1>
+                
+                <p className="text-lg md:text-xl text-[#606161] leading-relaxed max-w-xl">
+                  {heroDescription}
+                </p>
+                
+                <div className="flex gap-4 flex-wrap">
+                  <Button 
+                    size="lg" 
+                    className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] hover:from-[#0d3d6e] hover:to-[#0a2f56] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#104E8B]/30"
+                    onClick={() => {
+                      if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');
+                      else window.location.href = primaryCtaUrl;
+                    }}
+                  >
+                    {primaryCtaText}
+                    <Play className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-2 border-[#FFA502] text-[#FFA502] hover:bg-[#FFA502] hover:text-white font-bold px-8 h-14 text-lg"
+                    onClick={() => {
+                      if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
+                      else window.location.href = secondaryCtaUrl;
+                    }}
+                  >
+                    {secondaryCtaText}
+                    <ArrowRight className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* صورة Dashboard - اليسار */}
-            <div className="relative hidden md:block">
-              <div className="relative">
-                {/* Dashboard Mockup - Laptop */}
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-8 border-gray-200 bg-white mb-6">
-                  <div className="bg-gradient-to-r from-[#104E8B] to-[#00BCD4] p-3 flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                    </div>
-                    <div className="text-white text-sm mr-2">{isRTL ? "مركز القيادة - O-Time" : "Command Center - O-Time"}</div>
-                  </div>
-                  <div className="p-6 bg-gray-50">
-                    {/* محاكاة Dashboard */}
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                          <div className="text-xs text-gray-500 mb-1">{isRTL ? "إجمالي الموظفين" : "Total Employees"}</div>
-                          <div className="text-2xl font-bold text-blue-600">247</div>
-                          <div className="text-xs text-green-500 mt-1">↑ 12 {isRTL ? "هذا الشهر" : "this month"}</div>
+              {/* صورة Dashboard - اليسار */}
+              <div className="relative hidden md:block">
+                {currentSlide.image ? (
+                   <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-gray-100 bg-white">
+                     <img src={currentSlide.image} alt={heroTitle} className="w-full h-auto object-cover aspect-video" />
+                   </div>
+                ) : (
+                  <div className="relative">
+                    {/* Dashboard Mockup - Laptop */}
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-8 border-gray-200 bg-white mb-6">
+                      <div className="bg-gradient-to-r from-[#104E8B] to-[#00BCD4] p-3 flex items-center gap-2">
+                        <div className="flex gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-400"></div>
                         </div>
-                        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                          <div className="text-xs text-gray-500 mb-1">{isRTL ? "حاضر اليوم" : "Present Today"}</div>
-                          <div className="text-2xl font-bold text-green-600">234</div>
-                          <div className="text-xs text-gray-500 mt-1">94.7%</div>
-                        </div>
-                        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                          <div className="text-xs text-gray-500 mb-1">{isRTL ? "في إجازة" : "On Leave"}</div>
-                          <div className="text-2xl font-bold text-orange-600">13</div>
-                          <div className="text-xs text-gray-500 mt-1">5.3%</div>
-                        </div>
+                        <div className="text-white text-sm mr-2">{isRTL ? "مركز القيادة - O-Time" : "Command Center - O-Time"}</div>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="text-sm font-bold text-gray-700">{isRTL ? "معدل الحضور - هذا الأسبوع" : "Attendance Rate - This Week"}</div>
-                          <Badge className="bg-green-100 text-green-700 text-xs">{isRTL ? "ممتاز" : "Excellent"}</Badge>
-                        </div>
-                        <div className="flex items-end gap-2 h-20">
-                          {[85, 92, 88, 95, 90, 93, 91].map((val, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                              <div 
-                                className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t" 
-                                style={{height: `${val}%`}}
-                              ></div>
-                              <div className="text-[10px] text-gray-400">
-                                {isRTL ? ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'][i] : ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'][i]}
-                              </div>
+                      <div className="p-6 bg-gray-50">
+                        {/* محاكاة Dashboard */}
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                              <div className="text-xs text-gray-500 mb-1">{isRTL ? "إجمالي الموظفين" : "Total Employees"}</div>
+                              <div className="text-2xl font-bold text-blue-600">247</div>
+                              <div className="text-xs text-green-500 mt-1">↑ 12 {isRTL ? "هذا الشهر" : "this month"}</div>
                             </div>
-                          ))}
+                            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                              <div className="text-xs text-gray-500 mb-1">{isRTL ? "حاضر اليوم" : "Present Today"}</div>
+                              <div className="text-2xl font-bold text-green-600">234</div>
+                              <div className="text-xs text-gray-500 mt-1">94.7%</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                              <div className="text-xs text-gray-500 mb-1">{isRTL ? "في إجازة" : "On Leave"}</div>
+                              <div className="text-2xl font-bold text-orange-600">13</div>
+                              <div className="text-xs text-gray-500 mt-1">5.3%</div>
+                            </div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="text-sm font-bold text-gray-700">{isRTL ? "معدل الحضور - هذا الأسبوع" : "Attendance Rate - This Week"}</div>
+                              <Badge className="bg-green-100 text-green-700 text-xs">{isRTL ? "ممتاز" : "Excellent"}</Badge>
+                            </div>
+                            <div className="flex items-end gap-2 h-20">
+                              {[85, 92, 88, 95, 90, 93, 91].map((val, i) => (
+                                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                                  <div 
+                                    className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t" 
+                                    style={{height: `${val}%`}}
+                                  ></div>
+                                  <div className="text-[10px] text-gray-400">
+                                    {isRTL ? ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'][i] : ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'][i]}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                              <div className="text-xs text-purple-700 mb-1">{isRTL ? "طلبات معلقة" : "Pending Requests"}</div>
+                              <div className="text-xl font-bold text-purple-700">8</div>
+                            </div>
+                            <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 rounded-lg border border-orange-200">
+                              <div className="text-xs text-orange-700 mb-1">{isRTL ? "وظائف مفتوحة" : "Open Jobs"}</div>
+                              <div className="text-xl font-bold text-orange-700">5</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
-                          <div className="text-xs text-purple-700 mb-1">{isRTL ? "طلبات معلقة" : "Pending Requests"}</div>
-                          <div className="text-xl font-bold text-purple-700">8</div>
+                    </div>
+
+                    {/* Mobile Preview - متداخل */}
+                    <div className="absolute bottom-0 right-6 w-32 bg-gray-900 rounded-[1.5rem] shadow-2xl p-2 border-4 border-gray-800">
+                      <div className="bg-white rounded-[1rem] overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 text-center">
+                          <div className="text-white text-[10px] font-bold">O-Time</div>
                         </div>
-                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 rounded-lg border border-orange-200">
-                          <div className="text-xs text-orange-700 mb-1">{isRTL ? "وظائف مفتوحة" : "Open Jobs"}</div>
-                          <div className="text-xl font-bold text-orange-700">5</div>
+                        <div className="p-2 space-y-2 bg-gray-50">
+                          <div className="bg-white p-2 rounded shadow-sm">
+                            <div className="text-[8px] text-gray-500">{isRTL ? "الحضور" : "Attendance"}</div>
+                            <div className="text-xs font-bold text-green-600">{isRTL ? "8:30 ص" : "8:30 AM"}</div>
+                          </div>
+                          <div className="bg-white p-2 rounded shadow-sm">
+                            <div className="text-[8px] text-gray-500">{isRTL ? "الإجازات" : "Leaves"}</div>
+                            <div className="text-xs font-bold text-blue-600">{isRTL ? "12 يوم" : "12 Days"}</div>
+                          </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* شارة التميز */}
+                    <div className="absolute -bottom-4 -left-4 bg-white rounded-full p-3 shadow-xl border-4 border-indigo-100">
+                      <Award className="w-12 h-12 text-indigo-600" />
                     </div>
                   </div>
-                </div>
-
-                {/* Mobile Preview - متداخل */}
-                <div className="absolute bottom-0 right-6 w-32 bg-gray-900 rounded-[1.5rem] shadow-2xl p-2 border-4 border-gray-800">
-                  <div className="bg-white rounded-[1rem] overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 text-center">
-                      <div className="text-white text-[10px] font-bold">O-Time</div>
-                    </div>
-                    <div className="p-2 space-y-2 bg-gray-50">
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="text-[8px] text-gray-500">{isRTL ? "الحضور" : "Attendance"}</div>
-                        <div className="text-xs font-bold text-green-600">{isRTL ? "8:30 ص" : "8:30 AM"}</div>
-                      </div>
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="text-[8px] text-gray-500">{isRTL ? "الإجازات" : "Leaves"}</div>
-                        <div className="text-xs font-bold text-blue-600">{isRTL ? "12 يوم" : "12 Days"}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* شارة التميز */}
-                <div className="absolute -bottom-4 -left-4 bg-white rounded-full p-3 shadow-xl border-4 border-indigo-100">
-                  <Award className="w-12 h-12 text-indigo-600" />
-                </div>
+                )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
 
@@ -422,7 +628,11 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
               <Card key={index} className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <CardContent className="p-6 text-center">
                   <div className={`${prop.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4`}>
-                    <prop.icon className={`w-8 h-8 ${prop.iconColor}`} />
+                    {prop.customIcon ? (
+                       <img src={prop.customIcon} className="w-9 h-9 object-contain" alt="" />
+                    ) : (
+                       <prop.icon className={`w-8 h-8 ${prop.iconColor}`} />
+                    )}
                   </div>
                   <h3 className="text-xl font-bold text-[#161616] mb-3">
                     {prop.title}
@@ -457,7 +667,11 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
             {modules.map((module, index) => (
               <Card key={index} className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group">
                 <div className={`${module.color} p-5 text-white`}>
-                  <module.icon className="w-10 h-10 mb-3" />
+                  {module.customIcon ? (
+                     <img src={module.customIcon} className="w-12 h-12 mb-3 object-contain" alt="" />
+                  ) : (
+                     <module.icon className="w-10 h-10 mb-3" />
+                  )}
                   <h3 className="text-lg font-bold leading-tight">{module.title}</h3>
                 </div>
                 <CardContent className="p-5">
@@ -535,10 +749,14 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {uxFeatures.map((feature, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all">
+              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all group">
                 <CardContent className="p-6 text-center">
-                  <div className="bg-white/20 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-7 h-7 text-white" />
+                  <div className="bg-white/20 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    {feature.customIcon ? (
+                       <img src={feature.customIcon} className="w-8 h-8 object-contain" alt="" />
+                    ) : (
+                       <feature.icon className="w-7 h-7 text-white" />
+                    )}
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">
                     {feature.title}

@@ -16,13 +16,13 @@ export async function POST(request: NextRequest) {
 
     try {
       // Check if admin already exists
-      const adminExists = await User.findOne({ email: 'admin@orbit.com.sa' });
+      const adminExists = await User.findOne({ email: 'admin@corbit' });
       
       if (adminExists) {
         return NextResponse.json(
           { 
             message: 'Admin user already exists',
-            email: 'admin@orbit.com.sa',
+            email: 'admin@corbit',
             exists: true
           },
           { status: 200 }
@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
 
       // Create admin user
       const admin = await User.create({
-        email: 'admin@orbit.com.sa',
-        password: 'Abd123#Abd',
+        email: 'admin@corbit',
+        password: 'AAaa12341234',
         name: 'ORBIT Admin',
         role: 'admin',
       });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         message: 'Admin user created successfully',
         email: admin.email,
         name: admin.name,
-        password: 'Abd123#Abd', // Show password only on creation
+        password: 'AAaa12341234', // Show password only on creation
         note: 'Please change this password after first login for security',
       });
     } catch (dbError: any) {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { 
             error: 'Admin user already exists',
-            email: 'admin@orbit.com.sa'
+            email: 'admin@corbit'
           },
           { status: 409 }
         );
@@ -86,7 +86,7 @@ export async function GET() {
     }
 
     try {
-      const admin = await User.findOne({ email: 'admin@orbit.com.sa' });
+      const admin = await User.findOne({ email: 'admin@corbit' });
       
       if (admin) {
         return NextResponse.json({

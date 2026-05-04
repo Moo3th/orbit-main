@@ -121,7 +121,7 @@ export interface SectionField {
   key: string;
   label: string;
   labelEn: string;
-  type: "text" | "textarea" | "url" | "list" | "select";
+  type: "text" | "textarea" | "url" | "list" | "select" | "image";
   value: string;
   valueEn?: string;
   options?: { value: string; label: string; labelEn: string }[];
@@ -261,6 +261,7 @@ const homeSolutionsExtraFields: SectionField[] = [
 ];
 
 const homeHeroExtraFields: SectionField[] = [
+  { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "badge", label: "شارة الهيرو", labelEn: "Hero Badge", type: "text", value: "حلول تقنية رائدة", valueEn: "Leading Technical Solutions" },
   { key: "title", label: "عنوان الهيرو الرئيسي", labelEn: "Hero Main Title", type: "text", value: "نتيجة ربط الأنظمة", valueEn: "Connecting Systems, Delivering Results" },
   { key: "description", label: "وصف الهيرو", labelEn: "Hero Description", type: "textarea", value: "نوفر لك منصات مراسلة احترافية عبر الرسائل النصية وواتساب أعمال وحلول الموارد البشرية وبوابات المراسلة الحكومية.", valueEn: "We provide professional messaging platforms via SMS, WhatsApp Business, HR solutions, and government messaging gateways." },
@@ -269,7 +270,7 @@ const homeHeroExtraFields: SectionField[] = [
   { key: "cta2_text", label: "نص الزر الثانوي", labelEn: "Secondary CTA Text", type: "text", value: "تحدث مع المبيعات", valueEn: "Talk to Sales" },
   { key: "trust_text", label: "نص شارة الثقة", labelEn: "Trust Badge Text", type: "text", value: "موثوق من أكثر من 100 شركة", valueEn: "Trusted by 100+ companies" },
   { key: "cta_api_docs_url", label: "رابط زر تصفح ملفات API", labelEn: "Browse API Docs Button URL", type: "url", value: "https://drive.google.com/file/d/1xhdFti973PHqik0T5rGGDipm_30gq064/view?usp=drive_link", valueEn: "https://drive.google.com/file/d/1xhdFti973PHqik0T5rGGDipm_30gq064/view?usp=drive_link" },
-  { key: "hero_image_url", label: "رابط صورة البطل", labelEn: "Hero Image URL", type: "url", value: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", valueEn: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" },
+  { key: "hero_image_url", label: "رابط صورة البطل", labelEn: "Hero Image URL", type: "image", value: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", valueEn: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" },
   { key: "notification_title", label: "عنوان الإشعار", labelEn: "Notification Title", type: "text", value: "رسالة جديدة", valueEn: "New Message" },
   { key: "notification_desc", label: "وصف الإشعار", labelEn: "Notification Description", type: "text", value: "تم تأكيد طلبك بنجاح", valueEn: "Your order has been confirmed" },
 ];
@@ -298,7 +299,14 @@ const ensureHomeHeroFields = (pages: PageData[]): PageData[] => {
     const safeFields = Array.isArray(heroSection.fields) ? heroSection.fields : [];
     const existingKeys = new Set(safeFields.map((field) => field.key));
     const missingFields = homeHeroExtraFields.filter((field) => !existingKeys.has(field.key));
-    if (!missingFields.length) {
+    
+    // Also ensure type is updated for hero_image_url
+    const updatedFields = safeFields.map(f => {
+       if (f.key === 'hero_image_url') return { ...f, type: 'image' as const };
+       return f;
+    });
+
+    if (!missingFields.length && safeFields.length === updatedFields.length) {
       return page;
     }
 
@@ -306,7 +314,7 @@ const ensureHomeHeroFields = (pages: PageData[]): PageData[] => {
       ...page,
       sections: page.sections.map((section, index) =>
         index === heroIndex
-          ? { ...section, fields: [...safeFields, ...missingFields] }
+          ? { ...section, fields: [...updatedFields, ...missingFields] }
           : section
       ),
     };
@@ -377,12 +385,8 @@ const homePersonaTabsFields: SectionField[] = [
 const homeIntegrationsFields: SectionField[] = [
   { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "نعمل مع أدواتك المفضلة", valueEn: "We Work with Your Favorite Tools" },
   { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "text", value: "لن تضطر لتغيير نظام عملك الحالي، نحن نندمج معه بسهولة.", valueEn: "You won't have to change your current workflow; we integrate with it seamlessly." },
-  { key: "integrations_list", label: "أسماء التكاملات (مفصولة بفواصل)", labelEn: "Integration Names (comma separated)", type: "list", value: "سلة,دفترة,نور,اتقان,حضوري", valueEn: "Salla,Daftra,Noor,Itqan,Huddari" },
-  { key: "integration_salla_icon", label: "أيقونة سلة", labelEn: "Salla Icon", type: "url", value: "/1/salla.svg", valueEn: "/1/salla.svg" },
-  { key: "integration_daftra_icon", label: "أيقونة دفترة", labelEn: "Daftra Icon", type: "url", value: "/1/daftra.png", valueEn: "/1/daftra.png" },
-  { key: "integration_noor_icon", label: "أيقونة نور", labelEn: "Noor Icon", type: "url", value: "/1/noor.png", valueEn: "/1/noor.png" },
-  { key: "integration_itqan_icon", label: "أيقونة إتقان", labelEn: "Itqan Icon", type: "url", value: "/1/etqan.jpeg", valueEn: "/1/etqan.jpeg" },
-  { key: "integration_huddari_icon", label: "أيقونة حضوري", labelEn: "Huddari Icon", type: "url", value: "/1/huddari.png", valueEn: "/1/huddari.png" },
+  { key: "integrations_json", label: "قائمة التكاملات (JSON)", labelEn: "Integrations List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "integrations_list", label: "أسماء التكاملات (مفصولة بفواصل) - قديم", labelEn: "Integration Names (legacy)", type: "text", value: "سلة,دفترة,نور,اتقان,حضوري", valueEn: "Salla,Daftra,Noor,Itqan,Huddari" },
 ];
 
 const ensureHomePersonaTabsFields = (pages: PageData[]): PageData[] => {
@@ -556,6 +560,7 @@ const ensureHomeWhyUsFields = (pages: PageData[]): PageData[] => {
 };
 
 const smsHeroFields: SectionField[] = [
+  { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "retail_title", label: "عنوان تبويب التجزئة", labelEn: "Retail Tab Title", type: "text", value: "التجزئة والتجارة", valueEn: "Retail & Commerce" },
   { key: "retail_description", label: "وصف تبويب التجزئة", labelEn: "Retail Tab Description", type: "textarea", value: "أرسل عروضك التسويقية لآلاف العملاء بضغطة زر.", valueEn: "Send your marketing offers to thousands of customers with one click." },
   { key: "retail_cta", label: "نص زر التجزئة", labelEn: "Retail CTA Text", type: "text", value: "ابدأ الآن", valueEn: "Start Now" },
@@ -605,12 +610,13 @@ const smsHeroFields: SectionField[] = [
 
 const smsValueFields: SectionField[] = [
   { key: "title", label: "عنوان قسم المميزات", labelEn: "Value Props Title", type: "text", value: "لماذا الرسائل النصية مع المدار؟", valueEn: "Why SMS with ORBIT?" },
-  { key: "feature1_title", label: "عنوان الميزة 1", labelEn: "Feature 1 Title", type: "text", value: "سرعة فورية", valueEn: "Zero Latency" },
-  { key: "feature1_desc", label: "وصف الميزة 1", labelEn: "Feature 1 Description", type: "textarea", value: "رسائلك تصل في ثوانٍ معدودة، حتى في أوقات الذروة.", valueEn: "Your messages arrive in seconds, even during peak times." },
-  { key: "feature2_title", label: "عنوان الميزة 2", labelEn: "Feature 2 Title", type: "text", value: "معرف مرسل خاص", valueEn: "Your Own Sender ID" },
-  { key: "feature2_desc", label: "وصف الميزة 2", labelEn: "Feature 2 Description", type: "textarea", value: "أرسل باسم شركتك وعزز هويتك التجارية مع كل رسالة.", valueEn: "Send with your company name and reinforce your brand with every message." },
-  { key: "feature3_title", label: "عنوان الميزة 3", labelEn: "Feature 3 Title", type: "text", value: "دعم فني سريع", valueEn: "Fast Tech Support" },
-  { key: "feature3_desc", label: "وصف الميزة 3", labelEn: "Feature 3 Description", type: "textarea", value: "فريق الدعم الفني السعودي متاح على مدار الساعة لمساعدتك.", valueEn: "Our Saudi tech support team is available 24/7 to help you." },
+  { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "feature1_title", label: "عنوان الميزة 1 (قديم)", labelEn: "Feature 1 Title", type: "text", value: "سرعة فورية", valueEn: "Zero Latency" },
+  { key: "feature1_desc", label: "وصف الميزة 1 (قديم)", labelEn: "Feature 1 Description", type: "textarea", value: "رسائلك تصل في ثوانٍ معدودة، حتى في أوقات الذروة.", valueEn: "Your messages arrive in seconds, even during peak times." },
+  { key: "feature2_title", label: "عنوان الميزة 2 (قديم)", labelEn: "Feature 2 Title", type: "text", value: "معرف مرسل خاص", valueEn: "Your Own Sender ID" },
+  { key: "feature2_desc", label: "وصف الميزة 2 (قديم)", labelEn: "Feature 2 Description", type: "textarea", value: "أرسل باسم شركتك وعزز هويتك التجارية مع كل رسالة.", valueEn: "Send with your company name and reinforce your brand with every message." },
+  { key: "feature3_title", label: "عنوان الميزة 3 (قديم)", labelEn: "Feature 3 Title", type: "text", value: "دعم فني سريع", valueEn: "Fast Tech Support" },
+  { key: "feature3_desc", label: "وصف الميزة 3 (قديم)", labelEn: "Feature 3 Description", type: "textarea", value: "فريق الدعم الفني السعودي متاح على مدار الساعة لمساعدتك.", valueEn: "Our Saudi tech support team is available 24/7 to help you." },
 ];
 
 const smsSpecialOfferFields: SectionField[] = [
@@ -624,12 +630,13 @@ const smsSpecialOfferFields: SectionField[] = [
 
 const smsUseCasesFields: SectionField[] = [
   { key: "title", label: "عنوان حالات الاستخدام", labelEn: "Use Cases Title", type: "text", value: "حالات الاستخدام", valueEn: "Use Cases" },
-  { key: "otp_title", label: "عنوان OTP", labelEn: "OTP Title", type: "text", value: "التحقق بخطوة واحدة", valueEn: "One-Step Verification" },
-  { key: "otp_desc", label: "وصف OTP", labelEn: "OTP Description", type: "textarea", value: "أكواد تحقق فورية تصل في ثوانٍ لحماية حسابات مستخدميك.", valueEn: "Instant verification codes delivered in seconds to protect user accounts." },
-  { key: "api_title", label: "عنوان API", labelEn: "API Title", type: "text", value: "تكامل API مرن", valueEn: "Flexible API Integration" },
-  { key: "api_desc", label: "وصف API", labelEn: "API Description", type: "textarea", value: "ربط سهل مع أنظمتك الحالية عبر REST API مرن وموثق بالكامل.", valueEn: "Easy integration with your existing systems through a well-documented, flexible REST API." },
-  { key: "marketing_title", label: "عنوان التسويق", labelEn: "Marketing Title", type: "text", value: "حملات تسويقية ذكية", valueEn: "Smart Marketing Campaigns" },
-  { key: "marketing_desc", label: "وصف التسويق", labelEn: "Marketing Description", type: "textarea", value: "أرسل حملات مخصصة لشرائح مختلفة من عملائك مع تقارير أداء مفصلة.", valueEn: "Send personalized campaigns to different customer segments with detailed performance reports." },
+  { key: "usecases_json", label: "حالات الاستخدام (JSON)", labelEn: "Use Cases (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "otp_title", label: "عنوان OTP (قديم)", labelEn: "OTP Title", type: "text", value: "التحقق بخطوة واحدة", valueEn: "One-Step Verification" },
+  { key: "otp_desc", label: "وصف OTP (قديم)", labelEn: "OTP Description", type: "textarea", value: "أكواد تحقق فورية تصل في ثوانٍ لحماية حسابات مستخدميك.", valueEn: "Instant verification codes delivered in seconds to protect user accounts." },
+  { key: "api_title", label: "عنوان API (قديم)", labelEn: "API Title", type: "text", value: "تكامل API مرن", valueEn: "Flexible API Integration" },
+  { key: "api_desc", label: "وصف API (قديم)", labelEn: "API Description", type: "textarea", value: "ربط سهل مع أنظمتك الحالية عبر REST API مرن وموثق بالكامل.", valueEn: "Easy integration with your existing systems through a well-documented, flexible REST API." },
+  { key: "marketing_title", label: "عنوان التسويق (قديم)", labelEn: "Marketing Title", type: "text", value: "حملات تسويقية ذكية", valueEn: "Smart Marketing Campaigns" },
+  { key: "marketing_desc", label: "وصف التسويق (قديم)", labelEn: "Marketing Description", type: "textarea", value: "أرسل حملات مخصصة لشرائح مختلفة من عملائك مع تقارير أداء مفصلة.", valueEn: "Send personalized campaigns to different customer segments with detailed performance reports." },
 ];
 
 const smsDevelopersFields: SectionField[] = [
@@ -638,10 +645,11 @@ const smsDevelopersFields: SectionField[] = [
   { key: "description", label: "وصف قسم المطورين", labelEn: "Developer Description", type: "textarea", value: "REST API مرن مع توثيق شامل ودعم فني مخصص. انسخ الكود وابدأ الإرسال في 5 دقائق.", valueEn: "Flexible REST API with complete documentation and dedicated support. Copy the code and start sending in 5 minutes." },
   { key: "cta_text", label: "نص زر التوثيق", labelEn: "Docs Button Text", type: "text", value: "تصفح ملفات الـ API", valueEn: "Browse API Docs" },
   { key: "cta_url", label: "رابط التوثيق", labelEn: "Docs URL", type: "url", value: "https://drive.google.com/file/d/1xhdFti973PHqik0T5rGGDipm_30gq064/view", valueEn: "https://drive.google.com/file/d/1xhdFti973PHqik0T5rGGDipm_30gq064/view" },
-  { key: "platform_1", label: "منصة تكامل 1", labelEn: "Integration Platform 1", type: "text", value: "دفترة", valueEn: "Daftra" },
-  { key: "platform_2", label: "منصة تكامل 2", labelEn: "Integration Platform 2", type: "text", value: "سلة", valueEn: "Salla" },
-  { key: "platform_3", label: "منصة تكامل 3", labelEn: "Integration Platform 3", type: "text", value: "نظام نور", valueEn: "Noor System" },
-  { key: "platform_4", label: "منصة تكامل 4", labelEn: "Integration Platform 4", type: "text", value: "إتقان", valueEn: "Itqan" },
+  { key: "platforms_json", label: "منصات التكامل (JSON)", labelEn: "Platforms List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "platform_1", label: "منصة تكامل 1 (قديم)", labelEn: "Integration Platform 1", type: "text", value: "دفترة", valueEn: "Daftra" },
+  { key: "platform_2", label: "منصة تكامل 2 (قديم)", labelEn: "Integration Platform 2", type: "text", value: "سلة", valueEn: "Salla" },
+  { key: "platform_3", label: "منصة تكامل 3 (قديم)", labelEn: "Integration Platform 3", type: "text", value: "نظام نور", valueEn: "Noor System" },
+  { key: "platform_4", label: "منصة تكامل 4 (قديم)", labelEn: "Integration Platform 4", type: "text", value: "إتقان", valueEn: "Itqan" },
 ];
 
 const smsFinalCtaFields: SectionField[] = [
@@ -677,12 +685,25 @@ const ensureSmsSection = (pages: PageData[], sectionId: string, sectionName: str
   });
 };
 
+const smsPricingFields: SectionField[] = [
+  { key: "title", label: "عنوان قسم الأسعار", labelEn: "Pricing Title", type: "text", value: "اختر الباقة التي تناسبك، واضمن راحة بالك", valueEn: "Choose the package that suits you, and ensure your peace of mind" },
+  { key: "subtitle", label: "وصف قسم الأسعار", labelEn: "Pricing Subtitle", type: "textarea", value: "أسعار شاملة الضريبة، بدون رسوم خفية، ومعك خطوة بخطوة حتى الإرسال.", valueEn: "Prices include tax, no hidden fees, and we are with you step by step until sending." },
+  { key: "benefit1_label", label: "ميزة 1 - العنوان", labelEn: "Benefit 1 Label", type: "text", value: "صلاحية سنة كاملة", valueEn: "Full year validity" },
+  { key: "benefit1_desc", label: "ميزة 1 - الوصف", labelEn: "Benefit 1 Desc", type: "text", value: "رصيدك متاح لمدة 365 يوم", valueEn: "Your balance is available for 365 days" },
+  { key: "benefit2_label", label: "ميزة 2 - العنوان", labelEn: "Benefit 2 Label", type: "text", value: "دعم تفعيل الاسم", valueEn: "Name activation support" },
+  { key: "benefit2_desc", label: "ميزة 2 - الوصف", labelEn: "Benefit 2 Desc", type: "text", value: "نساعدك في اعتماد اسم المرسل", valueEn: "We help you approve the sender name" },
+  { key: "benefit3_label", label: "ميزة 3 - العنوان", labelEn: "Benefit 3 Label", type: "text", value: "تفعيل فوري", valueEn: "Instant activation" },
+  { key: "benefit3_desc", label: "ميزة 3 - الوصف", labelEn: "Benefit 3 Desc", type: "text", value: "اشحن وابدأ الإرسال مباشرة", valueEn: "Top up and start sending directly" },
+  { key: "plans_list", label: "قائمة الباقات", labelEn: "Plans List", type: "list", value: "", valueEn: "" },
+];
+
 const ensureSmsFields = (pages: PageData[]): PageData[] => {
   let result = ensureSmsSection(pages, "sms-hero", "هيرو SMS", "SMS Hero", smsHeroFields);
   result = ensureSmsSection(result, "sms-value", "مميزات SMS", "SMS Value Props", smsValueFields);
   result = ensureSmsSection(result, "sms-special-offer", "عرض خاص", "Special Offer", smsSpecialOfferFields);
   result = ensureSmsSection(result, "sms-usecases", "حالات الاستخدام", "Use Cases", smsUseCasesFields);
   result = ensureSmsSection(result, "sms-developers", "المطورين", "Developers", smsDevelopersFields);
+  result = ensureSmsSection(result, "sms-pricing", "أسعار SMS", "SMS Pricing", smsPricingFields);
   result = ensureSmsSection(result, "sms-final-cta", "CTA نهائي", "Final CTA", smsFinalCtaFields);
   return result;
 };
@@ -901,70 +922,8 @@ const ensureWhatsAppRequestFormFields = (pages: PageData[]): PageData[] => {
   });
 };
 
-const waWhyFields: SectionField[] = [
-  { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "المميزات الرئيسية", valueEn: "Key Features" },
-  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا واتساب الأعمال؟", valueEn: "Why WhatsApp Business?" },
-  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "text", value: "المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة", valueEn: "The most trusted and widespread platform for communicating with your customers in the Kingdom" },
-  { key: "feature1_title", label: "ميزة 1 - العنوان", labelEn: "Feature 1 Title", type: "text", value: "المنصة رقم 1 في المملكة", valueEn: "The #1 Platform in the Kingdom" },
-  { key: "feature1_desc", label: "ميزة 1 - الوصف", labelEn: "Feature 1 Description", type: "text", value: "الأكثر انتشاراً واستخداماً في السعودية", valueEn: "The most widespread and used in Saudi Arabia" },
-  { key: "feature2_title", label: "ميزة 2 - العنوان", labelEn: "Feature 2 Title", type: "text", value: "معدل فتح 98%", valueEn: "98% Open Rate" },
-  { key: "feature2_desc", label: "ميزة 2 - الوصف", labelEn: "Feature 2 Description", type: "text", value: "يتم فتح وقراءة معظم الرسائل فوراً", valueEn: "Most messages are opened and read immediately" },
-  { key: "feature3_title", label: "ميزة 3 - العنوان", labelEn: "Feature 3 Title", type: "text", value: "آمن وموثوق", valueEn: "Secure & Reliable" },
-  { key: "feature3_desc", label: "ميزة 3 - الوصف", labelEn: "Feature 3 Description", type: "text", value: "تشفير كامل من طرف لطرف للبيانات", valueEn: "End-to-end encryption for all data" },
-  { key: "feature4_title", label: "ميزة 4 - العنوان", labelEn: "Feature 4 Title", type: "text", value: "سهل الاستخدام", valueEn: "Easy to Use" },
-  { key: "feature4_desc", label: "ميزة 4 - الوصف", labelEn: "Feature 4 Description", type: "text", value: "تطبيق مألوف للجميع بدون تعقيد", valueEn: "Familiar app for everyone without complexity" },
-];
-
-const waSolutionsFields: SectionField[] = [
-  { key: "badge", label: "شارة الحلول", labelEn: "Solutions Badge", type: "text", value: "الحلول المتقدمة", valueEn: "Advanced Solutions" },
-  { key: "solution1_title", label: "حل 1 - العنوان", labelEn: "Solution 1 Title", type: "text", value: "رقم موحد للفريق", valueEn: "Unified Team Number" },
-  { key: "solution1_desc", label: "حل 1 - الوصف", labelEn: "Solution 1 Description", type: "textarea", value: "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية", valueEn: "No more scattered conversations, one number managed efficiently by the whole team" },
-  { key: "solution2_title", label: "حل 2 - العنوان", labelEn: "Solution 2 Title", type: "text", value: "إدارة الصلاحيات", valueEn: "Permissions Management" },
-  { key: "solution2_desc", label: "حل 2 - الوصف", labelEn: "Solution 2 Description", type: "textarea", value: "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية", valueEn: "Seamlessly transfer conversations between sales and technical support" },
-  { key: "solution3_title", label: "حل 3 - العنوان", labelEn: "Solution 3 Title", type: "text", value: "الردود الآلية (Chatbot)", valueEn: "Automated Replies (Chatbot)" },
-  { key: "solution3_desc", label: "حل 3 - الوصف", labelEn: "Solution 3 Description", type: "textarea", value: "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً", valueEn: "24/7 customer service without human intervention, automatically answer FAQs" },
-  { key: "solution4_title", label: "حل 4 - العنوان", labelEn: "Solution 4 Title", type: "text", value: "صندوق وارد مشترك", valueEn: "Shared Inbox" },
-  { key: "solution4_desc", label: "حل 4 - الوصف", labelEn: "Solution 4 Description", type: "textarea", value: "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة", valueEn: "Filter messages (read, unread, unanswered) in a single interface" },
-  { key: "solution5_title", label: "حل 5 - العنوان", labelEn: "Solution 5 Title", type: "text", value: "جدولة الرسائل", valueEn: "Message Scheduling" },
-  { key: "solution5_desc", label: "حل 5 - الوصف", labelEn: "Solution 5 Description", type: "textarea", value: "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي", valueEn: "Pre-schedule your messages to be sent at the optimal time" },
-  { key: "solution6_title", label: "حل 6 - العنوان", labelEn: "Solution 6 Title", type: "text", value: "تقارير تفصيلية", valueEn: "Detailed Reports" },
-  { key: "solution6_desc", label: "حل 6 - الوصف", labelEn: "Solution 6 Description", type: "textarea", value: "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً", valueEn: "Track campaign performance, read rates, and instant responses" },
-];
-
-const waMarketingFields: SectionField[] = [
-  { key: "badge", label: "شارة التسويق", labelEn: "Marketing Badge", type: "text", value: "التسويق الذكي", valueEn: "Smart Marketing" },
-  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", value: "استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل.", valueEn: "Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates." },
-  { key: "campaign1_title", label: "حملة 1 - العنوان", labelEn: "Campaign 1 Title", type: "text", value: "استهداف دقيق", valueEn: "Precise Targeting" },
-  { key: "campaign1_desc", label: "حملة 1 - الوصف", labelEn: "Campaign 1 Description", type: "text", value: "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك", valueEn: "Target your audience based on location, interests, and behavior" },
-  { key: "campaign2_title", label: "حملة 2 - العنوان", labelEn: "Campaign 2 Title", type: "text", value: "جدولة ذكية", valueEn: "Smart Scheduling" },
-  { key: "campaign2_desc", label: "حملة 2 - الوصف", labelEn: "Campaign 2 Description", type: "text", value: "أرسل في الوقت الأمثل لزيادة معدلات التفاعل", valueEn: "Send at the optimal time to increase interaction rates" },
-  { key: "campaign3_title", label: "حملة 3 - العنوان", labelEn: "Campaign 3 Title", type: "text", value: "قوالب جاهزة", valueEn: "Ready Templates" },
-  { key: "campaign3_desc", label: "حملة 3 - الوصف", labelEn: "Campaign 3 Description", type: "text", value: "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع", valueEn: "Professional messages with interactive buttons, images, and videos" },
-  { key: "campaign4_title", label: "حملة 4 - العنوان", labelEn: "Campaign 4 Title", type: "text", value: "تحليل الأداء", valueEn: "Performance Analysis" },
-  { key: "campaign4_desc", label: "حملة 4 - الوصف", labelEn: "Campaign 4 Description", type: "text", value: "تقارير شاملة عن معدلات الفتح والنقر والتحويل", valueEn: "Comprehensive reports on open rates, clicks, and conversions" },
-];
-
-const waGreenTickFields: SectionField[] = [
-  { key: "title", label: "عنوان الشارة الخضراء", labelEn: "Green Tick Title", type: "text", value: "احصل على الشارة الخضراء (Green Tick)", valueEn: "Get the Green Tick" },
-  { key: "subtitle", label: "وصف الشارة الخضراء", labelEn: "Green Tick Subtitle", type: "text", value: "عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب", valueEn: "Boost your customers' trust and stand out from competitors with an officially verified WhatsApp account" },
-  { key: "col_feature", label: "عنوان عمود المميزات", labelEn: "Features Column Header", type: "text", value: "المميزات", valueEn: "Features" },
-  { key: "col_unverified", label: "عنوان عمود بدون توثيق", labelEn: "Unverified Column Header", type: "text", value: "بدون توثيق", valueEn: "Unverified" },
-  { key: "col_business", label: "عنوان عمود حساب تجاري", labelEn: "Business Account Column Header", type: "text", value: "حساب تجاري", valueEn: "Business Account" },
-  { key: "col_verified", label: "عنوان عمود حساب موثوق", labelEn: "Verified Account Column Header", type: "text", value: "حساب موثوق", valueEn: "Verified Account" },
-  { key: "feature1", label: "ميزة المقارنة 1", labelEn: "Comparison Feature 1", type: "text", value: "ظهور اسم الشركة", valueEn: "Company Name Visibility" },
-  { key: "feature2", label: "ميزة المقارنة 2", labelEn: "Comparison Feature 2", type: "text", value: "الشارة الخضراء الرسمية", valueEn: "Official Green Badge" },
-  { key: "feature3", label: "ميزة المقارنة 3", labelEn: "Comparison Feature 3", type: "text", value: "ثقة أعلى من العملاء", valueEn: "Higher Customer Trust" },
-  { key: "feature4", label: "ميزة المقارنة 4", labelEn: "Comparison Feature 4", type: "text", value: "رسائل غير محدودة", valueEn: "Unlimited Messages" },
-  { key: "support_title", label: "عنوان دعم المدار", labelEn: "ORBIT Support Title", type: "text", value: "فريق المدار يساعدك في تجهيز المتطلبات", valueEn: "ORBIT Team helps you prepare the requirements" },
-  { key: "support_desc", label: "وصف دعم المدار", labelEn: "ORBIT Support Description", type: "text", value: "نوفر لك الدعم الكامل للحصول على التوثيق الرسمي من واتساب", valueEn: "We provide you with full support to get official WhatsApp verification" },
-];
-
-const waFooterCtaFields: SectionField[] = [
-  { key: "title", label: "عنوان CTA النهائي", labelEn: "Final CTA Title", type: "text", value: "جاهز لنقل خدمة عملائك لمستوى آخر؟", valueEn: "Ready to take your customer service to the next level?" },
-  { key: "subtitle", label: "وصف CTA النهائي", labelEn: "Final CTA Subtitle", type: "textarea", value: "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية", valueEn: "Our team is ready to help you get the Green Badge and integrate the API easily and professionally" },
-];
-
 const waHeroFields: SectionField[] = [
+  { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "badge", label: "شارة الهيرو", labelEn: "Hero Badge", type: "text", value: "واتساب أعمال API المعتمد", valueEn: "Official WhatsApp Business API" },
   { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "تواصل إحترافي مع عملائك", valueEn: "Professional Communication" },
   { key: "subtitle", label: "العنوان الفرعي", labelEn: "Subtitle", type: "text", value: "عبر واتساب أعمال API", valueEn: "via WhatsApp Business API" },
@@ -980,9 +939,39 @@ const waHeroFields: SectionField[] = [
 const waFeaturesFields: SectionField[] = [
   { key: "title", label: "عنوان قسم المميزات", labelEn: "Features Section Title", type: "text", value: "أدوات احترافية لإدارة محادثاتك", valueEn: "Professional Tools to Manage Conversations" },
   { key: "subtitle", label: "وصف قسم المميزات", labelEn: "Features Section Subtitle", type: "textarea", value: "كل ما تحتاجه لتحويل واتساب إلى قناة تواصل احترافية مع عملائك", valueEn: "Everything you need to turn WhatsApp into a professional communication channel with your customers" },
+  { key: "solutions_json", label: "قائمة الحلول (JSON)", labelEn: "Solutions List (JSON)", type: "list", value: "", valueEn: "" },
   { key: "solutions_title", label: "عنوان الحلول المتقدمة", labelEn: "Solutions Title", type: "text", value: "أدوات احترافية لإدارة محادثاتك", valueEn: "Professional Tools to Manage Conversations" },
+  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: "", valueEn: "" },
   { key: "campaigns_title", label: "عنوان حملات التسويق", labelEn: "Campaigns Title", type: "text", value: "أطلق حملاتك التسويقية بذكاء", valueEn: "Launch Your Campaigns Smartly" },
   { key: "api_pricing_title", label: "عنوان أسعار API", labelEn: "API Pricing Title", type: "text", value: "أسعار محادثات واتساب API", valueEn: "WhatsApp API Conversation Prices" },
+];
+
+const waWhyFields: SectionField[] = [
+  { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "المميزات الرئيسية", valueEn: "Key Features" },
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا واتساب الأعمال؟", valueEn: "Why WhatsApp Business?" },
+  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", value: "المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة", valueEn: "The most trusted and widespread platform for communicating with your customers in the Kingdom" },
+  { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: "", valueEn: "" },
+];
+
+const waSolutionsFields: SectionField[] = [
+  { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "الحلول المتقدمة", valueEn: "Advanced Solutions" },
+  { key: "solutions_json", label: "قائمة الحلول (JSON)", labelEn: "Solutions List (JSON)", type: "list", value: "", valueEn: "" },
+];
+
+const waMarketingFields: SectionField[] = [
+  { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "التسويق الذكي", valueEn: "Smart Marketing" },
+  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", value: "استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل.", valueEn: "Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates." },
+  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: "", valueEn: "" },
+];
+
+const waGreenTickFields: SectionField[] = [
+  { key: "title", label: "عنوان الشارة الخضراء", labelEn: "Green Tick Title", type: "text", value: "احصل على الشارة الخضراء (Green Tick)", valueEn: "Get the Green Tick" },
+  { key: "subtitle", label: "وصف الشارة الخضراء", labelEn: "Green Tick Subtitle", type: "text", value: "عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب", valueEn: "Boost your customers' trust and stand out from competitors with an officially verified WhatsApp account" },
+];
+
+const waFooterCtaFields: SectionField[] = [
+  { key: "title", label: "عنوان CTA النهائي", labelEn: "Final CTA Title", type: "text", value: "جاهز لنقل خدمة عملائك لمستوى آخر؟", valueEn: "Ready to take your customer service to the next level?" },
+  { key: "subtitle", label: "وصف CTA النهائي", labelEn: "Final CTA Subtitle", type: "textarea", value: "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية", valueEn: "Our team is ready to help you get the Green Badge and integrate the API easily and professionally" },
 ];
 
 const ensureWhatsAppSection = (pages: PageData[], sectionId: string, sectionName: string, sectionNameEn: string, fields: SectionField[]): PageData[] => {
@@ -1025,6 +1014,7 @@ const ensureWhatsAppFields = (pages: PageData[]): PageData[] => {
 };
 
 const otHeroFields: SectionField[] = [
+  { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "badge", label: "شارة الهيرو", labelEn: "Hero Badge", type: "text", value: "نظام الموارد البشرية السحابي المتكامل", valueEn: "Integrated Cloud HR System" },
   { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "مركز قيادة متكامل", valueEn: "Comprehensive Command Center" },
   { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "من التوظيف إلى التقاعد، O-Time يمنحك السيطرة الكاملة على الرواتب، الحضور، الأداء، والتوظيف في منصة سحابية واحدة آمنة وقابلة للتوسع.", valueEn: "From recruitment to retirement, O-Time gives you full control over payroll, attendance, performance, and recruitment in a single, secure, and scalable cloud platform." },
@@ -1040,6 +1030,10 @@ const otHeroFields: SectionField[] = [
 const otFeaturesFields: SectionField[] = [
   { key: "title", label: "عنوان قسم القيمة", labelEn: "Value Section Title", type: "text", value: "لماذا O-Time؟", valueEn: "Why O-Time?" },
   { key: "subtitle", label: "وصف قسم القيمة", labelEn: "Value Section Subtitle", type: "textarea", value: "منصة موحدة تجمع كل ما تحتاجه لإدارة الموارد البشرية بكفاءة عالية.", valueEn: "A unified platform covering everything you need to manage HR efficiently." },
+  { key: "value_props_json", label: "قيم O-Time (JSON)", labelEn: "Value Props (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "modules_json", label: "وحدات النظام (JSON)", labelEn: "System Modules (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "ux_features_json", label: "مميزات تجربة المستخدم (JSON)", labelEn: "UX Features (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "screenshots_json", label: "لقطات النظام (JSON)", labelEn: "System Screenshots (JSON)", type: "list", value: "", valueEn: "" },
   { key: "value_title", label: "عنوان القيمة الاستراتيجية", labelEn: "Strategic Value Title", type: "text", value: "القيمة الاستراتيجية التي تحتاجها", valueEn: "The Strategic Value You Need" },
   { key: "modules_title", label: "عنوان الوحدات", labelEn: "Modules Title", type: "text", value: "وحدات متكاملة لإدارة الموارد البشرية", valueEn: "Integrated HR Management Modules" },
   { key: "modules_subtitle", label: "وصف الوحدات", labelEn: "Modules Subtitle", type: "textarea", value: "من التوظيف إلى التقاعد - إدارة دورة حياة الموظف الكاملة في منصة واحدة متكاملة", valueEn: "From recruitment to retirement - Manage the full employee lifecycle in a single integrated platform" },
@@ -1055,6 +1049,7 @@ const otFeaturesFields: SectionField[] = [
 ];
 
 const ggHeroFields: SectionField[] = [
+  { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "badge", label: "شارة الهيرو", labelEn: "Hero Badge", type: "text", value: "بوابة حكومية آمنة", valueEn: "Secure Government Gateway" },
   { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "بوابتك الآمنة للتواصل الحكومي", valueEn: "Your Secure Gateway for Government Communications" },
   { key: "subtitle", label: "العنوان الفرعي المميز", labelEn: "Highlight Subtitle", type: "text", value: "بموثوقية عالية", valueEn: "with High Reliability" },
@@ -1067,12 +1062,13 @@ const ggAboutFields: SectionField[] = [
 ];
 
 const ggFeaturesFields: SectionField[] = [
-  { key: "feature1_title", label: "ميزة 1 - العنوان", labelEn: "Feature 1 Title", type: "text", value: "استقلالية تامة", valueEn: "Full Independence" },
-  { key: "feature1_desc", label: "ميزة 1 - الوصف", labelEn: "Feature 1 Description", type: "textarea", value: "بنية تحتية خاصة لا تعتمد على أطراف ثالثة، مما يضمن سيطرة كاملة على بياناتك وعملياتك", valueEn: "Private infrastructure independent of third parties, ensuring full control over your data and operations" },
-  { key: "feature2_title", label: "ميزة 2 - العنوان", labelEn: "Feature 2 Title", type: "text", value: "أمان متقدم", valueEn: "Advanced Security" },
-  { key: "feature2_desc", label: "ميزة 2 - الوصف", labelEn: "Feature 2 Description", type: "textarea", value: "تشفير شامل من طرف لطرف مع صلاحيات دقيقة ومراقبة مستمرة لجميع العمليات", valueEn: "Comprehensive end-to-end encryption with granular permissions and continuous monitoring of all operations" },
-  { key: "feature3_title", label: "ميزة 3 - العنوان", labelEn: "Feature 3 Title", type: "text", value: "موثوقية عالية", valueEn: "High Reliability" },
-  { key: "feature3_desc", label: "ميزة 3 - الوصف", labelEn: "Feature 3 Description", type: "textarea", value: "ضمان وقت تشغيل 99.9% مع نسخ احتياطي تلقائي واسترداد فوري للخدمات", valueEn: "99.9% uptime guarantee with automatic backups and instant service recovery" },
+  { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "feature1_title", label: "ميزة 1 - العنوان (قديم)", labelEn: "Feature 1 Title", type: "text", value: "استقلالية تامة", valueEn: "Full Independence" },
+  { key: "feature1_desc", label: "ميزة 1 - الوصف (قديم)", labelEn: "Feature 1 Description", type: "textarea", value: "بنية تحتية خاصة لا تعتمد على أطراف ثالثة، مما يضمن سيطرة كاملة على بياناتك وعملياتك", valueEn: "Private infrastructure independent of third parties, ensuring full control over your data and operations" },
+  { key: "feature2_title", label: "ميزة 2 - العنوان (قديم)", labelEn: "Feature 2 Title", type: "text", value: "أمان متقدم", valueEn: "Advanced Security" },
+  { key: "feature2_desc", label: "ميزة 2 - الوصف (قديم)", labelEn: "Feature 2 Description", type: "textarea", value: "تشفير شامل من طرف لطرف مع صلاحيات دقيقة ومراقبة مستمرة لجميع العمليات", valueEn: "Comprehensive end-to-end encryption with granular permissions and continuous monitoring of all operations" },
+  { key: "feature3_title", label: "ميزة 3 - العنوان (قديم)", labelEn: "Feature 3 Title", type: "text", value: "موثوقية عالية", valueEn: "High Reliability" },
+  { key: "feature3_desc", label: "ميزة 3 - الوصف (قديم)", labelEn: "Feature 3 Description", type: "textarea", value: "ضمان وقت تشغيل 99.9% مع نسخ احتياطي تلقائي واسترداد فوري للخدمات", valueEn: "99.9% uptime guarantee with automatic backups and instant service recovery" },
 ];
 
 const ggCtaFields: SectionField[] = [
@@ -1708,17 +1704,23 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
         }
 
         const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
+        console.log('API loaded pages:', loadedPages);
         const ensuredPages = ensureMissingPages(loadedPages);
-        const enhancedPages = ensureContactPageFields(
-          ensureGovGateFields(
-            ensureOTimeFields(
-              ensureWhatsAppFields(
-                ensureHomePersonaTabsFields(
-                  ensureHomeIntegrationsFields(
-                    ensureHomeWhyUsFields(
-                      ensureHomeTrustFields(
-                        ensureSmsFields(
-                          ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages))
+        console.log('Ensured pages:', ensuredPages);
+        
+        let enhancedPages = ensuredPages;
+        try {
+          enhancedPages = ensureContactPageFields(
+            ensureGovGateFields(
+              ensureOTimeFields(
+                ensureWhatsAppFields(
+                  ensureHomePersonaTabsFields(
+                    ensureHomeIntegrationsFields(
+                      ensureHomeWhyUsFields(
+                        ensureHomeTrustFields(
+                          ensureSmsFields(
+                            ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages))
+                          )
                         )
                       )
                     )
@@ -1726,8 +1728,11 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
                 )
               )
             )
-          )
-        );
+          );
+        } catch (e) {
+          console.error('Enhancement error:', e);
+        }
+        console.log('Enhanced pages:', enhancedPages);
         const mergedFooterData = mergeFooterData(site.footerData);
         normalizedDataChanged =
           JSON.stringify(loadedPages) !== JSON.stringify(enhancedPages) ||
@@ -1739,6 +1744,10 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
         setContactSubmissions(Array.isArray(site.contactSubmissions) ? site.contactSubmissions : []);
         setNotificationEmail(typeof site.notificationEmail === "string" ? site.notificationEmail : "");
         setFooterData(mergedFooterData);
+
+        if (normalizedDataChanged) {
+          await saveSiteData(enhancedPages);
+        }
       } catch (error) {
         console.error("Failed to load CMS site data:", error);
       } finally {

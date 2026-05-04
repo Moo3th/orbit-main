@@ -12,8 +12,10 @@ import {
   ArrowRight,
   Lock,
   User,
-  Key
+  Key,
+  ArrowLeft
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/business/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { CmsPage } from '@/lib/cms/types';
@@ -52,15 +54,48 @@ interface GovGatePageProps {
 
 export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
   const { t, isRTL } = useLanguage();
+  const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const g = t.products.govgate;
-  const heroBadge = getCmsField(cmsPage, 'gg-hero', 'badge', isRTL, g.subtitle);
-  const heroTitle = getCmsField(cmsPage, 'gg-hero', 'title', isRTL, g.heroTitle);
+  
+  const slidesJson = getCmsField(cmsPage, 'gg-hero', 'slides_json', isRTL, '');
+  const slides = React.useMemo(() => {
+    try {
+      if (slidesJson) {
+        return JSON.parse(slidesJson);
+      }
+    } catch (e) {
+      console.error("Error parsing gg slides", e);
+    }
+    // Fallback to single static slide
+    return [{
+      id: 'default',
+      titleAr: getCmsField(cmsPage, 'gg-hero', 'title', true, g.heroTitle),
+      titleEn: getCmsField(cmsPage, 'gg-hero', 'title', false, g.heroTitle),
+      descAr: getCmsField(cmsPage, 'gg-hero', 'description', true, g.heroDescription),
+      descEn: getCmsField(cmsPage, 'gg-hero', 'description', false, g.heroDescription),
+      ctaTextAr: getCmsField(cmsPage, 'gg-cta', 'cta_text', true, g.cta),
+      ctaTextEn: getCmsField(cmsPage, 'gg-cta', 'cta_text', false, g.cta),
+      ctaUrl: getCmsField(cmsPage, 'gg-cta', 'cta_url', isRTL, "/products/gov-gate/form"),
+      badgeAr: getCmsField(cmsPage, 'gg-hero', 'badge', true, g.subtitle),
+      badgeEn: getCmsField(cmsPage, 'gg-hero', 'badge', false, g.subtitle),
+      image: "https://images.unsplash.com/photo-1759661881353-5b9cc55e1cf4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    }];
+  }, [slidesJson, cmsPage, isRTL, g]);
+
+  React.useEffect(() => {
+    if (slides.length <= 1) return;
+    const timer = setInterval(() => setCurrentSlideIndex(p => (p + 1) % slides.length), 7000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const currentSlide = slides[currentSlideIndex] || slides[0];
+  const heroBadge = isRTL ? currentSlide.badgeAr : currentSlide.badgeEn;
+  const heroTitle = isRTL ? currentSlide.titleAr : currentSlide.titleEn;
+  const heroDescription = isRTL ? currentSlide.descAr : currentSlide.descEn;
+  const ctaText = isRTL ? currentSlide.ctaTextAr : currentSlide.ctaTextEn;
+  const ctaUrl = currentSlide.ctaUrl || "/products/gov-gate/form";
+
   const heroSubtitle = getCmsField(cmsPage, 'gg-hero', 'subtitle', isRTL, g.heroSubtitle);
-  const heroDescription = getCmsField(cmsPage, 'gg-hero', 'description', isRTL, g.heroDescription);
-  const ctaText = getCmsField(cmsPage, 'gg-cta', 'cta_text', isRTL, g.cta);
-  const ctaType = getCmsField(cmsPage, 'gg-cta', 'cta_type', isRTL, "external");
-  const ctaUrlRaw = getCmsField(cmsPage, 'gg-cta', 'cta_url', isRTL, `https://wa.me/966920006900?text=${encodeURIComponent(isRTL ? "مرحبا، أرغب أنا مهتم بـ GoveGate" : "Hello, I am interested in GoveGate")}`);
-  const ctaUrl = ctaType === 'form' ? '/products/gov-gate/form' : ctaUrlRaw;
   const finalCtaTitle = getCmsField(cmsPage, 'gg-cta', 'final_cta_title', isRTL, g.finalCta.title);
   const finalCtaDescription = getCmsField(cmsPage, 'gg-cta', 'final_cta_description', isRTL, g.finalCta.description);
 
@@ -71,46 +106,59 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[#0A2647] text-white py-24 lg:py-32">
+      <section className="relative overflow-hidden bg-[#0A2647] text-white min-h-[600px] flex items-center">
         {/* Background Overlay */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A2647]/95 to-[#104E8B]/90 z-10" />
-          <img 
-            src="https://images.unsplash.com/photo-1759661881353-5b9cc55e1cf4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGN5YmVyJTIwc2VjdXJpdHklMjBkYXJrJTIwYmx1ZSUyMG5ldHdvcmt8ZW58MXx8fHwxNzcyMzA2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080" 
-            alt="Secure Technology Background" 
-            className="w-full h-full object-cover opacity-30"
-          />
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={currentSlideIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0 z-0"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A2647]/95 to-[#104E8B]/90 z-10" />
+            <img 
+              src={currentSlide.image || "https://images.unsplash.com/photo-1759661881353-5b9cc55e1cf4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"} 
+              alt="Secure Technology Background" 
+              className="w-full h-full object-cover opacity-30"
+            />
+          </motion.div>
+        </AnimatePresence>
 
-        <div className="container relative z-20 mx-auto px-4">
+        <div className="container relative z-20 mx-auto px-4 py-24 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="inline-block py-1 px-3 rounded-full bg-[#00BCD4]/10 text-[#00BCD4] text-sm font-semibold mb-6 border border-[#00BCD4]/20">
-                {heroBadge}
-              </span>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                {heroTitle} <br />
-                <span className="text-[#00BCD4]">{heroSubtitle}</span>
-              </h1>
-              <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-                {heroDescription}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button 
-                  className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-8 py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
-                  asChild
-                >
-                  <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
-                    {ctaText}
-                  </a>
-                </Button>
-              </div>
-            </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={currentSlideIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6 }}
+              >
+                <span className="inline-block py-1 px-3 rounded-full bg-[#00BCD4]/10 text-[#00BCD4] text-sm font-semibold mb-6 border border-[#00BCD4]/20">
+                  {heroBadge}
+                </span>
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                  {heroTitle} {heroSubtitle && <><br /><span className="text-[#00BCD4]">{heroSubtitle}</span></>}
+                </h1>
+                <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+                  {heroDescription}
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button 
+                    className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-10 py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all rounded-2xl"
+                    asChild
+                  >
+                    <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
+                      {ctaText}
+                      {isRTL ? <ArrowLeft className="mr-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
+                    </a>
+                  </Button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
         
@@ -136,21 +184,36 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={<Building2 className="w-10 h-10 text-[#00BCD4]" />}
-              title={getCmsField(cmsPage, 'gg-features', 'feature1_title', isRTL, g.features.independence.title)}
-              description={getCmsField(cmsPage, 'gg-features', 'feature1_desc', isRTL, g.features.independence.description)}
-            />
-            <FeatureCard 
-              icon={<ShieldCheck className="w-10 h-10 text-[#00BCD4]" />}
-              title={getCmsField(cmsPage, 'gg-features', 'feature2_title', isRTL, g.features.security.title)}
-              description={getCmsField(cmsPage, 'gg-features', 'feature2_desc', isRTL, g.features.security.description)}
-            />
-            <FeatureCard 
-              icon={<Zap className="w-10 h-10 text-[#00BCD4]" />}
-              title={getCmsField(cmsPage, 'gg-features', 'feature3_title', isRTL, g.features.reliability.title)}
-              description={getCmsField(cmsPage, 'gg-features', 'feature3_desc', isRTL, g.features.reliability.description)}
-            />
+            {(() => {
+               const json = getCmsField(cmsPage, 'gg-features', 'features_json', isRTL, '');
+               try {
+                 if (json) {
+                   const items = JSON.parse(json);
+                   const icons = [Building2, ShieldCheck, Zap];
+                   return items.map((item: any, i: number) => (
+                      <FeatureCard 
+                        key={i}
+                        icon={item.icon ? <img src={item.icon} className="w-10 h-10 object-contain" alt="" /> : React.createElement(icons[i % 3], { className: "w-10 h-10 text-[#00BCD4]" })}
+                        title={isRTL ? item.titleAr : item.titleEn}
+                        description={isRTL ? item.descAr : item.descEn}
+                      />
+                   ));
+                 }
+               } catch (e) {}
+
+               return [
+                  { title: getCmsField(cmsPage, 'gg-features', 'feature1_title', isRTL, g.features.independence.title), desc: getCmsField(cmsPage, 'gg-features', 'feature1_desc', isRTL, g.features.independence.description), icon: <Building2 className="w-10 h-10 text-[#00BCD4]" /> },
+                  { title: getCmsField(cmsPage, 'gg-features', 'feature2_title', isRTL, g.features.security.title), desc: getCmsField(cmsPage, 'gg-features', 'feature2_desc', isRTL, g.features.security.description), icon: <ShieldCheck className="w-10 h-10 text-[#00BCD4]" /> },
+                  { title: getCmsField(cmsPage, 'gg-features', 'feature3_title', isRTL, g.features.reliability.title), desc: getCmsField(cmsPage, 'gg-features', 'feature3_desc', isRTL, g.features.reliability.description), icon: <Zap className="w-10 h-10 text-[#00BCD4]" /> }
+               ].map((item, i) => (
+                 <FeatureCard 
+                    key={i}
+                    icon={item.icon}
+                    title={item.title}
+                    description={item.desc}
+                  />
+               ));
+            })()}
           </div>
         </div>
       </section>

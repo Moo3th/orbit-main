@@ -4,12 +4,13 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-import {
+import { 
   MessageCircle, Users, Shield, Smartphone, Globe,
   CheckCircle2, Zap, Bot, Send, BarChart3, Star,
   Clock, TrendingUp, Award, Target, Headphones, Sparkles,
-  BadgeCheck, ArrowRight, X, ChevronLeft, ChevronRight
+  BadgeCheck, ArrowRight, X, ChevronLeft, ChevronRight, ArrowLeft
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { CmsPage } from '@/lib/cms/types';
@@ -51,18 +52,47 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const [currentSolutionIndex, setCurrentSolutionIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const heroBadge = getCmsField(cmsPage, 'wa-hero', 'badge', isRTL, isRTL ? "واتساب أعمال API المعتمد" : "Official WhatsApp Business API");
-  const heroTitle = getCmsField(cmsPage, 'wa-hero', 'title', isRTL, isRTL ? "تواصل إحترافي مع عملائك" : "Professional Communication");
-  const heroSubtitle = getCmsField(cmsPage, 'wa-hero', 'subtitle', isRTL, isRTL ? "عبر واتساب أعمال API" : "via WhatsApp Business API");
-  const heroDescription = getCmsField(
-    cmsPage,
-    'wa-hero',
-    'description',
-    isRTL,
-    isRTL
-      ? "كن أقرب لعملائك. نوفر لك ربطاً رسمياً ومعتمداً بخدمة واتساب مع أدوات متقدمة لإدارة المحادثات، الشات بوت، والحملات التسويقية."
-      : "Get closer to your customers. We provide an official WhatsApp integration with advanced tools for chat management, chatbots, and marketing campaigns."
-  );
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const slidesJson = getCmsField(cmsPage, 'wa-hero', 'slides_json', isRTL, '');
+  const slides = useMemo(() => {
+    try {
+      if (slidesJson) {
+        return JSON.parse(slidesJson);
+      }
+    } catch (e) {
+      console.error("Error parsing wa slides", e);
+    }
+    // Fallback to single static slide (Legacy)
+    return [{
+      id: 'default',
+      titleAr: getCmsField(cmsPage, 'wa-hero', 'title', true, "تواصل إحترافي مع عملائك"),
+      titleEn: getCmsField(cmsPage, 'wa-hero', 'title', false, "Professional Communication"),
+      descAr: getCmsField(cmsPage, 'wa-hero', 'description', true, "كن أقرب لعملائك..."),
+      descEn: getCmsField(cmsPage, 'wa-hero', 'description', false, "Get closer to your customers..."),
+      ctaTextAr: getCmsField(cmsPage, 'wa-hero', 'cta_primary_text', true, "اطلب الخدمة الآن"),
+      ctaTextEn: getCmsField(cmsPage, 'wa-hero', 'cta_primary_text', false, "Order Service Now"),
+      ctaUrl: getCmsField(cmsPage, 'wa-hero', 'cta_primary_url', isRTL, "/products/whatsapp/request"),
+      badgeAr: getCmsField(cmsPage, 'wa-hero', 'badge', true, "واتساب أعمال API المعتمد"),
+      badgeEn: getCmsField(cmsPage, 'wa-hero', 'badge', false, "Official WhatsApp Business API"),
+      image: "", // Use chat UI instead of main image if empty
+    }];
+  }, [slidesJson, cmsPage, isRTL]);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const timer = setInterval(() => setCurrentSlideIndex(p => (p + 1) % slides.length), 6000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const currentSlide = slides[currentSlideIndex] || slides[0];
+
+  const heroBadge = isRTL ? currentSlide.badgeAr : currentSlide.badgeEn;
+  const heroTitle = isRTL ? currentSlide.titleAr : currentSlide.titleEn;
+  const heroDescription = isRTL ? currentSlide.descAr : currentSlide.descEn;
+  const primaryCtaText = isRTL ? currentSlide.ctaTextAr : currentSlide.ctaTextEn;
+  const primaryCtaUrl = currentSlide.ctaUrl || "/products/whatsapp/request";
+
   const pricingTitle = getCmsField(
     cmsPage,
     'wa-pricing',
@@ -82,7 +112,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
     'wa-pricing',
     'api_title',
     isRTL,
-    getCmsField(cmsPage, 'wa-features', 'api_pricing_title', isRTL, isRTL ? "أسعار محادثات واتساب API" : "WhatsApp API Conversation Prices")
+    isRTL ? "أسعار محادثات واتساب API" : "WhatsApp API Conversation Prices"
   );
   const apiPricingSubtitle = getCmsField(
     cmsPage,
@@ -101,10 +131,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
       ? "محادثات خدمة العملاء مجانية تماماً خلال 24 ساعة من آخر رسالة! استفد من هذه الميزة للرد على استفسارات عملائك دون أي تكلفة إضافية."
       : "Customer service conversations are completely free within 24 hours of the last message. Use this to answer customer questions with no extra cost."
   );
-  const primaryCtaText = getCmsField(cmsPage, 'wa-hero', 'cta_primary_text', isRTL, isRTL ? "اطلب الخدمة الآن" : "Order Service Now");
-  const primaryCtaType = getCmsField(cmsPage, 'wa-hero', 'cta_primary_type', isRTL, "form");
-  const primaryCtaUrlRaw = getCmsField(cmsPage, 'wa-hero', 'cta_primary_url', isRTL, "/products/whatsapp/request");
-  const primaryCtaUrl = primaryCtaType === 'form' ? "/products/whatsapp/request" : primaryCtaUrlRaw;
+  
   const secondaryCtaText = getCmsField(cmsPage, 'wa-hero', 'cta_secondary_text', isRTL, isRTL ? "استعرض الباقات" : "View Packages");
   const secondaryCtaType = getCmsField(cmsPage, 'wa-hero', 'cta_secondary_type', isRTL, "external");
   const secondaryCtaUrlRaw = getCmsField(cmsPage, 'wa-hero', 'cta_secondary_url', isRTL, "https://wa.me/966920006900");
@@ -177,98 +204,152 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const features = [
-    {
-      icon: Globe,
-      title: getCmsField(cmsPage, 'wa-why', 'feature1_title', isRTL, isRTL ? "المنصة رقم 1 في المملكة" : "The #1 Platform in the Kingdom"),
-      description: getCmsField(cmsPage, 'wa-why', 'feature1_desc', isRTL, isRTL ? "الأكثر انتشاراً واستخداماً في السعودية" : "The most widespread and used in Saudi Arabia"),
-      color: "bg-blue-50",
-      iconColor: "text-blue-600"
-    },
-    {
-      icon: CheckCircle2,
-      title: getCmsField(cmsPage, 'wa-why', 'feature2_title', isRTL, isRTL ? "معدل فتح 98%" : "98% Open Rate"),
-      description: getCmsField(cmsPage, 'wa-why', 'feature2_desc', isRTL, isRTL ? "يتم فتح وقراءة معظم الرسائل فوراً" : "Most messages are opened and read immediately"),
-      color: "bg-green-50",
-      iconColor: "text-[#65BF7B]"
-    },
-    {
-      icon: Shield,
-      title: getCmsField(cmsPage, 'wa-why', 'feature3_title', isRTL, isRTL ? "آمن وموثوق" : "Secure & Reliable"),
-      description: getCmsField(cmsPage, 'wa-why', 'feature3_desc', isRTL, isRTL ? "تشفير كامل من طرف لطرف للبيانات" : "End-to-end encryption for all data"),
-      color: "bg-purple-50",
-      iconColor: "text-purple-600"
-    },
-    {
-      icon: Smartphone,
-      title: getCmsField(cmsPage, 'wa-why', 'feature4_title', isRTL, isRTL ? "سهل الاستخدام" : "Easy to Use"),
-      description: getCmsField(cmsPage, 'wa-why', 'feature4_desc', isRTL, isRTL ? "تطبيق مألوف للجميع بدون تعقيد" : "Familiar app for everyone without complexity"),
-      color: "bg-orange-50",
-      iconColor: "text-[#F15822]"
-    }
-  ];
+  const features = useMemo(() => {
+     const json = getCmsField(cmsPage, 'wa-why', 'features_json', isRTL, '');
+     try {
+       if (json) {
+         const items = JSON.parse(json);
+         const icons = [Globe, CheckCircle2, Shield, Smartphone];
+         const colors = ["bg-blue-50", "bg-green-50", "bg-purple-50", "bg-orange-50"];
+         const iconColors = ["text-blue-600", "text-[#65BF7B]", "text-purple-600", "text-[#F15822]"];
+         
+         return items.map((item: any, i: number) => ({
+           icon: icons[i % 4],
+           title: isRTL ? item.titleAr : item.titleEn,
+           description: isRTL ? item.descAr : item.descEn,
+           color: colors[i % 4],
+           iconColor: iconColors[i % 4],
+           customIcon: item.icon
+         }));
+       }
+     } catch (e) {}
 
-  const solutions = [
-    {
-      icon: Users,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution1_title', isRTL, isRTL ? "رقم موحد للفريق" : "Unified Team Number"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution1_desc', isRTL, isRTL ? "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية" : "No more scattered conversations, one number managed efficiently by the whole team"),
-      image: solutionTeam
-    },
-    {
-      icon: Target,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution2_title', isRTL, isRTL ? "إدارة الصلاحيات" : "Permissions Management"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution2_desc', isRTL, isRTL ? "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية" : "Seamlessly transfer conversations between sales and technical support"),
-      image: solutionWorkflow
-    },
-    {
-      icon: Bot,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution3_title', isRTL, isRTL ? "الردود الآلية (Chatbot)" : "Automated Replies (Chatbot)"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution3_desc', isRTL, isRTL ? "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً" : "24/7 customer service without human intervention, automatically answer FAQs"),
-      image: solutionChatbot
-    },
-    {
-      icon: MessageCircle,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution4_title', isRTL, isRTL ? "صندوق وارد مشترك" : "Shared Inbox"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution4_desc', isRTL, isRTL ? "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة" : "Filter messages (read, unread, unanswered) in a single interface"),
-      image: solutionBroadcast
-    },
-    {
-      icon: Clock,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution5_title', isRTL, isRTL ? "جدولة الرسائل" : "Message Scheduling"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution5_desc', isRTL, isRTL ? "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي" : "Pre-schedule your messages to be sent at the optimal time"),
-      image: solutionSchedule
-    },
-    {
-      icon: BarChart3,
-      title: getCmsField(cmsPage, 'wa-solutions', 'solution6_title', isRTL, isRTL ? "تقارير تفصيلية" : "Detailed Reports"),
-      description: getCmsField(cmsPage, 'wa-solutions', 'solution6_desc', isRTL, isRTL ? "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً" : "Track campaign performance, read rates, and instant responses"),
-      image: solutionReports
-    }
-  ];
+     return [
+      {
+        icon: Globe,
+        title: getCmsField(cmsPage, 'wa-why', 'feature1_title', isRTL, isRTL ? "المنصة رقم 1 في المملكة" : "The #1 Platform in the Kingdom"),
+        description: getCmsField(cmsPage, 'wa-why', 'feature1_desc', isRTL, isRTL ? "الأكثر انتشاراً واستخداماً في السعودية" : "The most widespread and used in Saudi Arabia"),
+        color: "bg-blue-50",
+        iconColor: "text-blue-600"
+      },
+      {
+        icon: CheckCircle2,
+        title: getCmsField(cmsPage, 'wa-why', 'feature2_title', isRTL, isRTL ? "معدل فتح 98%" : "98% Open Rate"),
+        description: getCmsField(cmsPage, 'wa-why', 'feature2_desc', isRTL, isRTL ? "يتم فتح وقراءة معظم الرسائل فوراً" : "Most messages are opened and read immediately"),
+        color: "bg-green-50",
+        iconColor: "text-[#65BF7B]"
+      },
+      {
+        icon: Shield,
+        title: getCmsField(cmsPage, 'wa-why', 'feature3_title', isRTL, isRTL ? "آمن وموثوق" : "Secure & Reliable"),
+        description: getCmsField(cmsPage, 'wa-why', 'feature3_desc', isRTL, isRTL ? "تشفير كامل من طرف لطرف للبيانات" : "End-to-end encryption for all data"),
+        color: "bg-purple-50",
+        iconColor: "text-purple-600"
+      },
+      {
+        icon: Smartphone,
+        title: getCmsField(cmsPage, 'wa-why', 'feature4_title', isRTL, isRTL ? "سهل الاستخدام" : "Easy to Use"),
+        description: getCmsField(cmsPage, 'wa-why', 'feature4_desc', isRTL, isRTL ? "تطبيق مألوف للجميع بدون تعقيد" : "Familiar app for everyone without complexity"),
+        color: "bg-orange-50",
+        iconColor: "text-[#F15822]"
+      }
+    ];
+  }, [cmsPage, isRTL]);
 
-  const campaigns = [
-    {
-      icon: Send,
-      title: getCmsField(cmsPage, 'wa-marketing', 'campaign1_title', isRTL, isRTL ? "استهداف دقيق" : "Precise Targeting"),
-      description: getCmsField(cmsPage, 'wa-marketing', 'campaign1_desc', isRTL, isRTL ? "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك" : "Target your audience based on location, interests, and behavior")
-    },
-    {
-      icon: Clock,
-      title: getCmsField(cmsPage, 'wa-marketing', 'campaign2_title', isRTL, isRTL ? "جدولة ذكية" : "Smart Scheduling"),
-      description: getCmsField(cmsPage, 'wa-marketing', 'campaign2_desc', isRTL, isRTL ? "أرسل في الوقت الأمثل لزيادة معدلات التفاعل" : "Send at the optimal time to increase interaction rates")
-    },
-    {
-      icon: Sparkles,
-      title: getCmsField(cmsPage, 'wa-marketing', 'campaign3_title', isRTL, isRTL ? "قوالب جاهزة" : "Ready Templates"),
-      description: getCmsField(cmsPage, 'wa-marketing', 'campaign3_desc', isRTL, isRTL ? "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع" : "Professional messages with interactive buttons, images, and videos")
-    },
-    {
-      icon: TrendingUp,
-      title: getCmsField(cmsPage, 'wa-marketing', 'campaign4_title', isRTL, isRTL ? "تحليل الأداء" : "Performance Analysis"),
-      description: getCmsField(cmsPage, 'wa-marketing', 'campaign4_desc', isRTL, isRTL ? "تقارير شاملة عن معدلات الفتح والنقر والتحويل" : "Comprehensive reports on open rates, clicks, and conversions")
-    }
-  ];
+  const solutions = useMemo(() => {
+     const json = getCmsField(cmsPage, 'wa-features', 'solutions_json', isRTL, '');
+     try {
+       if (json) {
+         const items = JSON.parse(json);
+         const icons = [Users, Target, Bot, MessageCircle, Clock, BarChart3];
+         return items.map((item: any, i: number) => ({
+           icon: icons[i % 6],
+           title: isRTL ? item.titleAr : item.titleEn,
+           description: isRTL ? item.descAr : item.descEn,
+           image: item.image || item.icon,
+           customIcon: item.icon
+         }));
+       }
+     } catch (e) {}
+
+     return [
+      {
+        icon: Users,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution1_title', isRTL, isRTL ? "رقم موحد للفريق" : "Unified Team Number"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution1_desc', isRTL, isRTL ? "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية" : "No more scattered conversations, one number managed efficiently by the whole team"),
+        image: solutionTeam
+      },
+      {
+        icon: Target,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution2_title', isRTL, isRTL ? "إدارة الصلاحيات" : "Permissions Management"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution2_desc', isRTL, isRTL ? "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية" : "Seamlessly transfer conversations between sales and technical support"),
+        image: solutionWorkflow
+      },
+      {
+        icon: Bot,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution3_title', isRTL, isRTL ? "الردود الآلية (Chatbot)" : "Automated Replies (Chatbot)"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution3_desc', isRTL, isRTL ? "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً" : "24/7 customer service without human intervention, automatically answer FAQs"),
+        image: solutionChatbot
+      },
+      {
+        icon: MessageCircle,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution4_title', isRTL, isRTL ? "صندوق وارد مشترك" : "Shared Inbox"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution4_desc', isRTL, isRTL ? "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة" : "Filter messages (read, unread, unanswered) in a single interface"),
+        image: solutionBroadcast
+      },
+      {
+        icon: Clock,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution5_title', isRTL, isRTL ? "جدولة الرسائل" : "Message Scheduling"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution5_desc', isRTL, isRTL ? "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي" : "Pre-schedule your messages to be sent at the optimal time"),
+        image: solutionSchedule
+      },
+      {
+        icon: BarChart3,
+        title: getCmsField(cmsPage, 'wa-solutions', 'solution6_title', isRTL, isRTL ? "تقارير تفصيلية" : "Detailed Reports"),
+        description: getCmsField(cmsPage, 'wa-solutions', 'solution6_desc', isRTL, isRTL ? "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً" : "Track campaign performance, read rates, and instant responses"),
+        image: solutionReports
+      }
+    ];
+  }, [cmsPage, isRTL]);
+
+  const campaigns = useMemo(() => {
+     const json = getCmsField(cmsPage, 'wa-features', 'campaigns_json', isRTL, '');
+     try {
+       if (json) {
+         const items = JSON.parse(json);
+         const icons = [Send, Clock, Sparkles, TrendingUp];
+         return items.map((item: any, i: number) => ({
+           icon: icons[i % 4],
+           title: isRTL ? item.titleAr : item.titleEn,
+           description: isRTL ? item.descAr : item.descEn,
+           customIcon: item.icon
+         }));
+       }
+     } catch (e) {}
+
+     return [
+      {
+        icon: Send,
+        title: getCmsField(cmsPage, 'wa-marketing', 'campaign1_title', isRTL, isRTL ? "استهداف دقيق" : "Precise Targeting"),
+        description: getCmsField(cmsPage, 'wa-marketing', 'campaign1_desc', isRTL, isRTL ? "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك" : "Target your audience based on location, interests, and behavior")
+      },
+      {
+        icon: Clock,
+        title: getCmsField(cmsPage, 'wa-marketing', 'campaign2_title', isRTL, isRTL ? "جدولة ذكية" : "Smart Scheduling"),
+        description: getCmsField(cmsPage, 'wa-marketing', 'campaign2_desc', isRTL, isRTL ? "أرسل في الوقت الأمثل لزيادة معدلات التفاعل" : "Send at the optimal time to increase interaction rates")
+      },
+      {
+        icon: Sparkles,
+        title: getCmsField(cmsPage, 'wa-marketing', 'campaign3_title', isRTL, isRTL ? "قوالب جاهزة" : "Ready Templates"),
+        description: getCmsField(cmsPage, 'wa-marketing', 'campaign3_desc', isRTL, isRTL ? "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع" : "Professional messages with interactive buttons, images, and videos")
+      },
+      {
+        icon: TrendingUp,
+        title: getCmsField(cmsPage, 'wa-marketing', 'campaign4_title', isRTL, isRTL ? "تحليل الأداء" : "Performance Analysis"),
+        description: getCmsField(cmsPage, 'wa-marketing', 'campaign4_desc', isRTL, isRTL ? "تقارير شاملة عن معدلات الفتح والنقر والتحويل" : "Comprehensive reports on open rates, clicks, and conversions")
+      }
+    ];
+  }, [cmsPage, isRTL]);
 
   const defaultPricingPlans = useMemo(() => getDefaultWhatsAppPlans(isRTL), [isRTL]);
   const cmsPricingPlansRaw = useMemo(
@@ -412,167 +493,164 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Hero Section */}
-      <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 bg-gradient-to-br from-white via-green-50/30 to-orange-50/20 overflow-hidden">
+      <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 bg-gradient-to-br from-white via-green-50/30 to-orange-50/20 overflow-hidden min-h-[600px] flex items-center">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzI1RDM2NiIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            {/* النص - اليمين */}
-            <div className={`text-${isRTL ? 'right' : 'left'} space-y-4 md:space-y-6`}>
-              <Badge className="bg-[#25D366] text-white border-none px-4 py-2 text-sm">
-                <MessageCircle className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {heroBadge}
-              </Badge>
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={currentSlideIndex}
+              initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRTL ? -30 : 30 }}
+              transition={{ duration: 0.5 }}
+              className="grid md:grid-cols-2 gap-8 md:gap-12 items-center"
+            >
+              {/* النص - اليمين */}
+              <div className={`text-${isRTL ? 'right' : 'left'} space-y-4 md:space-y-6`}>
+                <Badge className="bg-[#25D366] text-white border-none px-4 py-2 text-sm">
+                  <MessageCircle className={`w-4 h-4 inline ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  {heroBadge}
+                </Badge>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#161616] leading-tight">
-                {heroTitle}
-                <br />
-                <span className="text-[#25D366]">{heroSubtitle}</span><span className="text-[#F15822]">.</span>
-              </h1>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#161616] leading-tight">
+                  {heroTitle}
+                </h1>
 
-              <p className="text-lg md:text-xl text-[#606161] leading-relaxed max-w-xl">
-                {heroDescription}
-              </p>
+                <p className="text-lg md:text-xl text-[#606161] leading-relaxed max-w-xl">
+                  {heroDescription}
+                </p>
 
-              <div className="flex gap-4 flex-wrap">
-                <Button
-                  size="lg"
-                  className="bg-[#128C7E] hover:bg-[#0d6b5f] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#128C7E]/30"
-                  asChild
-                >
-                  {primaryCtaUrl.startsWith('http') ? (
-                    <a href={primaryCtaUrl} target="_blank" rel="noopener noreferrer">
-                      {primaryCtaText}
-                      <ArrowRight className={`w-5 h-5 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                    </a>
-                  ) : (
-                    <a href={primaryCtaUrl}>
-                      {primaryCtaText}
-                      <ArrowRight className={`w-5 h-5 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                    </a>
-                  )}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-[#606161] text-[#161616] hover:bg-gray-50 font-bold px-8 h-14 text-lg"
-                  onClick={() => {
-                    const pricingSection = document.getElementById('pricing');
-                    if (pricingSection) {
-                      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                >
-                  {secondaryCtaText}
-                  <BarChart3 className={`w-5 h-5 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                </Button>
-              </div>
-
-              {/* إحصائيات سريعة */}
-              <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
-                <div>
-                  <div className="text-3xl font-extrabold text-[#25D366]">98%</div>
-                  <div className="text-sm text-gray-600">{isRTL ? "معدل الفتح" : "Open Rate"}</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-[#128C7E]">20,000+</div>
-                  <div className="text-sm text-gray-600">{isRTL ? "عميل نشط" : "Active Clients"}</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-[#161616]">24/7</div>
-                  <div className="text-sm text-gray-600">{isRTL ? "دعم فني" : "Support"}</div>
+                <div className="flex gap-4 flex-wrap">
+                  <Button
+                    size="lg"
+                    className="bg-[#128C7E] hover:bg-[#0d6b5f] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#128C7E]/30"
+                    asChild
+                  >
+                    {primaryCtaUrl.startsWith('http') ? (
+                      <a href={primaryCtaUrl} target="_blank" rel="noopener noreferrer">
+                        {primaryCtaText}
+                        <ArrowRight className={`w-5 h-5 ${isRTL ? 'mr-2' : 'ml-2'}`} />
+                      </a>
+                    ) : (
+                      <Link href={primaryCtaUrl}>
+                        {primaryCtaText}
+                        {isRTL ? <ArrowLeft className="mr-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
+                      </Link>
+                    )}
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-[#606161] text-[#161616] hover:bg-gray-50 font-bold px-8 h-14 text-lg"
+                    onClick={() => {
+                      const pricingSection = document.getElementById('pricing');
+                      if (pricingSection) {
+                        pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                  >
+                    {secondaryCtaText}
+                    <BarChart3 className={`w-5 h-5 ${isRTL ? 'mr-2' : 'ml-2'}`} />
+                  </Button>
                 </div>
               </div>
-            </div>
 
-            {/* الصورة - اليسار */}
-            <div className="relative hidden md:block">
-              <div className="relative">
-                {/* واجهة صندوق الوارد الموحد */}
-                <Card className="bg-white shadow-2xl border-0 overflow-hidden">
-                  <CardContent className="p-0">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] p-4 text-white">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                            <MessageCircle className="w-6 h-6 text-[#25D366]" />
-                          </div>
-                          <div>
-                            <div className="font-bold">صندوق لوارد الموحد</div>
-                            <div className="text-xs opacity-90">15 محادثة نشطة</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* رسائل تجريبية */}
-                    <div className="p-4 space-y-3 bg-gray-50 h-[300px] max-h-[300px] overflow-y-auto" ref={chatContainerRef} style={{ scrollBehavior: 'smooth' }}>
-                      <div className="flex gap-2 items-start animate-fade-in">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex-shrink-0"></div>
-                        <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%]">
-                          <div className="text-xs text-gray-500 mb-1">{isRTL ? "أحمد - قسم المبيعات" : "Ahmed - Sales"}</div>
-                          <div className="text-sm">{isRTL ? "مرحباً! كيف يمكنني مساعدتك اليوم؟" : "Hello! How can I help you today?"}</div>
-                          <div className="text-xs text-gray-400 mt-1">10:30 AM</div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2 items-start justify-end animate-fade-in">
-                        <div className="bg-[#DCF8C6] p-3 rounded-lg shadow-sm max-w-[70%]">
-                          <div className="text-sm">{isRTL ? "أريد الاستفسار عن باقات واتساب API" : "I want to inquire about WhatsApp API packages"}</div>
-                          <div className="text-xs text-gray-500 mt-1 flex items-center justify-end gap-1">
-                            10:31 AM
-                            <CheckCircle2 className="w-3 h-3 text-blue-500" />
-                          </div>
-                        </div>
-                      </div>
-
-                      {chatMessages.map(msg => (
-                        <div key={msg.id} className="animate-slide-up">
-                          {msg.type === 'user' ? (
-                            <div className="flex gap-2 items-start justify-end">
-                              <div className="bg-[#DCF8C6] p-3 rounded-lg shadow-sm max-w-[70%]">
-                                <div className="text-sm">{msg.text}</div>
-                                <div className="text-xs text-gray-500 mt-1 flex items-center justify-end gap-1">
-                                  {new Date().toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
-                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
-                                </div>
+              {/* الصورة - اليسار */}
+              <div className="relative hidden md:block">
+                {currentSlide.image ? (
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
+                    <img src={currentSlide.image} alt={heroTitle} className="w-full h-auto object-cover aspect-[4/3]" />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    {/* واجهة صندوق الوارد الموحد */}
+                    <Card className="bg-white shadow-2xl border-0 overflow-hidden">
+                      <CardContent className="p-0">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-[#25D366] to-[#128C7E] p-4 text-white">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                                <MessageCircle className="w-6 h-6 text-[#25D366]" />
+                              </div>
+                              <div>
+                                <div className="font-bold">صندوق لوارد الموحد</div>
+                                <div className="text-xs opacity-90">15 محادثة نشطة</div>
                               </div>
                             </div>
-                          ) : (
-                            <div className="flex gap-2 items-start">
-                              <div className={`w-8 h-8 ${msg.type === 'bot' ? 'bg-green-500' : 'bg-blue-500'} rounded-full flex-shrink-0`}></div>
-                              <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%]">
-                                <div className="text-xs text-gray-500 mb-1">
-                                  {msg.type === 'bot' ? (isRTL ? 'بوت آلي 🤖' : 'Automated Bot 🤖') : (isRTL ? 'محمد - قسم المبيعات 👤' : 'Mohammed - Sales 👤')}
-                                </div>
-                                <div className="text-sm">{msg.text}</div>
-                                {msg.buttons && (
-                                  <div className="flex gap-2 mt-2">
-                                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={handleShowPackages}>{isRTL ? 'عرض الباقات' : 'Show Packages'}</Button>
-                                  </div>
-                                )}
-                                {msg.confirmButton && (
-                                  <div className="flex gap-2 mt-2">
-                                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={handleConfirmSales}>{isRTL ? 'نعم' : 'Yes'}</Button>
-                                  </div>
-                                )}
+                          </div>
+                        </div>
+
+                        {/* رسائل تجريبية */}
+                        <div className="p-4 space-y-3 bg-gray-50 h-[300px] max-h-[300px] overflow-y-auto" ref={chatContainerRef} style={{ scrollBehavior: 'smooth' }}>
+                          <div className="flex gap-2 items-start animate-fade-in">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex-shrink-0"></div>
+                            <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%]">
+                              <div className="text-xs text-gray-500 mb-1">{isRTL ? "أحمد - قسم المبيعات" : "Ahmed - Sales"}</div>
+                              <div className="text-sm">{isRTL ? "مرحباً! كيف يمكنني مساعدتك اليوم؟" : "Hello! How can I help you today?"}</div>
+                              <div className="text-xs text-gray-400 mt-1">10:30 AM</div>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 items-start justify-end animate-fade-in">
+                            <div className="bg-[#DCF8C6] p-3 rounded-lg shadow-sm max-w-[70%]">
+                              <div className="text-sm">{isRTL ? "أريد الاستفسار عن باقات واتساب API" : "I want to inquire about WhatsApp API packages"}</div>
+                              <div className="text-xs text-gray-500 mt-1 flex items-center justify-end gap-1">
+                                10:31 AM
+                                <CheckCircle2 className="w-3 h-3 text-blue-500" />
                               </div>
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                          </div>
 
-                {/* شارة التوثيق */}
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-3 shadow-xl border-4 border-green-100">
-                  <BadgeCheck className="w-12 h-12 text-[#25D366]" />
-                </div>
+                          {chatMessages.map(msg => (
+                            <div key={msg.id} className="animate-slide-up">
+                              {msg.type === 'user' ? (
+                                <div className="flex gap-2 items-start justify-end">
+                                  <div className="bg-[#DCF8C6] p-3 rounded-lg shadow-sm max-w-[70%]">
+                                    <div className="text-sm">{msg.text}</div>
+                                    <div className="text-xs text-gray-500 mt-1 flex items-center justify-end gap-1">
+                                      {new Date().toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                                      <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex gap-2 items-start">
+                                  <div className={`w-8 h-8 ${msg.type === 'bot' ? 'bg-green-500' : 'bg-blue-500'} rounded-full flex-shrink-0`}></div>
+                                  <div className="bg-white p-3 rounded-lg shadow-sm max-w-[70%]">
+                                    <div className="text-xs text-gray-500 mb-1">
+                                      {msg.type === 'bot' ? (isRTL ? 'بوت آلي 🤖' : 'Automated Bot 🤖') : (isRTL ? 'محمد - قسم المبيعات 👤' : 'Mohammed - Sales 👤')}
+                                    </div>
+                                    <div className="text-sm">{msg.text}</div>
+                                    {msg.buttons && (
+                                      <div className="flex gap-2 mt-2">
+                                        <Button size="sm" variant="outline" className="text-xs h-7" onClick={handleShowPackages}>{isRTL ? 'عرض الباقات' : 'Show Packages'}</Button>
+                                      </div>
+                                    )}
+                                    {msg.confirmButton && (
+                                      <div className="flex gap-2 mt-2">
+                                        <Button size="sm" variant="outline" className="text-xs h-7" onClick={handleConfirmSales}>{isRTL ? 'نعم' : 'Yes'}</Button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* شارة التوثيق */}
+                    <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-3 shadow-xl border-4 border-green-100">
+                      <BadgeCheck className="w-12 h-12 text-[#25D366]" />
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
 
@@ -593,11 +671,15 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className={`${feature.color} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}>
-                      <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
+                    <div className={`${feature.color} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      {feature.customIcon ? (
+                        <img src={feature.customIcon} className="w-6 h-6 object-contain" alt="" />
+                      ) : (
+                        <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-[#161616] mb-1">
@@ -641,17 +723,19 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             >
               <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
                 {/* النص - اليمين */}
-                <div className="text-right space-y-4">
-                  <div className="inline-flex items-center gap-3 bg-gradient-to-br from-green-50 to-green-100 px-4 py-3 rounded-lg">
-                    {(() => {
+                <div className={`text-${isRTL ? 'right' : 'left'} space-y-4`}>
+                  <div className="inline-flex items-center gap-3 bg-gradient-to-br from-green-50 to-green-100 px-4 py-3 rounded-xl border border-green-200/50">
+                    {solutions[currentSolutionIndex].customIcon ? (
+                        <img src={solutions[currentSolutionIndex].customIcon} className="w-8 h-8 object-contain" alt="" />
+                    ) : (() => {
                       const CurrentIcon = solutions[currentSolutionIndex].icon;
                       return <CurrentIcon className="w-8 h-8 text-[#25D366]" />;
                     })()}
-                    <h3 className="text-2xl md:text-3xl font-extrabold text-[#161616]">
+                    <h3 className="text-2xl md:text-3xl font-black text-[#161616]">
                       {solutions[currentSolutionIndex].title}
                     </h3>
                   </div>
-                  <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                  <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-medium">
                     {solutions[currentSolutionIndex].description}
                   </p>
                 </div>
@@ -722,15 +806,19 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
 
               <div className="space-y-4">
                 {campaigns.map((campaign, index) => (
-                  <div key={index} className="flex gap-4 items-start bg-white p-4 rounded-lg border border-gray-200 hover:border-[#F15822] transition-all">
-                    <div className="bg-orange-100 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <campaign.icon className="w-5 h-5 text-[#F15822]" />
+                  <motion.div initial={{ opacity: 0, x: isRTL ? 20 : -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }} key={index} className="flex gap-4 items-start bg-white p-5 rounded-2xl border border-gray-100 hover:border-[#F15822]/30 hover:shadow-lg transition-all group">
+                    <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      {campaign.customIcon ? (
+                         <img src={campaign.customIcon} className="w-6 h-6 object-contain" alt="" />
+                      ) : (
+                         <campaign.icon className="w-6 h-6 text-[#F15822]" />
+                      )}
                     </div>
                     <div>
-                      <h4 className="font-bold text-[#161616] mb-1">{campaign.title}</h4>
-                      <p className="text-sm text-gray-600">{campaign.description}</p>
+                      <h4 className="font-black text-[#161616] mb-1 text-lg">{campaign.title}</h4>
+                      <p className="text-sm text-gray-600 font-medium leading-relaxed">{campaign.description}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -970,19 +1058,33 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                           </div>
 
                           {/* الأسعار - داخل الشرائح */}
-                          <div className="flex items-baseline justify-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
-                            <span className="text-3xl md:text-5xl font-extrabold text-[#161616]">
-                              {currentTier.price}
-                            </span>
-                            <span className="inline-flex items-center">
-                              <ImageWithFallback
-                                src={saudiRiyalSymbol}
-                                alt={isRTL ? "رمز الريال السعودي" : "Saudi Riyal symbol"}
-                                width={20}
-                                height={20}
-                                className="w-[18px] h-[18px] md:w-[20px] md:h-[20px] object-contain opacity-70"
-                              />
-                            </span>
+                          <div className="flex flex-col items-center justify-center gap-1 mb-2">
+                            {currentTier.originalPrice && (
+                              <div className="flex items-center gap-1 text-gray-400 line-through text-sm decoration-red-500/40 font-medium">
+                                 <span>{currentTier.originalPrice}</span>
+                                 <ImageWithFallback
+                                  src={saudiRiyalSymbol}
+                                  alt=""
+                                  width={12}
+                                  height={12}
+                                  className="w-[12px] h-[12px] object-contain opacity-40"
+                                />
+                              </div>
+                            )}
+                            <div className="flex items-baseline justify-center gap-1.5 md:gap-2">
+                              <span className="text-3xl md:text-5xl font-extrabold text-[#161616]">
+                                {currentTier.price}
+                              </span>
+                              <span className="inline-flex items-center">
+                                <ImageWithFallback
+                                  src={saudiRiyalSymbol}
+                                  alt={isRTL ? "رمز الريال السعودي" : "Saudi Riyal symbol"}
+                                  width={20}
+                                  height={20}
+                                  className="w-[18px] h-[18px] md:w-[20px] md:h-[20px] object-contain opacity-70"
+                                />
+                              </span>
+                            </div>
                           </div>
                           <p className="text-xs md:text-sm text-gray-500 mb-0.5 md:mb-1">{plan.period || (isRTL ? "شهرياً" : "Monthly")}</p>
                           <p className="text-[10px] md:text-xs text-gray-400 inline-flex items-center justify-center gap-1">

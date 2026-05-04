@@ -2,6 +2,7 @@ export interface WhatsAppPlanTier {
   name: string;
   price: string;
   priceWithTax: string;
+  originalPrice?: string; // Discount support
   setupFee: string;
   conversations: string;
   broadcastMessages: string;
@@ -252,6 +253,7 @@ const normalizePlanTier = (value: unknown): WhatsAppPlanTier | null => {
     name,
     price: asString(value.price).trim(),
     priceWithTax: asString(value.priceWithTax).trim(),
+    originalPrice: asString(value.originalPrice).trim(),
     setupFee: asString(value.setupFee).trim(),
     conversations: asString(value.conversations).trim(),
     broadcastMessages: asString(value.broadcastMessages).trim(),

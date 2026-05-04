@@ -93,15 +93,10 @@ export default function BlogPostPageClient({ post }: BlogPostPageClientProps) {
               </div>
             )}
 
-            <div className="prose prose-lg max-w-none text-gray-800 dark:text-gray-100 leading-8">
-              {content
-                .split('\n')
-                .map((paragraph) => paragraph.trim())
-                .filter(Boolean)
-                .map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-            </div>
+            <div 
+              className="prose prose-lg max-w-none text-gray-800 dark:text-gray-100 leading-8 prose-img:rounded-3xl prose-headings:text-slate-900 prose-a:text-primary"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           </article>
         </div>
       </main>

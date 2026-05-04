@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Save, Plus, ChevronDown, Eye, EyeOff, ExternalLink, FileText, Search, Image as ImageIcon, Globe } from 'lucide-react';
 import { Button } from '@/components/business/ui/button';
 import { Card, CardContent } from '@/components/business/ui/card';
+import { Badge } from '@/components/business/ui/badge';
 import { useSiteData, PageData, PageSection, SectionField, PageSeo } from '../SiteDataContext';
 import { parseSmsPlanRows, stringifySmsPlanRows, type SmsPlanRow } from '@/lib/cms/smsPricing';
 import {
@@ -74,8 +75,16 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
               value={row.price}
               onChange={(e) => updateRow(index, { price: e.target.value })}
               disabled={row.custom}
-              placeholder={isAr ? "السعر (مثال: 110)" : "Price (e.g. 110)"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100"
+              placeholder={isAr ? "السعر الجديد (مثال: 110)" : "Offer Price (e.g. 110)"}
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100 font-bold text-primary"
+            />
+            <input
+              type="text"
+              value={row.originalPrice || ""}
+              onChange={(e) => updateRow(index, { originalPrice: e.target.value })}
+              disabled={row.custom}
+              placeholder={isAr ? "السعر الأصلي (قبل الخصم)" : "Original Price (Strike)"}
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100 italic text-gray-400"
             />
             <input
               type="text"
@@ -344,7 +353,8 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   <input type="text" value={tier.name} onChange={(e) => updateTier(planIndex, tierIndex, { name: e.target.value })} placeholder={isAr ? "اسم الشريحة" : "Tier name"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.price} onChange={(e) => updateTier(planIndex, tierIndex, { price: e.target.value })} placeholder={isAr ? "السعر" : "Price"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
+                  <input type="text" value={tier.price} onChange={(e) => updateTier(planIndex, tierIndex, { price: e.target.value })} placeholder={isAr ? "السعر الجديد" : "Offer Price"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs font-bold text-primary" />
+                  <input type="text" value={tier.originalPrice || ""} onChange={(e) => updateTier(planIndex, tierIndex, { originalPrice: e.target.value })} placeholder={isAr ? "السعر الأصلي" : "Original Price"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs italic text-gray-400" />
                   <input type="text" value={tier.priceWithTax} onChange={(e) => updateTier(planIndex, tierIndex, { priceWithTax: e.target.value })} placeholder={isAr ? "السعر شامل الضريبة" : "Tax-included"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
                   <input type="text" value={tier.setupFee} onChange={(e) => updateTier(planIndex, tierIndex, { setupFee: e.target.value })} placeholder={isAr ? "رسوم التأسيس" : "Setup fee"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
                   <input type="text" value={tier.conversations} onChange={(e) => updateTier(planIndex, tierIndex, { conversations: e.target.value })} placeholder={isAr ? "عدد المحادثات" : "Conversations"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
@@ -408,13 +418,15 @@ const WhatsAppApiPricesEditor = ({ value, onChange, isAr }: { value: string; onC
               disabled={row.isFree}
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100"
             />
-            <input
-              type="text"
-              value={row.duration}
-              onChange={(e) => updateRow(index, { duration: e.target.value })}
-              placeholder={isAr ? "المدة" : "Duration"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
+          </div>
+          <input
+            type="text"
+            value={row.duration}
+            onChange={(e) => updateRow(index, { duration: e.target.value })}
+            placeholder={isAr ? "المدة" : "Duration"}
+            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+          />
+          <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-xs text-gray-600 px-1">
               <input
                 type="checkbox"
@@ -446,10 +458,272 @@ const WhatsAppApiPricesEditor = ({ value, onChange, isAr }: { value: string; onC
   );
 };
 
-const SPECIALIZED_FIELDS: Record<string, 'sms-plans' | 'whatsapp-plans' | 'whatsapp-api-prices'> = {
+const SPECIALIZED_FIELDS: Record<string, 'sms-plans' | 'whatsapp-plans' | 'whatsapp-api-prices' | 'hero-slides' | 'integrations-list' | 'generic-list'> = {
   'plans_list': 'sms-plans',
   'api_prices_list': 'whatsapp-api-prices',
   'wa_pricing': 'whatsapp-plans',
+  'slides_json': 'hero-slides',
+  'integrations_json': 'integrations-list',
+  'features_json': 'generic-list',
+  'usecases_json': 'generic-list',
+  'platforms_json': 'generic-list',
+  'solutions_json': 'generic-list',
+  'campaigns_json': 'generic-list',
+  'modules_json': 'generic-list',
+  'value_props_json': 'generic-list',
+  'ux_features_json': 'generic-list',
+  'screenshots_json': 'generic-list',
+};
+
+const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string; sectionId: string }) => {
+  let items: any[] = [];
+  try {
+    items = value ? JSON.parse(value) : [];
+  } catch (e) {
+    items = [];
+  }
+
+  const commit = (next: any[]) => onChange(JSON.stringify(next));
+
+  const updateItem = (index: number, patch: any) => {
+    const next = [...items];
+    next[index] = { ...next[index], ...patch };
+    commit(next);
+  };
+
+  const addItem = () => commit([...items, { titleAr: "", titleEn: "", descAr: "", descEn: "", listAr: "", listEn: "", icon: "", image: "" }]);
+  const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "إدارة العناصر" : "Manage Items"}</label>
+        <Button size="sm" onClick={addItem} className="bg-primary text-white h-7 text-[10px]">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة عنصر" : "Add Item"}
+        </Button>
+      </div>
+      <div className="space-y-4">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-200 rounded-2xl p-4 bg-white space-y-4 relative shadow-sm hover:border-primary/20 transition-all">
+            <button onClick={() => removeItem(idx)} className="absolute top-2 left-2 p-1 text-gray-300 hover:text-red-500 transition-colors">
+              <Plus className="w-4 h-4 rotate-45" />
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان (عربي)" : "Title (AR)"}</label>
+                    <input type="text" value={item.titleAr} onChange={e => updateItem(idx, { titleAr: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
+                    <input type="text" value={item.titleEn} onChange={e => updateItem(idx, { titleEn: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف (عربي)" : "Description (AR)"}</label>
+                  <textarea value={item.descAr} onChange={e => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-1.5 text-xs resize-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
+                  <textarea value={item.descEn} onChange={e => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-1.5 text-xs dir-ltr resize-none" dir="ltr" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نقاط فرعية (مفصولة بفاصلة)" : "Sub-items (comma separated)"}</label>
+                  <input type="text" value={item.listAr || ""} onChange={e => updateItem(idx, { listAr: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" placeholder="ميزة 1, ميزة 2" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-gray-400 block">{isAr ? "الأيقونة" : "Icon"}</label>
+                  <ImageUploader
+                    value={item.icon}
+                    onChange={(url) => updateItem(idx, { icon: url })}
+                    folder={`pages/${pageId}/${sectionId}`}
+                    isAr={isAr}
+                    aspectRatio="square"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-gray-400 block">{isAr ? "الصورة" : "Image"}</label>
+                  <ImageUploader
+                    value={item.image}
+                    onChange={(url) => updateItem(idx, { image: url })}
+                    folder={`pages/${pageId}/${sectionId}`}
+                    isAr={isAr}
+                    aspectRatio="video"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {items.length === 0 && <p className="text-center py-8 text-xs text-gray-400 italic bg-gray-50 border-2 border-dashed rounded-2xl">{isAr ? "لا توجد عناصر مضافة" : "No items added yet"}</p>}
+    </div>
+  );
+};
+
+const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string }) => {
+  let items: { nameAr: string; nameEn: string; icon: string }[] = [];
+  try {
+    items = value ? JSON.parse(value) : [];
+  } catch (e) {
+    console.error("Parse error in IntegrationsListEditor", e);
+  }
+
+  const commit = (next: typeof items) => onChange(JSON.stringify(next));
+
+  const updateItem = (index: number, patch: any) => {
+    const next = [...items];
+    next[index] = { ...next[index], ...patch };
+    commit(next);
+  };
+
+  const addItem = () => commit([...items, { nameAr: "", nameEn: "", icon: "" }]);
+  const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "قائمة التكاملات" : "Integrations List"}</label>
+        <Button size="sm" variant="outline" onClick={addItem} className="h-7 text-[10px] border-[#104E8B] text-[#104E8B] hover:bg-[#104E8B]/5">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة تكامل" : "Add Integration"}
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-white space-y-3 relative group">
+            <button onClick={() => removeItem(idx)} className="absolute top-2 left-2 p-1 text-gray-300 hover:text-red-500 transition-colors">
+              <Plus className="w-4 h-4 rotate-45" />
+            </button>
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-400 block">{isAr ? "أيقونة التكامل" : "Icon"}</label>
+              <ImageUploader
+                value={item.icon}
+                onChange={(url) => updateItem(idx, { icon: url })}
+                folder={`pages/${pageId}/integrations`}
+                isAr={isAr}
+                aspectRatio="square"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الاسم (عربي)" : "Name (AR)"}</label>
+                <input type="text" value={item.nameAr} onChange={e => updateItem(idx, { nameAr: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">Name (EN)</label>
+                <input type="text" value={item.nameEn} onChange={e => updateItem(idx, { nameEn: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" dir="ltr" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {items.length === 0 && <p className="text-center py-4 text-xs text-gray-400 italic border-2 border-dashed rounded-lg">{isAr ? "لا توجد تكاملات مضافة" : "No integrations added yet"}</p>}
+    </div>
+  );
+};
+
+const HeroSlidesEditor = ({ value, onChange, isAr, pageId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string }) => {
+  let slides: any[] = [];
+  try {
+    slides = value ? JSON.parse(value) : [];
+  } catch (e) {
+    // Attempt fallback from old fields if possible, or just start empty
+    slides = [];
+  }
+
+  const commit = (next: any[]) => onChange(JSON.stringify(next));
+
+  const updateSlide = (index: number, patch: any) => {
+    const next = [...slides];
+    next[index] = { ...next[index], ...patch };
+    commit(next);
+  };
+
+  const addSlide = () => commit([...slides, { 
+    id: Date.now(), titleAr: "", titleEn: "", descAr: "", descEn: "", 
+    ctaTextAr: "", ctaTextEn: "", ctaUrl: "", image: "", badgeAr: "", badgeEn: "" 
+  }]);
+  
+  const removeSlide = (index: number) => commit(slides.filter((_, i) => i !== index));
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "شرائح البانر (Slider)" : "Hero Slides"}</label>
+        <Button size="sm" onClick={addSlide} className="bg-[#104E8B] text-white h-7 text-[10px]">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة شريحة" : "Add Slide"}
+        </Button>
+      </div>
+      
+      <div className="space-y-6">
+        {slides.map((slide, idx) => (
+          <div key={slide.id || idx} className="border-2 border-[#104E8B]/10 rounded-2xl p-4 bg-white space-y-4 relative shadow-sm">
+            <div className="flex items-center justify-between border-b pb-2">
+              <span className="text-xs font-bold text-[#104E8B]">{isAr ? `الشريحة ${idx + 1}` : `Slide ${idx + 1}`}</span>
+              <button onClick={() => removeSlide(idx)} className="text-xs text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
+                {isAr ? "حذف الشريحة" : "Remove Slide"}
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان (عربي)" : "Title (AR)"}</label>
+                    <input type="text" value={slide.titleAr} onChange={e => updateSlide(idx, { titleAr: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
+                    <input type="text" value={slide.titleEn} onChange={e => updateSlide(idx, { titleEn: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف (عربي)" : "Description (AR)"}</label>
+                  <textarea value={slide.descAr} onChange={e => updateSlide(idx, { descAr: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
+                  <textarea value={slide.descEn} onChange={e => updateSlide(idx, { descEn: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-2 text-sm" dir="ltr" />
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                 <div className="space-y-1">
+                    <label className="text-[10px] text-gray-400 block">{isAr ? "صورة الشريحة" : "Slide Image"}</label>
+                    <ImageUploader
+                      value={slide.image}
+                      onChange={(url) => updateSlide(idx, { image: url })}
+                      folder={`pages/${pageId}/hero`}
+                      isAr={isAr}
+                      aspectRatio="video"
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نص الزر" : "CTA Text"}</label>
+                    <input type="text" value={slide.ctaTextAr} onChange={e => updateSlide(idx, { ctaTextAr: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "رابط الزر" : "CTA URL"}</label>
+                    <input type="text" value={slide.ctaUrl} onChange={e => updateSlide(idx, { ctaUrl: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" dir="ltr" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {slides.length === 0 && (
+        <div className="p-10 border-2 border-dashed rounded-2xl bg-gray-50 flex flex-col items-center gap-3">
+          <p className="text-sm text-gray-400">{isAr ? "لم يتم إضافة شرائح بعد. سيظهر الهيرو الافتراضي." : "No slides added. Default hero will be shown."}</p>
+          <Button size="sm" onClick={addSlide}>{isAr ? "إضافة الشريحة الأولى" : "Add First Slide"}</Button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const getGroupLabel = (sectionId: string, groupKey: string, isAr: boolean): string => {
@@ -528,6 +802,14 @@ const shouldUseGroupedFields = (sectionId: string) => {
     "wa-request-form", "home-solutions", "ot-hero", "ot-features", "gg-hero", "gg-cta",
   ]);
   return groupedSectionIds.has(sectionId);
+};
+
+const getSectionIcon = (sectionId: string) => {
+  if (sectionId.includes('hero')) return <Globe className="w-4 h-4 text-blue-500" />;
+  if (sectionId.includes('pricing')) return <FileText className="w-4 h-4 text-green-500" />;
+  if (sectionId.includes('feature')) return <ImageIcon className="w-4 h-4 text-purple-500" />;
+  if (sectionId.includes('integration')) return <Plus className="w-4 h-4 text-orange-500" />;
+  return <FileText className="w-4 h-4 text-gray-500" />;
 };
 
 export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
@@ -662,6 +944,62 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           onChange={(v) => handleFieldChange(sectionId, field.key, v)}
           isAr={isAr}
         />
+      );
+    }
+
+    if (field.key === 'slides_json') {
+      return (
+        <HeroSlidesEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+          pageId={page.id}
+        />
+      );
+    }
+
+    if (field.key === 'integrations_json') {
+      return (
+        <IntegrationsListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+          pageId={page.id}
+        />
+      );
+    }
+
+    if (field.key.endsWith('_json')) {
+      return (
+        <GenericListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+          pageId={page.id}
+          sectionId={sectionId}
+        />
+      );
+    }
+
+    if (field.type === 'image' || field.key.includes('image') || field.key.includes('logo') || field.key.includes('icon')) {
+      const isIcon = field.key.includes('logo') || field.key.includes('icon');
+      return (
+        <div key={fieldKey} className="space-y-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm group transition-all hover:border-[#104E8B]/20">
+          <div className="flex items-center justify-between mb-1">
+             <label className="text-xs font-bold text-gray-500 uppercase tracking-tight">{isAr ? field.label : field.labelEn}</label>
+             <Badge variant="outline" className="text-[9px] uppercase font-bold text-[#104E8B] bg-blue-50/50 border-blue-100">{isIcon ? 'Icon' : 'Image'}</Badge>
+          </div>
+          <ImageUploader
+            value={value}
+            onChange={(url) => handleFieldChange(sectionId, field.key, url)}
+            folder={`pages/${page.id}/${sectionId}`}
+            isAr={isAr}
+            aspectRatio={isIcon ? 'square' : 'video'}
+          />
+        </div>
       );
     }
 
@@ -999,12 +1337,12 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
                 onClick={() => toggleSection(section.id)}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#104E8B]/10 text-[#104E8B] text-sm">
-                    {sIndex + 1}
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100">
+                    {getSectionIcon(section.id)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm font-bold text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
+                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
                       {isExternallyManagedSection
                         ? (isAr ? "يُدار مركزياً" : "Managed centrally")
                         : `${section.fields.length} ${isAr ? "حقول" : "fields"}`}

@@ -1,6 +1,7 @@
 export interface SmsPlanRow {
   messages: string;
   price: string;
+  originalPrice?: string; // For discounts
   feature: string;
   description: string;
   featured: boolean;
@@ -12,10 +13,11 @@ export const parseSmsPlanRows = (value: string): SmsPlanRow[] => value
   .map((line) => line.trim())
   .filter(Boolean)
   .map((line) => {
-    const [messages = "", price = "", feature = "", description = "", featured = "false", custom = "false"] = line.split("|");
+    const [messages = "", price = "", feature = "", description = "", featured = "false", custom = "false", originalPrice = ""] = line.split("|");
     return {
       messages,
       price,
+      originalPrice,
       feature,
       description,
       featured: featured.trim().toLowerCase() === "true",
@@ -27,6 +29,7 @@ export const stringifySmsPlanRows = (rows: SmsPlanRow[]): string => rows
   .map((row) => {
     const messages = row.custom ? "custom" : row.messages;
     const price = row.custom ? "" : row.price;
-    return `${messages}|${price}|${row.feature}|${row.description}|${row.featured}|${row.custom}`;
+    const orig = row.originalPrice || "";
+    return `${messages}|${price}|${row.feature}|${row.description}|${row.featured}|${row.custom}|${orig}`;
   })
   .join("\n");
