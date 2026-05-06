@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -84,7 +84,19 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   const techSectionTitle = getCmsField(cmsPage, 'ot-features', 'tech_title', isRTL, isRTL ? "بنية تحتية قوية وآمنة" : "Robost & Secure Infrastructure");
 
   // Screenshots للنظام
-  const screenshots = [
+  const screenshots = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'screenshots_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        return items.map((item: any) => ({
+          title: isRTL ? item.titleAr : item.titleEn,
+          description: isRTL ? item.descAr : item.descEn,
+          image: item.image
+        }));
+      }
+    } catch (e) {}
+    return [
     {
       title: isRTL ? "لوحة التحكم - مركز القيادة" : "Dashboard - Command Center",
       description: isRTL ? "نظرة شاملة على جميع عمليات الموارد البشرية في لوحة واحدة" : "Comprehensive overview of all HR operations in a single dashboard",
@@ -101,6 +113,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
       image: attendanceImg
     }
   ];
+  }, [cmsPage, isRTL]);
 
   // إعادة تعيين currentScreenshot إذا كان خارج النطاق
   React.useEffect(() => {
@@ -289,118 +302,9 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   ];
   }, [cmsPage, isRTL]);
 
-  const screenshots = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'screenshots_json', isRTL, '');
-    try {
-      if (json) {
-        const items = JSON.parse(json);
-        return items.map((item: any) => ({
-          title: isRTL ? item.titleAr : item.titleEn,
-          description: isRTL ? item.descAr : item.descEn,
-          image: item.image
-        }));
-      }
-    } catch (e) {}
-    return [
-    {
-      title: isRTL ? "لوحة التحكم - مركز القيادة" : "Dashboard - Command Center",
-      description: isRTL ? "نظرة شاملة على جميع عمليات الموارد البشرية في لوحة واحدة" : "Comprehensive overview of all HR operations in a single dashboard",
-      image: dashboardImg
-    },
-    {
-      title: isRTL ? "نظام الرواتب الذكي" : "Smart Payroll System",
-      description: isRTL ? "حساب وإصدار الرواتب تلقائياً مع التوافق الكامل مع نظام حماية الأجور" : "Automated salary calculation and issuance, fully compliant with the Wage Protection System (WPS)",
-      image: payrollImg
-    },
-    {
-      title: isRTL ? "الحضور والانصراف" : "Attendance & Departure",
-      description: isRTL ? "تتبع دقيق لساعات العمل مع دعم البصمة والموقع الجغرافي" : "Accurate tracking of working hours with biometric and GPS support",
-      image: attendanceImg
-    }
-  ];
-  }, [cmsPage, isRTL]);
 
-  const modules = [
-    {
-      icon: Users,
-      title: isRTL ? "إدارة الموظفين والملفات" : "Employee & File Management",
-      description: isRTL ? "سجلات رقمية شاملة لدورة حياة الموظف الكاملة، إدارة العقود، الوثائق، والهيكل التنظيمي الديناميكي" : "Comprehensive digital records for the entire employee lifecycle, contract and document management, and dynamic organizational structure",
-      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
-      features: isRTL ? ["ملفات رقمية شاملة", "إدارة العقود والوثائق", "الهيكل التنظيمي", "المسار المهني"] : ["Comprehensive digital files", "Contract and document management", "Organizational structure", "Career path"]
-    },
-    {
-      icon: DollarSign,
-      title: isRTL ? "نظام الرواتب الذكي" : "Smart Payroll System",
-      description: isRTL ? "إعداد مسيرات الرواتب تلقائياً، حساب البدلات والخصومات، وإصدار قسائم الدفع بما يتوافق مع نظام حماية الأجور" : "Automate payroll generation, calculate allowances and deductions, and issue payslips in compliance with the Wage Protection System",
-      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
-      features: isRTL ? ["حساب آلي للرواتب", "نظام حماية الأجور", "قسائم الراتب", "تقارير مالية"] : ["Automated salary calculation", "Wage protection system", "Payslips", "Financial reports"]
-    },
-    {
-      icon: Clock,
-      title: isRTL ? "الحضور والانصراف" : "Attendance & Departure",
-      description: isRTL ? "تتبع دقيق لساعات العمل عبر الأجهزة البيومترية أو الموقع الجغرافي، مع إدارة سهلة للإجازات والمغادرات" : "Accurate tracking of working hours via biometric devices or GPS, with easy management of leaves and early departures",
-      color: "bg-gradient-to-br from-[#00BCD4] to-[#0097a7]",
-      features: isRTL ? ["تتبع البصمة", "الموقع الجغرافي", "إدارة الإجازات", "نظام الورديات"] : ["Biometric tracking", "Geolocation", "Leave management", "Shift management"]
-    },
-    {
-      icon: Target,
-      title: isRTL ? "إدارة الأداء والتقييم" : "Performance & Evaluation Management",
-      description: isRTL ? "نظام KPIs متطور، تقييمات دورية، ومتابعة أهداف الموظفين لرفع الإنتاجية وتحقيق التميز" : "Advanced KPIs system, periodic evaluations, and tracking employee goals to increase productivity and achieve excellence",
-      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
-      features: isRTL ? ["نظام KPIs", "تقييمات دورية", "متابعة الأهداف", "تقارير الأداء"] : ["KPIs system", "Periodic evaluations", "Goal tracking", "Performance reports"]
-    },
-    {
-      icon: Briefcase,
-      title: isRTL ? "التوظيف والتهيئة" : "Recruitment & Onboarding",
-      description: isRTL ? "إدارة دورة التوظيف الكاملة من نشر الوظائف، فرز السير الذاتية، وحتى تهيئة الموظف الجديد (Onboarding)" : "Manage the entire recruitment cycle from job posting, resume screening, to new employee onboarding",
-      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
-      features: isRTL ? ["نظام ATS", "نشر الوظائف", "إدارة المقابلات", "Onboarding"] : ["ATS system", "Job posting", "Interview management", "Onboarding"]
-    },
-    {
-      icon: CreditCard,
-      title: isRTL ? "الإدارة المالية والعهدة" : "Financial & Custody Management",
-      description: isRTL ? "تتبع المصروفات، العهد العينية (Assets)، السلف والقروض، وإدارة ميزانية الموارد البشرية بدقة" : "Track expenses, physical assets, advances and loans, and accurately manage the HR budget",
-      color: "bg-gradient-to-br from-[#00BCD4] to-[#0097a7]",
-      features: isRTL ? ["إدارة العهد", "السلف والقروض", "المصروفات", "الميزانية"] : ["Custody management", "Advances and loans", "Expenses", "Budgeting"]
-    },
-    {
-      icon: Smartphone,
-      title: isRTL ? "الخدمة الذاتية للموظف" : "Employee Self-Service",
-      description: isRTL ? "تطبيق وبوابة تتيح للموظف تقديم الطلبات (إجازات، خطابات، سلف) ومتابعتها دون الرجوع لموظف HR" : "An application and portal that allows employees to submit requests (leaves, letters, advances) and track them without returning to the HR employee",
-      color: "bg-gradient-to-br from-[#104E8B] to-[#0d3d6e]",
-      features: isRTL ? ["بوابة الموظف", "تقديم الطلبات", "قسائم الراتب", "السجل الوظيفي"] : ["Employee portal", "Submit requests", "Payslips", "Employment record"]
-    },
-    {
-      icon: GraduationCap,
-      title: isRTL ? "التدريب والتطوير" : "Training & Development",
-      description: isRTL ? "جدولة الدورات التدريبية، تتبع سجلات التدريب، وإدارة الشهادات لضمان النمو المستمر للموظفين" : "Schedule training courses, track training records, and manage certificates to ensure continuous employee growth",
-      color: "bg-gradient-to-br from-[#FFA502] to-[#e69302]",
-      features: isRTL ? ["إدارة الدورات", "سجلات التدريب", "الشهادات", "خطط التطوير"] : ["Course management", "Training records", "Certificates", "Development plans"]
-    }
-  ];
 
-  const uxFeatures = [
-    {
-      icon: Bell,
-      title: isRTL ? "تنبيهات فورية" : "Instant Notifications",
-      description: isRTL ? "قوالب إشعارات جاهزة للرواتب، الإجازات، والقرارات الإدارية" : "Ready-made notification templates for payroll, leaves, and administrative decisions"
-    },
-    {
-      icon: MessageCircle,
-      title: isRTL ? "تواصل فعال" : "Effective Communication",
-      description: isRTL ? "نظام رسائل داخلي متكامل وتكامل مع Zoom للاجتماعات" : "Integrated internal messaging system and integration with Zoom for meetings"
-    },
-    {
-      icon: FileSpreadsheet,
-      title: isRTL ? "تقارير بضغطة زر" : "One-Click Reports",
-      description: isRTL ? "أكثر من 20 تقرير جاهز للتصدير (Excel/PDF) لدعم اتخاذ القرار" : "More than 20 ready-to-export reports (Excel/PDF) to support decision making"
-    },
-    {
-      icon: Languages,
-      title: isRTL ? "واجهة متعددة اللغات" : "Multilingual Interface",
-      description: isRTL ? "دعم كامل للعربية والإنجليزية مع إمكانية التبديل الفوري" : "Full support for Arabic and English with instant switching capability"
-    }
-  ];
+
 
   const technicalSpecs = [
     {
