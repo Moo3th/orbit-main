@@ -10,6 +10,7 @@ import {
   Clock, TrendingUp, Award, Target, Headphones, Sparkles,
   BadgeCheck, ArrowRight, X, ChevronLeft, ChevronRight, ArrowLeft
 } from "lucide-react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import { useLanguage } from "@/contexts/LanguageContext";

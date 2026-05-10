@@ -30,6 +30,8 @@ import {
 } from "@/lib/cms/whatsappPricing";
 import { CmsPagesView } from './views/CmsPagesView';
 import { CmsPageEditorView } from './views/CmsPageEditorView';
+import { FormBuilderView } from './views/FormBuilderView';
+import { CmsSeoView } from './views/CmsSeoView';
 import { RichTextEditor } from "@/components/business/RichTextEditor";
 
 type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder";

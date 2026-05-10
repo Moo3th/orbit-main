@@ -162,7 +162,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
     'contact-form',
     'privacy_note',
     isRTL,
-    isRTL ? 'بإرسال النموذج، أنت توافق على سياسة الخصوصية.' : 'By sending this form, you agree to the privacy policy.'
+    isRTL ? 'بإرسال النموذج، أنت توافق على شروط المستخدم.' : 'By sending this form, you agree to the Terms of Use.'
   );
 
   const serviceOptions = useMemo(() => {
@@ -549,7 +549,23 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                 </motion.button>
 
                 <p className={`text-xs text-center text-gray-500 dark:text-gray-400 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                  {privacyNote}
+                  {isRTL ? (
+                    <>
+                      بإرسال النموذج، أنت توافق على{' '}
+                      <a href="https://app.mobile.net.sa/terms-of-use" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">
+                        شروط المستخدم
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      By sending this form, you agree to the{' '}
+                      <a href="https://app.mobile.net.sa/terms-of-use" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">
+                        Terms of Use
+                      </a>
+                      .
+                    </>
+                  )}
                 </p>
               </motion.form>
             </motion.div>

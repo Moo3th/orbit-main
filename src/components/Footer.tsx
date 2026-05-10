@@ -491,6 +491,14 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 text-white/40">
             <span>{commercialRegistry}</span>
             <span>{licenseText}</span>
+            <a 
+              href="https://app.mobile.net.sa/terms-of-use" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-white transition-colors"
+            >
+              {isRTL ? "شروط المستخدم" : "Terms of Use"}
+            </a>
           </div>
         </motion.div>
       </div>
