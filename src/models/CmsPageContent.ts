@@ -59,12 +59,10 @@ const cmsPageContentSchema = new Schema<ICmsPageContent>(
     pageId: {
       type: String,
       required: true,
-      unique: true,
     },
     path: {
       type: String,
       required: true,
-      unique: true,
     },
     order: { type: Number, default: 0 },
     seo: {

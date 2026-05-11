@@ -502,7 +502,7 @@ function PersonaTabs({ isRTL, t }: { isRTL: boolean; t: (ar: string, en: string)
             <div className="bg-slate-900 rounded-2xl p-8 text-left font-mono text-sm">
               <div className="text-emerald-400 mb-2"># Orbit REST API v3</div>
               <div className="text-slate-400 mb-1"><span className="text-blue-400">POST</span> /api/v3/sms/send</div>
-              <div className="text-slate-500 mb-4">{'{'} "to": "+9665XXXXXXXX", "message": "رمز التحقق: 4829" {'}'}</div>
+              <div className="text-slate-500 mb-4">{'{'} &quot;to&quot;: &quot;+9665XXXXXXXX&quot;, &quot;message&quot;: &quot;رمز التحقق: 4829&quot; {'}'}</div>
               <div className="text-emerald-400">{'//'} 200 OK — {t("تم التسليم في 0.8 ثانية", "Delivered in 0.8s")} ✓</div>
               <div className="flex gap-2 mt-6">
                 {["Python", "Node.js", "PHP", "Java", "Go"].map(l => <span key={l} className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">{l}</span>)}

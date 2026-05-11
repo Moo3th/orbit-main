@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await connectDB();
   
   // Try to find form by custom domain + slug or just slug
-  let config = await FormConfig.findOne({ 
+  const config = await FormConfig.findOne({ 
     $or: [
       { slug: path, customDomain: host },
       { slug: path, customDomain: { $in: [null, ''] } }
@@ -47,7 +47,7 @@ export default async function CatchAllPage({ params }: Props) {
 
   // 1. Try to find by exact slug + custom domain
   // 2. Try to find by exact slug + no custom domain
-  let config = await FormConfig.findOne({ 
+  const config = await FormConfig.findOne({ 
     $or: [
       { slug: path, customDomain: host },
       { slug: path, customDomain: { $in: [null, ''] } }

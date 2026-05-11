@@ -268,7 +268,7 @@ export default function TechPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
-            <p className="font-mono text-xs text-primary/60 mb-2">// {t("أربع منصات متكاملة", "Four integrated platforms")}</p>
+            <p className="font-mono text-xs text-primary/60 mb-2">{'// '}{t("أربع منصات متكاملة", "Four integrated platforms")}</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white">{t("حلولنا التقنية", "Our Tech Solutions")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -330,10 +330,10 @@ export default function TechPage() {
                 <div className="my-3" />
                 <div className="text-white/30 mb-2">{t("// إرسال رسالة في 3 أسطر", "// Send a message in 3 lines")}</div>
                 <div className="text-blue-300">const</div>
-                <div className="text-white/70 pl-4">orbit = <span className="text-blue-300">new</span> <span className="text-amber-200">OrbitClient</span>({'{'} apiKey: <span className="text-emerald-300">'sk_xxx'</span> {'}'})</div>
+                <div className="text-white/70 pl-4">orbit = <span className="text-blue-300">new</span> <span className="text-amber-200">OrbitClient</span>({'{'} apiKey: <span className="text-emerald-300">{'\''}sk_xxx{'\''}</span> {'}'})</div>
                 <div className="text-white/70 pl-4"><span className="text-blue-300">await</span> orbit.sms.send({'{'}</div>
-                <div className="text-white/50 pl-8">to: <span className="text-emerald-300">'+9665XXXXXXXX'</span>,</div>
-                <div className="text-white/50 pl-8">message: <span className="text-emerald-300">'رمز التحقق: 4829'</span></div>
+                <div className="text-white/50 pl-8">to: <span className="text-emerald-300">{'\''}+9665XXXXXXXX{'\''}</span>,</div>
+                <div className="text-white/50 pl-8">message: <span className="text-emerald-300">{'\''}رمز التحقق: 4829{'\''}</span></div>
                 <div className="text-white/70 pl-4">{'}'})</div>
                 <div className="text-emerald-400/60 mt-1">{t("// ✅ تم التسليم في 0.8 ثانية", "// ✅ Delivered in 0.8s")}</div>
               </div>

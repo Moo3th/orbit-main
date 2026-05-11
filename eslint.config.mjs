@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/purity": "warn",
       "react-hooks/immutability": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
       // Allow CommonJS-style config files (e.g. Tailwind config).
       "@typescript-eslint/no-require-imports": "off",
     },
