@@ -102,7 +102,7 @@ export const Integrations = ({ pageData = null }: IntegrationsProps) => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+              whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
               className="flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-3xl shadow-sm border border-slate-100 transition-all cursor-pointer group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />

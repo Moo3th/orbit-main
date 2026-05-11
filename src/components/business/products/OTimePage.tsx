@@ -528,7 +528,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-            {valueProps.map((prop, index) => (
+            {valueProps.map((prop: { icon: React.ComponentType<{ className?: string }>; title: string; description: string; color: string; iconColor: string; customIcon?: string }, index: number) => (
               <Card key={index} className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <CardContent className="p-6 text-center">
                   <div className={`${prop.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4`}>
