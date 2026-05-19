@@ -19,6 +19,7 @@ const SHOW_NAV_OFFERS = false;
 const DEFAULT_SOLUTIONS = [
   { slug: 'sms-platform', nameEn: 'SMS Messaging', nameAr: 'الرسائل النصية SMS', href: '/products/sms', id: 'sms' },
   { slug: 'whatsapp-business-api', nameEn: 'WhatsApp Business API', nameAr: 'واتساب أعمال API', href: '/products/whatsapp', id: 'whatsapp' },
+  { slug: 'schoolbit', nameEn: 'SchoolBit', nameAr: 'سكول بت', href: '/products/schoolbit', id: 'schoolbit' },
   { slug: 'otime', nameEn: 'O-Time HR Software', nameAr: 'O-Time برنامج الموارد البشرية', href: '/products/o-time', id: 'otime' },
   { slug: 'gov-gate', nameEn: 'Gov Gate', nameAr: 'Gov Gate', href: '/products/gov-gate', id: 'govgate' },
 ];

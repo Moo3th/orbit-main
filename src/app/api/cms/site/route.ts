@@ -117,6 +117,7 @@ export async function PUT(request: NextRequest) {
       '/products/whatsapp',
       '/products/o-time',
       '/products/gov-gate',
+      '/products/schoolbit',
       '/solutions/sms-platform',
       '/solutions/whatsapp-business-api',
       '/solutions/otime',

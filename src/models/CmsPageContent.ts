@@ -7,11 +7,14 @@ export interface ICmsField {
   richText?: boolean;
 }
 
+export type CmsSectionType = 'hero' | 'features' | 'pricing' | 'cta' | 'testimonials' | 'trust' | 'custom';
+
 export interface ICmsSection {
   id: string;
-  type: 'hero' | 'features' | 'pricing' | 'cta' | 'testimonials' | 'trust' | 'custom';
+  type: string;
   order: number;
   fields: ICmsField[];
+  visible?: boolean;
 }
 
 export interface ICmsPageContent {
@@ -47,7 +50,6 @@ const cmsSectionSchema = new Schema<ICmsSection>({
   id: { type: String, required: true },
   type: {
     type: String,
-    enum: ['hero', 'features', 'pricing', 'cta', 'testimonials', 'trust', 'custom'],
     required: true,
   },
   order: { type: Number, default: 0 },

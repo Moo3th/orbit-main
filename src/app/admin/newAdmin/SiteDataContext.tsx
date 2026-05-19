@@ -7,6 +7,11 @@ import {
   serializeWhatsAppConversationPrices,
   serializeWhatsAppPlans,
 } from "@/lib/cms/whatsappPricing";
+import {
+  getDefaultSchoolBitPlans,
+  getDefaultSchoolBitSmsPlans,
+  serializeSchoolBitPlans,
+} from "@/lib/cms/schoolbitPricing";
 
 export interface Partner {
   id: string;
@@ -708,6 +713,181 @@ const ensureSmsFields = (pages: PageData[]): PageData[] => {
   return result;
 };
 
+const schoolbitHeroFields: SectionField[] = [
+  { key: "eyebrow", label: "شارة أعلى العنوان", labelEn: "Eyebrow Badge", type: "text", value: "منصة إدارة المدارس الذكية", valueEn: "Smart School Management Platform" },
+  { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "إدارة مدرستك بالكامل من منصة واحدة", valueEn: "Manage Your Entire School from One Platform" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "SchoolBit تجمع الحضور، الطلاب، الكادر، الجداول، الاختبارات، الرسائل، والتقارير في نظام ذكي يساعدك على تقليل العمل اليدوي، رفع الانضباط، واتخاذ قرارات أسرع.", valueEn: "SchoolBit brings together attendance, students, staff, schedules, exams, messaging, and reports in a smart system that helps you reduce manual work, improve discipline, and make faster decisions." },
+  { key: "cta1_text", label: "نص الزر الأول", labelEn: "Primary CTA Text", type: "text", value: "اطلب عرضاً توضيحياً", valueEn: "Request a Demo" },
+  { key: "cta1_url", label: "رابط الزر الأول", labelEn: "Primary CTA URL", type: "url", value: "#contact", valueEn: "#contact" },
+  { key: "cta2_text", label: "نص الزر الثاني", labelEn: "Secondary CTA Text", type: "text", value: "اكتشف المميزات", valueEn: "Explore Features" },
+  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "Secondary CTA URL", type: "url", value: "#features", valueEn: "#features" },
+  { key: "chip_noor", label: "شارة تكامل نور", labelEn: "Noor Integration Chip", type: "text", value: "تكامل مع نظام نور", valueEn: "Noor Integration" },
+  { key: "chip_biotime", label: "شارة ربط البصمة", labelEn: "BioTime Chip", type: "text", value: "ربط أجهزة البصمة", valueEn: "BioTime Devices" },
+  { key: "chip_messages", label: "شارة الرسائل", labelEn: "Messages Chip", type: "text", value: "رسائل SMS و WhatsApp", valueEn: "SMS & WhatsApp" },
+  { key: "chip_reports", label: "شارة التقارير", labelEn: "Reports Chip", type: "text", value: "تقارير تلقائية", valueEn: "Auto Reports" },
+  { key: "hero_image", label: "صورة الهيرو", labelEn: "Hero Image", type: "image", value: "", valueEn: "" },
+];
+const schoolbitTrustFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "كل ما تحتاجه المدرسة لتعمل بكفاءة أعلى:", valueEn: "Everything your school needs to run more efficiently:" },
+  { key: "dashboard_label", label: "لوحة تحكم - العنوان", labelEn: "Dashboard Label", type: "text", value: "لوحة تحكم", valueEn: "Live Monitoring" },
+  { key: "dashboard_desc", label: "لوحة تحكم - الوصف", labelEn: "Dashboard Desc", type: "text", value: "متابعة لحظية", valueEn: "Real-time overview" },
+  { key: "attendance_label", label: "حضور - العنوان", labelEn: "Attendance Label", type: "text", value: "حضور", valueEn: "Attendance" },
+  { key: "attendance_desc", label: "حضور - الوصف", labelEn: "Attendance Desc", type: "text", value: "غياب وتأخر وانصراف", valueEn: "Absence, late, departure" },
+  { key: "messages_label", label: "رسائل - العنوان", labelEn: "Messages Label", type: "text", value: "رسائل", valueEn: "Messaging" },
+  { key: "messages_desc", label: "رسائل - الوصف", labelEn: "Messages Desc", type: "text", value: "تواصل مباشر مع ولي الأمر", valueEn: "Direct parent contact" },
+  { key: "reports_label", label: "تقارير - العنوان", labelEn: "Reports Label", type: "text", value: "تقارير", valueEn: "Reports" },
+  { key: "reports_desc", label: "تقارير - الوصف", labelEn: "Reports Desc", type: "text", value: "مؤشرات جاهزة للإدارة", valueEn: "Ready-made indicators" },
+  { key: "integrations_label", label: "تكاملات - العنوان", labelEn: "Integrations Label", type: "text", value: "تكاملات", valueEn: "Integrations" },
+  { key: "integrations_desc", label: "تكاملات - الوصف", labelEn: "Integrations Desc", type: "text", value: "نور، BioTime، Excel", valueEn: "Noor, BioTime, Excel" },
+];
+const schoolbitProblemFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "هل ما زالت إدارة المدرسة موزعة بين ملفات ورسائل وأنظمة متفرقة؟", valueEn: "Is your school management still scattered across files, messages, and disconnected systems?" },
+  { key: "p1_title", label: "مشكلة 1 - العنوان", labelEn: "Problem 1 Title", type: "text", value: "أعمال يدوية متكررة", valueEn: "Repetitive Manual Work" },
+  { key: "p1_desc", label: "مشكلة 1 - الوصف", labelEn: "Problem 1 Desc", type: "textarea", value: "متابعة الغياب، تجهيز التقارير، وتنظيم الاختبارات يدويًا.", valueEn: "Tracking absence, preparing reports, and organizing exams manually." },
+  { key: "p2_title", label: "مشكلة 2 - العنوان", labelEn: "Problem 2 Title", type: "text", value: "صعوبة في رؤية المشكلات مبكرًا", valueEn: "Hard to Spot Problems Early" },
+  { key: "p2_desc", label: "مشكلة 2 - الوصف", labelEn: "Problem 2 Desc", type: "textarea", value: "الطالب المتعثر أو كثير الغياب لا يظهر إلا بعد أن تتفاقم الحالة.", valueEn: "A struggling or frequently absent student only appears after the situation worsens." },
+  { key: "p3_title", label: "مشكلة 3 - العنوان", labelEn: "Problem 3 Title", type: "text", value: "تواصل بطيء مع أولياء الأمور", valueEn: "Slow Parent Communication" },
+  { key: "p3_desc", label: "مشكلة 3 - الوصف", labelEn: "Problem 3 Desc", type: "textarea", value: "الإشعارات المهمة تتأخر أو تعتمد على اجتهادات فردية.", valueEn: "Important notifications are delayed or rely on individual efforts." },
+  { key: "solution_text", label: "نص الحل", labelEn: "Solution Text", type: "textarea", value: "SchoolBit تحول إدارة المدرسة إلى عملية موحدة، سريعة، وذكية.", valueEn: "SchoolBit transforms school management into a unified, fast, and smart operation." },
+];
+const schoolbitBenefitsFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "لماذا SchoolBit؟", valueEn: "Why SchoolBit?" },
+  { key: "benefits_json", label: "قائمة المميزات", labelEn: "Benefits List", type: "list", value: JSON.stringify([
+    { icon: "LayoutDashboard", title: "منصة واحدة لإدارة المدرسة", titleEn: "One Platform for School Management", desc: "إدارة الطلاب، الحضور، الكادر، الجداول، الاختبارات، الرسائل، والتقارير ضمن نظام واحد بدل التنقل بين أدوات متعددة.", descEn: "Manage students, attendance, staff, schedules, exams, messaging, and reports in one system instead of multiple tools." },
+    { icon: "Eye", title: "متابعة لحظية لما يحتاج تدخلك", titleEn: "Instant Monitoring of What Matters", desc: "لوحة تحكم تعرض الغياب، الطلاب في خطر، المخالفات، ومؤشرات المدرسة بشكل مباشر.", descEn: "A dashboard showing absence, at-risk students, violations, and school indicators at a glance." },
+    { icon: "MessageCircle", title: "تواصل أسرع مع ولي الأمر", titleEn: "Faster Parent Communication", desc: "أرسل رسائل الغياب، الاستدعاءات، التذكيرات، والتقارير عبر SMS أو WhatsApp من داخل المنصة.", descEn: "Send absence notifications, summons, reminders, and reports via SMS or WhatsApp from within the platform." },
+    { icon: "FileSpreadsheet", title: "تقارير جاهزة بدل إعدادها يدويًا", titleEn: "Ready Reports Instead of Manual Preparation", desc: "أنشئ وجدول تقارير الحضور، التأخر، المخالفات، الكادر، والرسائل بصيغ PDF وExcel.", descEn: "Create and schedule attendance, tardiness, violations, staff, and messaging reports in PDF and Excel." },
+    { icon: "Zap", title: "أتمتة تقلل الأخطاء وتوفر الوقت", titleEn: "Automation That Reduces Errors and Saves Time", desc: "توزيع ذكي للجداول، توزيع تلقائي للاختبارات، كشف تعارضات، وتنبيهات ذكية.", descEn: "Smart schedule distribution, automatic exam room assignment, conflict detection, and smart alerts." },
+    { icon: "Globe", title: "تكامل مع بيئة المدرسة", titleEn: "Integration with Your School Environment", desc: "ربط مع نظام نور، أجهزة BioTime، ملفات Excel، وWebhooks للتكاملات المستقبلية.", descEn: "Connect with Noor system, BioTime devices, Excel files, and Webhooks for future integrations." },
+  ]), valueEn: "" },
+];
+const schoolbitRolesFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "كيف تساعد كل إدارة داخل المدرسة؟", valueEn: "How does it help each department in the school?" },
+  { key: "roles_json", label: "قائمة الأدوار", labelEn: "Roles List", type: "list", value: JSON.stringify([
+    { key: "admin", name: "الإدارة", nameEn: "Administration", icon: "LayoutDashboard", bullets: ["ترى مؤشرات المدرسة من لوحة واحدة", "تستقبل تقارير دورية تلقائيًا", "تراقب الحضور والانضباط والكادر", "تمنح صلاحيات دقيقة لكل مستخدم"], bulletsEn: ["See school indicators from a single dashboard", "Receive automatic periodic reports", "Monitor attendance, discipline, and staff", "Grant precise permissions to each user"] },
+    { key: "studentsAffairs", name: "شؤون الطلاب", nameEn: "Student Affairs", icon: "Users", bullets: ["ملف متكامل لكل طالب", "تسجيل المخالفات والاستدعاءات والتكريمات", "متابعة الحضور والغياب والتأخر", "التواصل الفوري مع ولي الأمر"], bulletsEn: ["Complete profile for each student", "Record violations, summons, and commendations", "Track attendance, absence, and tardiness", "Instant communication with parents"] },
+    { key: "vicePrincipal", name: "الوكيل", nameEn: "Vice Principal", icon: "CalendarDays", bullets: ["إدارة الجداول والحصص اليومية", "متابعة الانصراف والبصمة", "تجهيز الاختبارات وتوزيع القاعات", "اكتشاف التعارضات مبكرًا"], bulletsEn: ["Manage daily schedules and classes", "Track departure and biometric attendance", "Prepare exams and assign rooms", "Detect conflicts early"] },
+    { key: "teacher", name: "المعلم", nameEn: "Teacher", icon: "BookOpen", bullets: ["الوصول للطلاب والفصول المرتبطة به", "متابعة الحضور والسلوك", "رفع ملفات الإنجاز", "استقبال التذكيرات والمتطلبات"], bulletsEn: ["Access assigned students and classes", "Track attendance and behavior", "Upload achievement files", "Receive reminders and requirements"] },
+    { key: "counselor", name: "المرشد الطلابي", nameEn: "Counselor", icon: "AlertTriangle", bullets: ["رؤية الطلاب في خطر", "تتبع السجل السلوكي", "متابعة الغياب المتكرر", "تنفيذ تدخلات أسرع وأكثر دقة"], bulletsEn: ["See at-risk students", "Track behavioral records", "Monitor frequent absence", "Execute faster, more accurate interventions"] },
+  ]), valueEn: "" },
+];
+const schoolbitModulesFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "الوحدات الرئيسية", valueEn: "Core Modules" },
+  { key: "modules_json", label: "قائمة الوحدات", labelEn: "Modules List", type: "list", value: JSON.stringify([
+    { key: "dashboard", label: "لوحة تحكم", labelEn: "Dashboard", title: "لوحة التحكم الذكية", titleEn: "Smart Control Panel", subtitle: "كل مؤشرات مدرستك أمامك منذ لحظة الدخول", subtitleEn: "All your school indicators at a glance from the moment you log in", icon: "LayoutDashboard", bullets: ["إجمالي الطلاب والكادر", "معدل الحضور", "الطلاب في خطر", "الغائبون اليوم", "المخالفات الأسبوعية", "إرسال إشعار جماعي مباشرة"], bulletsEn: ["Total students and staff", "Attendance rate", "Students at risk", "Absent today", "Weekly violations", "Send bulk notification instantly"] },
+    { key: "attendance", label: "حضور", labelEn: "Attendance", title: "الحضور والانصراف", titleEn: "Attendance & Departure", subtitle: "سجل حضور أدق، وتدخل أسرع", subtitleEn: "More accurate attendance, faster intervention", icon: "Clock", bullets: ["حضور يومي وحضور لكل حصة", "تكامل مع أجهزة البصمة BioTime", "حساب الغياب والتأخر تلقائيًا", "متابعة الطلاب الذين لم ينصرفوا", "تقارير الحضور والتأخر"], bulletsEn: ["Daily and per-period attendance", "BioTime device integration", "Automatic absence and tardiness calculation", "Track students who haven't departed", "Attendance and tardiness reports"] },
+    { key: "studentProfile", label: "ملف طالب", labelEn: "Student Profile", title: "ملف الطالب", titleEn: "Student Profile", subtitle: "الصورة الكاملة لكل طالب في مكان واحد", subtitleEn: "The complete picture of each student in one place", icon: "Users", bullets: ["بيانات شخصية وأكاديمية", "سجل حضور وسلوك", "استدعاءات وملاحظات", "مخالفات وتكريمات", "رسائل مباشرة لولي الأمر"], bulletsEn: ["Personal and academic data", "Attendance and behavior record", "Summons and notes", "Violations and commendations", "Direct messaging to parent"] },
+    { key: "messaging", label: "رسائل", labelEn: "Messaging", title: "الرسائل والتواصل", titleEn: "Messaging & Communication", subtitle: "التواصل المهم يصل في وقته", subtitleEn: "Important communication arrives on time", icon: "MessageCircle", bullets: ["SMS و WhatsApp", "قوالب جاهزة للغياب والاختبارات والاستدعاءات", "رسائل مجدولة ومسودات", "متغيرات ديناميكية باسم الطالب والصف والتاريخ", "أرشيف وتقارير إرسال"], bulletsEn: ["SMS & WhatsApp", "Ready templates for absence, exams, and summons", "Scheduled and draft messages", "Dynamic variables for student name, class, and date", "Sending archive and reports"] },
+    { key: "schedules", label: "جداول", labelEn: "Schedules", title: "الجداول والاختبارات", titleEn: "Schedules & Exams", subtitle: "تنظيم أكاديمي أقل تعقيدًا وأكثر دقة", subtitleEn: "Less complex, more accurate academic organization", icon: "CalendarDays", bullets: ["توزيع ذكي للحصص", "كشف التعارضات", "إدارة نصاب المعلمين", "توزيع الطلاب على قاعات الاختبارات", "تخطيط المقاعد وأرقام الجلوس"], bulletsEn: ["Smart class distribution", "Conflict detection", "Teacher workload management", "Student exam room distribution", "Seating plan and exam numbers"] },
+    { key: "reports", label: "تقارير", labelEn: "Reports", title: "التقارير والتحليلات", titleEn: "Reports & Analytics", subtitle: "قرارات الإدارة تبدأ من بيانات واضحة", subtitleEn: "Administrative decisions start with clear data", icon: "BarChart3", bullets: ["تقارير حضور وتأخر", "تقارير الكادر", "تقارير المخالفات والاستدعاءات", "جدولة أسبوعية وشهرية", "إرسال تلقائي بالبريد", "تصدير PDF و Excel"], bulletsEn: ["Attendance and tardiness reports", "Staff reports", "Violation and summons reports", "Weekly and monthly scheduling", "Automatic email delivery", "PDF & Excel export"] },
+  ]), valueEn: "" },
+];
+const schoolbitAutomationFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "دع المهام المتكررة تعمل تلقائيًا", valueEn: "Let repetitive tasks work automatically" },
+  { key: "highlight_text", label: "نص بارز", labelEn: "Highlight Text", type: "textarea", value: "SchoolBit لا تحفظ البيانات فقط، بل تساعد المدرسة على التصرف بناءً عليها.", valueEn: "SchoolBit doesn't just store data — it helps the school act on it." },
+  { key: "automation_json", label: "قائمة عناصر الأتمتة", labelEn: "Automation Items", type: "list", value: JSON.stringify([
+    { icon: "Bell", title: "إشعار أولياء أمور الغائبين", titleEn: "Absence Parent Notification", desc: "إرسال تلقائي فور تسجيل الغياب", descEn: "Automatic notification upon absence registration" },
+    { icon: "CalendarDays", title: "جدولة التقارير", titleEn: "Report Scheduling", desc: "تقارير دورية تصل للإدارة في موعدها", descEn: "Periodic reports delivered to administration on time" },
+    { icon: "ClipboardCheck", title: "كشف تعارضات الجداول", titleEn: "Schedule Conflict Detection", desc: "تنبيه فوري عند أي تعارض في الحصص", descEn: "Immediate alert for any class conflict" },
+    { icon: "GraduationCap", title: "توزيع قاعات الاختبارات", titleEn: "Exam Room Distribution", desc: "توزيع تلقائي للطلاب على القاعات", descEn: "Automatic student distribution across exam rooms" },
+    { icon: "ScanLine", title: "مزامنة البصمة", titleEn: "Biometric Sync", desc: "ربط مباشر مع أجهزة BioTime", descEn: "Direct connection with BioTime devices" },
+    { icon: "AlertTriangle", title: "تنبيه الطلاب في خطر", titleEn: "At-Risk Student Alert", desc: "إشعار تلقائي عند تجاوز حد الغياب", descEn: "Automatic notification when absence threshold is exceeded" },
+  ]), valueEn: "" },
+];
+const schoolbitIntegrationsFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "يتكامل مع الأنظمة التي تعتمد عليها المدرسة", valueEn: "Integrates with the systems your school relies on" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "تقليل إدخال البيانات يدويًا، وتسهيل انتقال المدرسة إلى إدارة أكثر تكاملًا.", valueEn: "Reduce manual data entry and make the transition to more integrated school management easier." },
+  { key: "integrations_json", label: "قائمة التكاملات", labelEn: "Integrations List", type: "list", value: JSON.stringify([
+    { name: "نظام نور", nameEn: "Noor System" },
+    { name: "BioTime", nameEn: "BioTime" },
+    { name: "مزودو SMS", nameEn: "SMS Providers" },
+    { name: "واتساب / WAHA", nameEn: "WhatsApp / WAHA" },
+    { name: "Excel", nameEn: "Excel" },
+    { name: "Webhooks", nameEn: "Webhooks" },
+  ]), valueEn: "" },
+];
+const schoolbitSecurityFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "تحكم دقيق، وأمان أعلى", valueEn: "Precise Control, Higher Security" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "كل مستخدم يعمل ضمن ما يحتاجه فقط، والإدارة تحتفظ بالسيطرة.", valueEn: "Every user works within only what they need, and administration retains full control." },
+  { key: "highlight_text", label: "نص بارز", labelEn: "Highlight Text", type: "textarea", value: "كل مستخدم يعمل ضمن ما يحتاجه فقط، والإدارة تحتفظ بالسيطرة.", valueEn: "Every user works within only what they need, and administration retains full control." },
+  { key: "features_json", label: "قائمة ميزات الأمان", labelEn: "Security Features", type: "list", value: JSON.stringify([
+    { text: "أدوار جاهزة للمدير والوكيل والمعلم والمرشد", textEn: "Ready roles for Principal, Vice Principal, Teacher, and Counselor" },
+    { text: "أدوار مخصصة", textEn: "Custom roles" },
+    { text: "37 صلاحية قابلة للتحكم", textEn: "37 controllable permissions" },
+    { text: "مصادقة ثنائية", textEn: "Two-factor authentication" },
+    { text: "سجل دخول والأجهزة المتصلة", textEn: "Login log and connected devices" },
+    { text: "إنهاء الجلسات من مكان واحد", textEn: "End sessions from one place" },
+  ]), valueEn: "" },
+];
+const schoolbitPricingFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "باقات تناسب كل مدرسة", valueEn: "Packages for Every School" },
+  { key: "subtitle", label: "العنوان الفرعي", labelEn: "Subtitle", type: "text", value: "اختر الباقة المناسبة لحجم مدرستك واحتياجاتك", valueEn: "Choose the package that fits your school size and needs" },
+  { key: "monthly_label", label: "نص شهري", labelEn: "Monthly Label", type: "text", value: "شهري", valueEn: "Monthly" },
+  { key: "_3months_label", label: "نص 3 أشهر", labelEn: "3 Months Label", type: "text", value: "3 أشهر", valueEn: "3 Months" },
+  { key: "yearly_label", label: "نص سنوي", labelEn: "Yearly Label", type: "text", value: "سنوي", valueEn: "Yearly" },
+  { key: "save_label", label: "نص وفر", labelEn: "Save Label", type: "text", value: "وفر", valueEn: "Save" },
+  { key: "perYear", label: "نص /سنة", labelEn: "Per Year", type: "text", value: "/سنة", valueEn: "/year" },
+  { key: "custom_label", label: "نص سعر مخصص", labelEn: "Custom Price Label", type: "text", value: "مخصص", valueEn: "Custom" },
+  { key: "all_features_label", label: "نص كل المميزات", labelEn: "All Features Label", type: "text", value: "كل مميزات", valueEn: "All features of" },
+  { key: "popular_label", label: "نص الأكثر طلباً", labelEn: "Popular Badge", type: "text", value: "الأكثر طلباً", valueEn: "Most Popular" },
+  { key: "plans_list", label: "قائمة الباقات", labelEn: "Plans List", type: "list", value: serializeSchoolBitPlans(getDefaultSchoolBitPlans(true)), valueEn: serializeSchoolBitPlans(getDefaultSchoolBitPlans(false)) },
+  { key: "biotime_title", label: "عنوان جهاز BioTime", labelEn: "BioTime Title", type: "text", value: "جهاز BioTime للبصمة", valueEn: "BioTime Biometric Device" },
+  { key: "biotime_price", label: "سعر جهاز BioTime", labelEn: "BioTime Price", type: "text", value: "60 ر.س / شهرياً", valueEn: "60 SAR / month" },
+  { key: "biotime_additional", label: "سعر الجهاز الإضافي", labelEn: "Additional Device Price", type: "text", value: "+ 45 ر.س لكل جهاز إضافي", valueEn: "+ 45 SAR per additional device" },
+  { key: "sms_title", label: "عنوان باقات الرسائل", labelEn: "SMS Plans Title", type: "text", value: "باقات الرسائل النصية", valueEn: "SMS Plans" },
+  { key: "sms_subtitle", label: "عنوان فرعي للرسائل", labelEn: "SMS Plans Subtitle", type: "text", value: "تواصل مع أولياء الأمور بسهولة وفعالية", valueEn: "Communicate with parents easily and effectively" },
+  { key: "sms_per_message", label: "نص لكل رسالة", labelEn: "Per Message", type: "text", value: "ر.س/رسالة", valueEn: "SAR/msg" },
+  { key: "sms_plans_json", label: "باقات الرسائل", labelEn: "SMS Plans", type: "list", value: JSON.stringify(getDefaultSchoolBitSmsPlans(true)), valueEn: JSON.stringify(getDefaultSchoolBitSmsPlans(false)) },
+];
+const schoolbitOutcomesFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "ماذا تكسب المدرسة مع SchoolBit؟", valueEn: "What does the school gain with SchoolBit?" },
+  { key: "outcomes_json", label: "قائمة النتائج", labelEn: "Outcomes List", type: "list", value: JSON.stringify([
+    { icon: "Clock", title: "وقت أقل", titleEn: "Less Time", desc: "في المهام التشغيلية المتكررة", descEn: "On repetitive operational tasks" },
+    { icon: "Eye", title: "وضوح أعلى", titleEn: "More Clarity", desc: "في متابعة الطلاب والكادر", descEn: "In tracking students and staff" },
+    { icon: "Zap", title: "استجابة أسرع", titleEn: "Faster Response", desc: "للغياب والمخالفات", descEn: "To absence and violations" },
+    { icon: "MessageCircle", title: "تواصل أفضل", titleEn: "Better Communication", desc: "مع أولياء الأمور", descEn: "With parents" },
+  ]), valueEn: "" },
+];
+const schoolbitCtaFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "ابدأ بإدارة مدرستك بطريقة أكثر ذكاءً", valueEn: "Start Managing Your School Smarter" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "احصل على عرض توضيحي لمنصة SchoolBit، واكتشف كيف يمكن تحويل العمليات اليومية إلى نظام أكثر سرعة، دقة، وتنظيمًا.", valueEn: "Get a demo of the SchoolBit platform and discover how daily operations can become a faster, more accurate, and organized system." },
+  { key: "button_text", label: "نص الزر الرئيسي", labelEn: "Primary Button Text", type: "text", value: "اطلب عرضاً توضيحياً", valueEn: "Request a Demo" },
+  { key: "button_url", label: "رابط الزر الرئيسي", labelEn: "Primary Button URL", type: "url", value: "https://app.mobile.net.sa/reg", valueEn: "https://app.mobile.net.sa/reg" },
+  { key: "secondary_text", label: "نص الزر الثانوي", labelEn: "Secondary Button Text", type: "text", value: "أو تواصل معنا", valueEn: "Contact Us" },
+  { key: "secondary_url", label: "رابط الزر الثانوي", labelEn: "Secondary Button URL", type: "url", value: "/contact", valueEn: "/contact" },
+  { key: "disclaimer", label: "نص إخلاء المسؤولية", labelEn: "Disclaimer", type: "text", value: "لا حاجة لبطاقة ائتمانية — تفعيل فوري", valueEn: "No credit card required — Instant activation" },
+  { key: "logo_image", label: "صورة الشعار", labelEn: "Logo Image", type: "image", value: "", valueEn: "" },
+];
+const schoolbitFaqFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "الأسئلة الشائعة", valueEn: "Frequently Asked Questions" },
+  { key: "faq_json", label: "قائمة الأسئلة", labelEn: "FAQ List", type: "list", value: JSON.stringify([
+    { q: "هل SchoolBit مناسبة للمدارس الأهلية والحكومية؟", qEn: "Is SchoolBit suitable for private and government schools?", a: "نعم، المنصة قابلة للتخصيص بحسب هيكل المدرسة وصلاحيات المستخدمين.", aEn: "Yes, the platform can be customized according to the school structure and user permissions." },
+    { q: "هل تدعم المنصة إرسال رسائل لأولياء الأمور؟", qEn: "Does the platform support sending messages to parents?", a: "نعم، عبر SMS و WhatsApp، مع قوالب ورسائل مجدولة وتلقائية.", aEn: "Yes, via SMS and WhatsApp, with templates, scheduled, and automatic messages." },
+    { q: "هل يمكن ربطها بأجهزة البصمة؟", qEn: "Can it be linked to biometric devices?", a: "نعم، تدعم التكامل مع BioTime للحضور والانصراف.", aEn: "Yes, it supports integration with BioTime for attendance and departure." },
+    { q: "هل توفر تقارير جاهزة؟", qEn: "Does it provide ready-made reports?", a: "نعم، مع إمكان التصدير والجدولة والإرسال التلقائي.", aEn: "Yes, with the ability to export, schedule, and automatically send them." },
+    { q: "هل يوجد تكامل مع نظام نور؟", qEn: "Is there integration with the Noor system?", a: "نعم، المنصة تتضمن مركز تكامل ومزامنة مع نظام نور.", aEn: "Yes, the platform includes an integration and synchronization center with the Noor system." },
+  ]), valueEn: "" },
+];
+
+const ensureSchoolBitFields = (pages: PageData[]): PageData[] => {
+  const pid = "schoolbit";
+  const pp = "/products/schoolbit";
+  let result = ensurePageSection(pages, pid, pp, "schoolbit-hero", "SchoolBit الرئيسي", "SchoolBit Hero", schoolbitHeroFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-trust", "شريط الثقة", "Trust Bar", schoolbitTrustFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-problem", "المشكلة والحل", "Problem & Value", schoolbitProblemFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-benefits", "المميزات", "Benefits", schoolbitBenefitsFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-roles", "الأدوار", "Roles", schoolbitRolesFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-modules", "الوحدات", "Modules", schoolbitModulesFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-automation", "الأتمتة", "Automation", schoolbitAutomationFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-integrations", "التكاملات", "Integrations", schoolbitIntegrationsFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-security", "الأمان", "Security", schoolbitSecurityFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-pricing", "الأسعار", "Pricing", schoolbitPricingFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-outcomes", "النتائج", "Outcomes", schoolbitOutcomesFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-cta", "دعوة للإجراء", "Call to Action", schoolbitCtaFields);
+  result = ensurePageSection(result, pid, pp, "schoolbit-faq", "الأسئلة الشائعة", "FAQ", schoolbitFaqFields);
+  return result;
+};
+
 const defaultWhatsAppPricingFields: SectionField[] = [
   {
     key: "title",
@@ -1324,6 +1504,7 @@ const PAGE_BLUEPRINTS: { id: string; path: string; title: string; titleEn: strin
   { id: 'home', path: '/', title: 'الصفحة الرئيسية', titleEn: 'Home' },
   { id: 'sms', path: '/products/sms', title: 'خدمة الرسائل النصية SMS', titleEn: 'SMS Service' },
   { id: 'whatsapp', path: '/products/whatsapp', title: 'واتساب أعمال API', titleEn: 'WhatsApp Business API' },
+  { id: 'schoolbit', path: '/products/schoolbit', title: 'SchoolBit إدارة المدارس', titleEn: 'SchoolBit School Management' },
   { id: 'otime', path: '/products/o-time', title: 'O-Time برنامج الموارد البشرية', titleEn: 'O-Time HR Software' },
   { id: 'govgate', path: '/products/gov-gate', title: 'Gov Gate', titleEn: 'Gov Gate' },
   { id: 'contact', path: '/contact', title: 'تواصل معنا', titleEn: 'Contact Us' },
@@ -1560,6 +1741,20 @@ export const SiteDataProvider = ({ children }: { children: React.ReactNode }) =>
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextAutosaveRef = useRef(true);
 
+  // Refs to hold latest state values for stable callbacks
+  const pagesRef = useRef(pages);
+  pagesRef.current = pages;
+  const partnersRef = useRef(partners);
+  partnersRef.current = partners;
+  const socialLinksRef = useRef(socialLinks);
+  socialLinksRef.current = socialLinks;
+  const contactSubmissionsRef = useRef(contactSubmissions);
+  contactSubmissionsRef.current = contactSubmissions;
+  const notificationEmailRef = useRef(notificationEmail);
+  notificationEmailRef.current = notificationEmail;
+  const footerDataRef = useRef(footerData);
+  footerDataRef.current = footerData;
+
   const fetchWhatsAppRequests = useCallback(async () => {
     try {
       const res = await fetch("/api/whatsapp-request");
@@ -1612,16 +1807,18 @@ export const SiteDataProvider = ({ children }: { children: React.ReactNode }) =>
 
 const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
       const enhancedPages = ensureMissingPages(
-        ensureContactPageFields(
-          ensureGovGateFields(
-            ensureOTimeFields(
-              ensureWhatsAppFields(
-                ensureHomePersonaTabsFields(
-                  ensureHomeIntegrationsFields(
-                    ensureHomeWhyUsFields(
-                      ensureHomeTrustFields(
-                        ensureSmsFields(
-                          ensureHomeHeroFields(ensureHomeSolutionsFields(loadedPages))
+        ensureSchoolBitFields(
+          ensureContactPageFields(
+            ensureGovGateFields(
+              ensureOTimeFields(
+                ensureWhatsAppFields(
+                  ensureHomePersonaTabsFields(
+                    ensureHomeIntegrationsFields(
+                      ensureHomeWhyUsFields(
+                        ensureHomeTrustFields(
+                          ensureSmsFields(
+                            ensureHomeHeroFields(ensureHomeSolutionsFields(loadedPages))
+                          )
                         )
                       )
                     )
@@ -1649,18 +1846,18 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
   const saveSiteData = useCallback(async (overridePages?: PageData[]): Promise<boolean> => {
     try {
       setIsSyncing(true);
-      const currentPages = overridePages || pages;
+      const currentPages = overridePages || pagesRef.current;
 
       const res = await fetch("/api/cms/site", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pages: currentPages,
-          partners,
-          socialLinks,
-          contactSubmissions,
-          notificationEmail,
-          footerData,
+          partners: partnersRef.current,
+          socialLinks: socialLinksRef.current,
+          contactSubmissions: contactSubmissionsRef.current,
+          notificationEmail: notificationEmailRef.current,
+          footerData: footerDataRef.current,
         }),
       });
 
@@ -1682,8 +1879,9 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
     } finally {
       setIsSyncing(false);
     }
-  }, [pages, partners, socialLinks, contactSubmissions, notificationEmail, footerData]);
+  }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only run once on mount; saveSiteData uses refs
   useEffect(() => {
     let mounted = true;
 
@@ -1710,16 +1908,18 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
         
         let enhancedPages = ensuredPages;
         try {
-          enhancedPages = ensureContactPageFields(
-            ensureGovGateFields(
-              ensureOTimeFields(
-                ensureWhatsAppFields(
-                  ensureHomePersonaTabsFields(
-                    ensureHomeIntegrationsFields(
-                      ensureHomeWhyUsFields(
-                        ensureHomeTrustFields(
-                          ensureSmsFields(
-                            ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages))
+          enhancedPages = ensureSchoolBitFields(
+            ensureContactPageFields(
+              ensureGovGateFields(
+                ensureOTimeFields(
+                  ensureWhatsAppFields(
+                    ensureHomePersonaTabsFields(
+                      ensureHomeIntegrationsFields(
+                        ensureHomeWhyUsFields(
+                          ensureHomeTrustFields(
+                            ensureSmsFields(
+                              ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages))
+                            )
                           )
                         )
                       )
@@ -1792,7 +1992,8 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [hydrated, pages, partners, socialLinks, contactSubmissions, notificationEmail, footerData, saveSiteData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- saveSiteData uses refs so it's stable and doesn't need to be a dependency
+  }, [hydrated, pages, partners, socialLinks, contactSubmissions, notificationEmail, footerData]);
 
   const addPartner = useCallback((name: string, logo: string) => {
     const id = `p${Date.now()}`;

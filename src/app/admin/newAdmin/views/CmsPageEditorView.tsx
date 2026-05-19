@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Save, Plus, ChevronDown, Eye, EyeOff, ExternalLink, FileText, Search, Image as ImageIcon, Globe } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Save, Plus, ChevronDown, Eye, EyeOff, ExternalLink, FileText, Search, Image as ImageIcon, Globe, Shield, Lightbulb, Users, ArrowRight, Star, Mail, Newspaper, Zap, Palette, MessageSquare, LayoutGrid, Settings, Tag, Layers } from 'lucide-react';
 import { Button } from '@/components/business/ui/button';
 import { Card, CardContent } from '@/components/business/ui/card';
 import { Badge } from '@/components/business/ui/badge';
@@ -18,13 +18,16 @@ import {
   type WhatsAppPlanTier,
   type WhatsAppConversationPrice,
 } from '@/lib/cms/whatsappPricing';
+import {
+  parseSchoolBitPlans,
+  serializeSchoolBitPlans,
+  getDefaultSchoolBitPlans,
+  type SchoolBitPlan,
+  parseSchoolBitSmsPlans,
+  getDefaultSchoolBitSmsPlans,
+  type SchoolBitSmsPlan,
+} from '@/lib/cms/schoolbitPricing';
 import { ImageUploader } from '@/components/business/ImageUploader';
-
-interface Props {
-  isAr: boolean;
-  pageId: string | null;
-  onBack: () => void;
-}
 
 interface Props {
   isAr: boolean;
@@ -58,9 +61,9 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
 
   return (
     <div className="space-y-3">
-      <label className="text-xs text-gray-500 block">{isAr ? "باقات الرسائل" : "SMS Plans"}</label>
+      <label className="text-xs text-gray-500 font-medium block mb-2">{isAr ? "باقات الرسائل" : "SMS Plans"}</label>
       {rows.map((row, index) => (
-        <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white space-y-3">
+        <div key={index} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 shadow-sm hover:border-gray-200 transition-all">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input
               type="text"
@@ -68,7 +71,7 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
               onChange={(e) => updateRow(index, { messages: e.target.value })}
               disabled={row.custom}
               placeholder={isAr ? "عدد الرسائل (مثال: 1000)" : "Messages count (e.g. 1000)"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100"
+              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400"
             />
             <input
               type="text"
@@ -76,7 +79,7 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
               onChange={(e) => updateRow(index, { price: e.target.value })}
               disabled={row.custom}
               placeholder={isAr ? "السعر الجديد (مثال: 110)" : "Offer Price (e.g. 110)"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100 font-bold text-primary"
+              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 font-bold text-primary"
             />
             <input
               type="text"
@@ -84,52 +87,59 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
               onChange={(e) => updateRow(index, { originalPrice: e.target.value })}
               disabled={row.custom}
               placeholder={isAr ? "السعر الأصلي (قبل الخصم)" : "Original Price (Strike)"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100 italic text-gray-400"
+              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 italic text-gray-400"
             />
             <input
               type="text"
               value={row.feature}
               onChange={(e) => updateRow(index, { feature: e.target.value })}
               placeholder={isAr ? "عنوان الباقة" : "Plan feature/title"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
             />
             <input
               type="text"
               value={row.description}
               onChange={(e) => updateRow(index, { description: e.target.value })}
               placeholder={isAr ? "وصف الباقة" : "Plan description"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all md:col-span-2"
             />
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2 text-xs text-gray-600">
+            <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
               <input
                 type="checkbox"
                 checked={row.featured}
                 onChange={(e) => updateRow(index, { featured: e.target.checked })}
+                className="w-3.5 h-3.5 text-[#104E8B] rounded border-gray-300"
               />
               {isAr ? "الباقة المميزة" : "Featured plan"}
             </label>
-            <label className="flex items-center gap-2 text-xs text-gray-600">
+            <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
               <input
                 type="checkbox"
                 checked={row.custom}
                 onChange={(e) => updateRow(index, { custom: e.target.checked })}
+                className="w-3.5 h-3.5 text-[#104E8B] rounded border-gray-300"
               />
               {isAr ? "باقة مخصصة" : "Custom plan"}
             </label>
             <button
               onClick={() => removeRow(index)}
-              className="text-xs text-red-500 hover:text-red-600 hover:underline"
+              className="text-xs text-red-500 hover:text-red-600 hover:underline transition-colors"
             >
               {isAr ? "حذف الباقة" : "Delete plan"}
             </button>
           </div>
         </div>
       ))}
+      {rows.length === 0 && (
+        <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl">
+          {isAr ? "لا توجد باقات مضافة" : "No plans added yet"}
+        </div>
+      )}
       <button
         onClick={addRow}
-        className="flex items-center gap-1 text-xs text-[#104E8B] hover:text-[#0A2647] transition-colors"
+        className="flex items-center gap-1.5 text-xs font-medium text-[#104E8B] hover:text-[#0A2647] transition-colors"
       >
         <Plus className="w-3.5 h-3.5" />
         {isAr ? "إضافة باقة" : "Add plan"}
@@ -458,21 +468,33 @@ const WhatsAppApiPricesEditor = ({ value, onChange, isAr }: { value: string; onC
   );
 };
 
-const SPECIALIZED_FIELDS: Record<string, 'sms-plans' | 'whatsapp-plans' | 'whatsapp-api-prices' | 'hero-slides' | 'integrations-list' | 'generic-list'> = {
-  'plans_list': 'sms-plans',
-  'api_prices_list': 'whatsapp-api-prices',
-  'wa_pricing': 'whatsapp-plans',
-  'slides_json': 'hero-slides',
-  'integrations_json': 'integrations-list',
-  'features_json': 'generic-list',
-  'usecases_json': 'generic-list',
-  'platforms_json': 'generic-list',
-  'solutions_json': 'generic-list',
-  'campaigns_json': 'generic-list',
-  'modules_json': 'generic-list',
-  'value_props_json': 'generic-list',
-  'ux_features_json': 'generic-list',
-  'screenshots_json': 'generic-list',
+const SECTION_THEME: Record<string, { color: string; bg: string; border: string; icon: typeof Globe }> = {
+  hero:            { color: 'text-blue-500',       bg: 'bg-blue-50',       border: 'border-l-blue-500',       icon: Globe },
+  pricing:         { color: 'text-green-500',      bg: 'bg-green-50',      border: 'border-l-green-500',      icon: FileText },
+  feature:         { color: 'text-purple-500',      bg: 'bg-purple-50',     border: 'border-l-purple-500',     icon: Lightbulb },
+  integration:     { color: 'text-orange-500',      bg: 'bg-orange-50',     border: 'border-l-orange-500',     icon: Zap },
+  trust:           { color: 'text-emerald-500',     bg: 'bg-emerald-50',    border: 'border-l-emerald-500',    icon: Shield },
+  solution:         { color: 'text-indigo-500',      bg: 'bg-indigo-50',     border: 'border-l-indigo-500',     icon: Lightbulb },
+  persona:          { color: 'text-cyan-500',        bg: 'bg-cyan-50',       border: 'border-l-cyan-500',       icon: Users },
+  'persona-tab':    { color: 'text-cyan-500',        bg: 'bg-cyan-50',       border: 'border-l-cyan-500',       icon: Users },
+  cta:              { color: 'text-rose-500',        bg: 'bg-rose-50',       border: 'border-l-rose-500',      icon: ArrowRight },
+  'why-us':         { color: 'text-amber-500',       bg: 'bg-amber-50',      border: 'border-l-amber-500',      icon: Star },
+  contact:          { color: 'text-sky-500',         bg: 'bg-sky-50',        border: 'border-l-sky-500',        icon: Mail },
+  blog:             { color: 'text-slate-500',        bg: 'bg-slate-50',      border: 'border-l-slate-500',      icon: Newspaper },
+  form:             { color: 'text-violet-500',      bg: 'bg-violet-50',     border: 'border-l-violet-500',     icon: Layers },
+  footer:          { color: 'text-gray-500',        bg: 'bg-gray-50',       border: 'border-l-gray-500',       icon: LayoutGrid },
+  request:          { color: 'text-teal-500',        bg: 'bg-teal-50',       border: 'border-l-teal-500',       icon: MessageSquare },
+  plan:             { color: 'text-green-500',       bg: 'bg-green-50',      border: 'border-l-green-500',      icon: Tag },
+  module:           { color: 'text-fuchsia-500',    bg: 'bg-fuchsia-50',    border: 'border-l-fuchsia-500',    icon: Layers },
+  api:              { color: 'text-red-500',         bg: 'bg-red-50',        border: 'border-l-red-500',        icon: Settings },
+  screenshot:       { color: 'text-pink-500',        bg: 'bg-pink-50',       border: 'border-l-pink-500',       icon: ImageIcon },
+};
+
+const getSectionTheme = (sectionId: string) => {
+  for (const [key, theme] of Object.entries(SECTION_THEME)) {
+    if (sectionId.includes(key)) return theme;
+  }
+  return { color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-l-gray-400', icon: FileText as typeof Globe };
 };
 
 const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string; sectionId: string }) => {
@@ -497,40 +519,40 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "إدارة العناصر" : "Manage Items"}</label>
-        <Button size="sm" onClick={addItem} className="bg-primary text-white h-7 text-[10px]">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? "إدارة العناصر" : "Manage Items"}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
           <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة عنصر" : "Add Item"}
         </Button>
       </div>
       <div className="space-y-4">
         {items.map((item, idx) => (
-          <div key={idx} className="border border-gray-200 rounded-2xl p-4 bg-white space-y-4 relative shadow-sm hover:border-primary/20 transition-all">
-            <button onClick={() => removeItem(idx)} className="absolute top-2 left-2 p-1 text-gray-300 hover:text-red-500 transition-colors">
-              <Plus className="w-4 h-4 rotate-45" />
+          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-4 relative shadow-sm hover:border-gray-200 transition-all">
+            <button onClick={() => removeItem(idx)} className="absolute top-2.5 left-2.5 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+              <Plus className="w-3.5 h-3.5 rotate-45" />
             </button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان (عربي)" : "Title (AR)"}</label>
-                    <input type="text" value={item.titleAr} onChange={e => updateItem(idx, { titleAr: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" />
+                    <input type="text" value={item.titleAr} onChange={e => updateItem(idx, { titleAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
                   </div>
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
-                    <input type="text" value={item.titleEn} onChange={e => updateItem(idx, { titleEn: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" dir="ltr" />
+                    <input type="text" value={item.titleEn} onChange={e => updateItem(idx, { titleEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
                   </div>
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف (عربي)" : "Description (AR)"}</label>
-                  <textarea value={item.descAr} onChange={e => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-1.5 text-xs resize-none" />
+                  <textarea value={item.descAr} onChange={e => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
-                  <textarea value={item.descEn} onChange={e => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-1.5 text-xs dir-ltr resize-none" dir="ltr" />
+                  <textarea value={item.descEn} onChange={e => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all dir-ltr resize-none" dir="ltr" />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نقاط فرعية (مفصولة بفاصلة)" : "Sub-items (comma separated)"}</label>
-                  <input type="text" value={item.listAr || ""} onChange={e => updateItem(idx, { listAr: e.target.value })} className="w-full border rounded-md px-3 py-1.5 text-xs" placeholder="ميزة 1, ميزة 2" />
+                  <input type="text" value={item.listAr || ""} onChange={e => updateItem(idx, { listAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" placeholder="ميزة 1, ميزة 2" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -559,7 +581,7 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
           </div>
         ))}
       </div>
-      {items.length === 0 && <p className="text-center py-8 text-xs text-gray-400 italic bg-gray-50 border-2 border-dashed rounded-2xl">{isAr ? "لا توجد عناصر مضافة" : "No items added yet"}</p>}
+      {items.length === 0 && <div className="text-center py-8 text-xs text-gray-400 italic bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-xl">{isAr ? "لا توجد عناصر مضافة" : "No items added yet"}</div>}
     </div>
   );
 };
@@ -586,16 +608,16 @@ const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: stri
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "قائمة التكاملات" : "Integrations List"}</label>
-        <Button size="sm" variant="outline" onClick={addItem} className="h-7 text-[10px] border-[#104E8B] text-[#104E8B] hover:bg-[#104E8B]/5">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? "قائمة التكاملات" : "Integrations List"}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
           <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة تكامل" : "Add Integration"}
         </Button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {items.map((item, idx) => (
-          <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-white space-y-3 relative group">
-            <button onClick={() => removeItem(idx)} className="absolute top-2 left-2 p-1 text-gray-300 hover:text-red-500 transition-colors">
-              <Plus className="w-4 h-4 rotate-45" />
+          <div key={idx} className="border border-gray-100 rounded-xl p-3 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all">
+            <button onClick={() => removeItem(idx)} className="absolute top-2.5 left-2.5 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+              <Plus className="w-3.5 h-3.5 rotate-45" />
             </button>
             <div className="space-y-2">
               <label className="text-[10px] text-gray-400 block">{isAr ? "أيقونة التكامل" : "Icon"}</label>
@@ -610,17 +632,168 @@ const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: stri
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الاسم (عربي)" : "Name (AR)"}</label>
-                <input type="text" value={item.nameAr} onChange={e => updateItem(idx, { nameAr: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" />
+                <input type="text" value={item.nameAr} onChange={e => updateItem(idx, { nameAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
               </div>
               <div>
                 <label className="text-[10px] text-gray-400 block mb-1">Name (EN)</label>
-                <input type="text" value={item.nameEn} onChange={e => updateItem(idx, { nameEn: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" dir="ltr" />
+                <input type="text" value={item.nameEn} onChange={e => updateItem(idx, { nameEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
               </div>
             </div>
           </div>
         ))}
       </div>
-      {items.length === 0 && <p className="text-center py-4 text-xs text-gray-400 italic border-2 border-dashed rounded-lg">{isAr ? "لا توجد تكاملات مضافة" : "No integrations added yet"}</p>}
+      {items.length === 0 && <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">{isAr ? "لا توجد تكاملات مضافة" : "No integrations added yet"}</div>}
+    </div>
+  );
+};
+
+const SchoolBitPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  const plans = parseSchoolBitPlans(value, getDefaultSchoolBitPlans(isAr));
+
+  const updatePlan = (index: number, patch: Partial<SchoolBitPlan>) => {
+    const next = plans.map((p, i) => i === index ? { ...p, ...patch } : p);
+    onChange(serializeSchoolBitPlans(next));
+  };
+
+  const updateFeature = (planIndex: number, featureIndex: number, text: string) => {
+    const plan = plans[planIndex];
+    const features = isAr ? [...plan.features] : [...plan.featuresEn];
+    features[featureIndex] = text;
+    updatePlan(planIndex, isAr ? { features } : { featuresEn: features });
+  };
+
+  const removeFeature = (planIndex: number, featureIndex: number) => {
+    const plan = plans[planIndex];
+    const features = isAr ? plan.features.filter((_, i) => i !== featureIndex) : plan.featuresEn.filter((_, i) => i !== featureIndex);
+    updatePlan(planIndex, isAr ? { features } : { featuresEn: features });
+  };
+
+  const addFeature = (planIndex: number) => {
+    const plan = plans[planIndex];
+    const features = isAr ? [...plan.features, ''] : [...plan.featuresEn, ''];
+    updatePlan(planIndex, isAr ? { features } : { featuresEn: features });
+  };
+
+  const addPlan = () => {
+    onChange(serializeSchoolBitPlans([...plans, {
+      name: isAr ? 'باقة جديدة' : 'New Plan',
+      nameEn: 'New Plan',
+      price: 0,
+      price3Months: 0,
+      priceYearly: 0,
+      description: '',
+      descriptionEn: '',
+      featured: false,
+      features: [],
+      featuresEn: [],
+      isCustom: false,
+    }]));
+  };
+
+  const removePlan = (index: number) => {
+    onChange(serializeSchoolBitPlans(plans.filter((_, i) => i !== index)));
+  };
+
+  return (
+    <div className="space-y-4">
+      <label className="text-xs text-gray-500 font-medium block mb-2">{isAr ? "باقات SchoolBit" : "SchoolBit Plans"}</label>
+      {plans.map((plan, pi) => (
+        <div key={pi} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 shadow-sm hover:border-gray-200 transition-all">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-[#0EA8F1]">{isAr ? plan.name : plan.nameEn}</span>
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 text-xs text-gray-500">
+                <input type="checkbox" checked={plan.featured} onChange={(e) => updatePlan(pi, { featured: e.target.checked })} className="rounded" />
+                {isAr ? "مميزة" : "Featured"}
+              </label>
+              <label className="flex items-center gap-1.5 text-xs text-gray-500">
+                <input type="checkbox" checked={plan.isCustom} onChange={(e) => updatePlan(pi, { isCustom: e.target.checked })} className="rounded" />
+                {isAr ? "سعر مخصص" : "Custom"}
+              </label>
+              <button onClick={() => removePlan(pi)} className="text-red-400 hover:text-red-600 text-xs">{isAr ? "حذف" : "Remove"}</button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" value={isAr ? plan.name : plan.nameEn} onChange={(e) => updatePlan(pi, isAr ? { name: e.target.value } : { nameEn: e.target.value })} placeholder={isAr ? "اسم الباقة (عربي)" : "Plan name (EN)"} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+            <input type="text" value={isAr ? plan.description : plan.descriptionEn} onChange={(e) => updatePlan(pi, isAr ? { description: e.target.value } : { descriptionEn: e.target.value })} placeholder={isAr ? "الوصف (عربي)" : "Description (EN)"} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+          </div>
+          {!plan.isCustom && (
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="text-[10px] text-gray-400">{isAr ? "السعر الشهري (ر.س)" : "Monthly (SAR)"}</label>
+                <input type="number" value={plan.price ?? ''} onChange={(e) => updatePlan(pi, { price: e.target.value === '' ? null : Number(e.target.value) })} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400">{isAr ? "سعر 3 أشهر (ر.س)" : "3-Month (SAR)"}</label>
+                <input type="number" value={plan.price3Months ?? ''} onChange={(e) => updatePlan(pi, { price3Months: e.target.value === '' ? null : Number(e.target.value) })} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+                {plan.price && plan.price3Months ? (
+                  <span className="text-[10px] text-green-600">-{Math.round(((plan.price * 3 - plan.price3Months) / (plan.price * 3)) * 100)}%</span>
+                ) : null}
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400">{isAr ? "السعر السنوي/شهر (ر.س)" : "Yearly/month (SAR)"}</label>
+                <input type="number" value={plan.priceYearly ?? ''} onChange={(e) => updatePlan(pi, { priceYearly: e.target.value === '' ? null : Number(e.target.value) })} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+                {plan.price && plan.priceYearly ? (
+                  <span className="text-[10px] text-green-600">-{Math.round(((plan.price - plan.priceYearly) / plan.price) * 100)}%</span>
+                ) : null}
+              </div>
+            </div>
+          )}
+          <div className="space-y-2">
+            <span className="text-[10px] text-gray-400 font-medium">{isAr ? "المميزات" : "Features"}</span>
+            {(isAr ? plan.features : plan.featuresEn).map((f, fi) => (
+              <div key={fi} className="flex items-center gap-2">
+                <input type="text" value={f} onChange={(e) => updateFeature(pi, fi, e.target.value)} className="flex-1 h-9 border border-gray-200 rounded-lg px-3 text-sm" />
+                <button onClick={() => removeFeature(pi, fi)} className="text-red-400 hover:text-red-600 text-xs px-2">{isAr ? "حذف" : "X"}</button>
+              </div>
+            ))}
+            <button onClick={() => addFeature(pi)} className="text-[#1B6BF1] text-xs font-medium hover:underline">+ {isAr ? "إضافة ميزة" : "Add feature"}</button>
+          </div>
+        </div>
+      ))}
+      <button onClick={addPlan} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-[#1B6BF1] hover:text-[#1B6BF1] transition-all">
+        + {isAr ? "إضافة باقة" : "Add Plan"}
+      </button>
+    </div>
+  );
+};
+
+const SchoolBitSmsPlansEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  const plans = parseSchoolBitSmsPlans(value, getDefaultSchoolBitSmsPlans(isAr));
+
+  const updatePlan = (index: number, patch: Partial<SchoolBitSmsPlan>) => {
+    const next = plans.map((p, i) => i === index ? { ...p, ...patch } : p);
+    onChange(JSON.stringify(next));
+  };
+
+  const addPlan = () => {
+    onChange(JSON.stringify([...plans, { name: 'باقة جديدة', nameEn: 'New Plan', messages: 0, price: 0, priceEn: '0 SAR' }]));
+  };
+
+  const removePlan = (index: number) => {
+    onChange(JSON.stringify(plans.filter((_, i) => i !== index)));
+  };
+
+  return (
+    <div className="space-y-4">
+      <label className="text-xs text-gray-500 font-medium block mb-2">{isAr ? "باقات الرسائل النصية" : "SMS Plans"}</label>
+      {plans.map((plan, pi) => (
+        <div key={pi} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 shadow-sm hover:border-gray-200 transition-all">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-[#0EA8F1]">{isAr ? plan.name : plan.nameEn}</span>
+            <button onClick={() => removePlan(pi)} className="text-red-400 hover:text-red-600 text-xs">{isAr ? "حذف" : "Remove"}</button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <input type="text" value={isAr ? plan.name : plan.nameEn} onChange={(e) => updatePlan(pi, isAr ? { name: e.target.value } : { nameEn: e.target.value })} placeholder={isAr ? "الاسم (عربي)" : "Name (EN)"} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+            <input type="number" value={plan.messages} onChange={(e) => updatePlan(pi, { messages: Number(e.target.value) || 0 })} placeholder={isAr ? "عدد الرسائل" : "Messages"} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+            <input type="number" value={plan.price} onChange={(e) => updatePlan(pi, { price: Number(e.target.value) || 0 })} placeholder={isAr ? "السعر (ر.س)" : "Price (SAR)"} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+            <input type="text" value={plan.priceEn} onChange={(e) => updatePlan(pi, { priceEn: e.target.value })} placeholder="Price (EN)" className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" />
+          </div>
+        </div>
+      ))}
+      <button onClick={addPlan} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-[#1B6BF1] hover:text-[#1B6BF1] transition-all">
+        + {isAr ? "إضافة باقة رسائل" : "Add SMS Plan"}
+      </button>
     </div>
   );
 };
@@ -652,18 +825,21 @@ const HeroSlidesEditor = ({ value, onChange, isAr, pageId }: { value: string; on
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-xs text-gray-500 font-bold uppercase">{isAr ? "شرائح البانر (Slider)" : "Hero Slides"}</label>
-        <Button size="sm" onClick={addSlide} className="bg-[#104E8B] text-white h-7 text-[10px]">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? "شرائح البانر (Slider)" : "Hero Slides"}</label>
+        <Button size="sm" onClick={addSlide} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
           <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة شريحة" : "Add Slide"}
         </Button>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-4">
         {slides.map((slide, idx) => (
-          <div key={slide.id || idx} className="border-2 border-[#104E8B]/10 rounded-2xl p-4 bg-white space-y-4 relative shadow-sm">
-            <div className="flex items-center justify-between border-b pb-2">
-              <span className="text-xs font-bold text-[#104E8B]">{isAr ? `الشريحة ${idx + 1}` : `Slide ${idx + 1}`}</span>
-              <button onClick={() => removeSlide(idx)} className="text-xs text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
+          <div key={slide.id || idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-4 relative shadow-sm hover:border-gray-200 transition-all">
+            <div className="flex items-center justify-between border-b border-gray-50 pb-2">
+              <span className="text-xs font-bold text-[#104E8B] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-md bg-[#104E8B]/10 flex items-center justify-center text-[10px]">{idx + 1}</span>
+                {isAr ? `الشريحة ${idx + 1}` : `Slide ${idx + 1}`}
+              </span>
+              <button onClick={() => removeSlide(idx)} className="text-xs text-red-500 hover:bg-red-50 px-2.5 py-1 rounded-lg transition-colors">
                 {isAr ? "حذف الشريحة" : "Remove Slide"}
               </button>
             </div>
@@ -673,20 +849,20 @@ const HeroSlidesEditor = ({ value, onChange, isAr, pageId }: { value: string; on
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان (عربي)" : "Title (AR)"}</label>
-                    <input type="text" value={slide.titleAr} onChange={e => updateSlide(idx, { titleAr: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" />
+                    <input type="text" value={slide.titleAr} onChange={e => updateSlide(idx, { titleAr: e.target.value })} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
                   </div>
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
-                    <input type="text" value={slide.titleEn} onChange={e => updateSlide(idx, { titleEn: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" dir="ltr" />
+                    <input type="text" value={slide.titleEn} onChange={e => updateSlide(idx, { titleEn: e.target.value })} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
                   </div>
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف (عربي)" : "Description (AR)"}</label>
-                  <textarea value={slide.descAr} onChange={e => updateSlide(idx, { descAr: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-2 text-sm" />
+                  <textarea value={slide.descAr} onChange={e => updateSlide(idx, { descAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
-                  <textarea value={slide.descEn} onChange={e => updateSlide(idx, { descEn: e.target.value })} rows={2} className="w-full border rounded-md px-3 py-2 text-sm" dir="ltr" />
+                  <textarea value={slide.descEn} onChange={e => updateSlide(idx, { descEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" dir="ltr" />
                 </div>
               </div>
               
@@ -704,11 +880,11 @@ const HeroSlidesEditor = ({ value, onChange, isAr, pageId }: { value: string; on
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نص الزر" : "CTA Text"}</label>
-                    <input type="text" value={slide.ctaTextAr} onChange={e => updateSlide(idx, { ctaTextAr: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" />
+                    <input type="text" value={slide.ctaTextAr} onChange={e => updateSlide(idx, { ctaTextAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
                   </div>
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "رابط الزر" : "CTA URL"}</label>
-                    <input type="text" value={slide.ctaUrl} onChange={e => updateSlide(idx, { ctaUrl: e.target.value })} className="w-full border rounded-md px-2 py-1.5 text-xs" dir="ltr" />
+                    <input type="text" value={slide.ctaUrl} onChange={e => updateSlide(idx, { ctaUrl: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
                   </div>
                 </div>
               </div>
@@ -717,9 +893,10 @@ const HeroSlidesEditor = ({ value, onChange, isAr, pageId }: { value: string; on
         ))}
       </div>
       {slides.length === 0 && (
-        <div className="p-10 border-2 border-dashed rounded-2xl bg-gray-50 flex flex-col items-center gap-3">
+        <div className="p-10 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50 flex flex-col items-center gap-3">
+          <ImageIcon className="w-8 h-8 text-gray-300" />
           <p className="text-sm text-gray-400">{isAr ? "لم يتم إضافة شرائح بعد. سيظهر الهيرو الافتراضي." : "No slides added. Default hero will be shown."}</p>
-          <Button size="sm" onClick={addSlide}>{isAr ? "إضافة الشريحة الأولى" : "Add First Slide"}</Button>
+          <Button size="sm" onClick={addSlide} className="bg-[#104E8B] hover:bg-[#0A2647] text-white">{isAr ? "إضافة الشريحة الأولى" : "Add First Slide"}</Button>
         </div>
       )}
     </div>
@@ -804,17 +981,15 @@ const shouldUseGroupedFields = (sectionId: string) => {
   return groupedSectionIds.has(sectionId);
 };
 
-const getSectionIcon = (sectionId: string) => {
-  if (sectionId.includes('hero')) return <Globe className="w-4 h-4 text-blue-500" />;
-  if (sectionId.includes('pricing')) return <FileText className="w-4 h-4 text-green-500" />;
-  if (sectionId.includes('feature')) return <ImageIcon className="w-4 h-4 text-purple-500" />;
-  if (sectionId.includes('integration')) return <Plus className="w-4 h-4 text-orange-500" />;
-  return <FileText className="w-4 h-4 text-gray-500" />;
+  const getSectionIcon = (sectionId: string) => {
+  const theme = getSectionTheme(sectionId);
+  const IconComponent = theme.icon;
+  return <IconComponent className={`w-4 h-4 ${theme.color}`} />;
 };
 
 export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
   const { pages, updateSectionField, toggleSectionVisibility, saveSiteData, updatePageSeo } = useSiteData();
-  const page = pages.find(p => p.id === pageId) || pages[0];
+  const page = useMemo(() => pages.find(p => p.id === pageId) || pages[0], [pages, pageId]);
   const [activeLangTab, setActiveLangTab] = useState<"ar" | "en">("ar");
   const [activeEditorTab, setActiveEditorTab] = useState<"content" | "seo" | "image">("content");
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
@@ -838,16 +1013,18 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
   
   const [seo, setSeo] = useState<PageSeo>(() => getDefaultSeo(page));
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset on page/section count change, not on every field edit
   useEffect(() => {
     if (!page?.sections?.[0]?.id) return;
     setExpandedSections(new Set([page.sections[0].id]));
-  }, [page]);
+  }, [page?.id, page?.sections?.length]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset SEO when page ID changes
   useEffect(() => {
     if (page) {
       setSeo(getDefaultSeo(page));
     }
-  }, [page]);
+  }, [page?.id]);
 
   if (!page) {
     return (
@@ -923,6 +1100,28 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         />
       );
     }
+
+    if (field.key === 'plans_list' && sectionId === 'schoolbit-pricing') {
+      return (
+        <SchoolBitPlansListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
+
+    if (field.key === 'sms_plans_json' && sectionId === 'schoolbit-pricing') {
+      return (
+        <SchoolBitSmsPlansEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
     
     if (field.key === 'wa_pricing') {
       const plansField = page.sections.find(s => s.id === sectionId)?.fields.find(f => f.key === 'plans_list');
@@ -987,9 +1186,9 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
     if (field.type === 'image' || field.key.includes('image') || field.key.includes('logo') || field.key.includes('icon')) {
       const isIcon = field.key.includes('logo') || field.key.includes('icon');
       return (
-        <div key={fieldKey} className="space-y-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm group transition-all hover:border-[#104E8B]/20">
-          <div className="flex items-center justify-between mb-1">
-             <label className="text-xs font-bold text-gray-500 uppercase tracking-tight">{isAr ? field.label : field.labelEn}</label>
+        <div key={fieldKey} className="space-y-2 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-[#104E8B]/20 transition-all">
+          <div className="flex items-center justify-between">
+             <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{isAr ? field.label : field.labelEn}</label>
              <Badge variant="outline" className="text-[9px] uppercase font-bold text-[#104E8B] bg-blue-50/50 border-blue-100">{isIcon ? 'Icon' : 'Image'}</Badge>
           </div>
           <ImageUploader
@@ -1010,7 +1209,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           value={value}
           onChange={(e) => handleFieldChange(sectionId, field.key, e.target.value)}
           rows={3}
-          className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm"
+          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
           placeholder={isAr ? 'أدخل النص...' : 'Enter text...'}
         />
       );
@@ -1023,7 +1222,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           type="url"
           value={value}
           onChange={(e) => handleFieldChange(sectionId, field.key, e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm"
+          className="w-full h-10 border border-gray-200 rounded-xl px-4 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
           dir="ltr"
           placeholder="https://"
         />
@@ -1036,7 +1235,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           <select
             value={value}
             onChange={(e) => handleFieldChange(sectionId, field.key, e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white"
+            className="w-full h-10 border border-gray-200 rounded-xl px-4 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all appearance-none"
           >
             {field.options.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -1045,12 +1244,13 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
             ))}
           </select>
           {field.key.includes('type') && value === 'form' && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+              <Zap className="w-3 h-3" />
               {isAr ? "سيتم توجيه المستخدم لفورم الطلب مع تحديد الباقة تلقائياً" : "User will be directed to request form with package pre-selected"}
             </p>
           )}
           {field.key.includes('type') && value === 'external' && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1.5">
               {isAr ? "أدخل الرابط الخارجي في حقل الرابط أعلاه" : "Enter the external URL in the URL field above"}
             </p>
           )}
@@ -1064,28 +1264,37 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         type="text"
         value={value}
         onChange={(e) => handleFieldChange(sectionId, field.key, e.target.value)}
-        className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm"
+        className="w-full h-10 border border-gray-200 rounded-xl px-4 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
       />
     );
   };
 
   const renderFields = (sectionId: string, fields: SectionField[]) => {
+    const theme = getSectionTheme(sectionId);
     if (shouldUseGroupedFields(sectionId)) {
       const groupedFields = getGroupedFields(sectionId, fields);
       return (
         <div className="space-y-4">
           {groupedFields.map(([groupKey, groupFields]) => (
-            <div key={groupKey} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
-              <h4 className="text-xs font-bold text-[#104E8B] mb-3">{getGroupLabel(sectionId, groupKey, isAr)}</h4>
+            <div key={groupKey} className={`rounded-xl p-4 border-l-4 ${theme.border} bg-white border border-gray-100 shadow-sm`}>
+              <h4 className="text-xs font-bold text-[#104E8B] mb-3 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#104E8B]" />
+                {getGroupLabel(sectionId, groupKey, isAr)}
+              </h4>
               <div className="space-y-3">
-                {groupFields.map((field) => (
-                  <div key={field.key}>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      {isAr ? field.label : field.labelEn}
-                    </label>
-                    {renderField(sectionId, field)}
-                  </div>
-                ))}
+                {groupFields.map((field) => {
+                  const hasOwnLabel = field.key === 'plans_list' || field.key === 'integrations_json' || field.key === 'slides_json' || field.key.endsWith('_json');
+                  return (
+                    <div key={field.key}>
+                      {!hasOwnLabel && (
+                        <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                          {isAr ? field.label : field.labelEn}
+                        </label>
+                      )}
+                      {renderField(sectionId, field)}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -1095,37 +1304,45 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
 
     return (
       <div className="space-y-3">
-        {fields.map((field) => (
-          <div key={field.key}>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              {isAr ? field.label : field.labelEn}
-            </label>
-            {renderField(sectionId, field)}
-          </div>
-        ))}
+        {fields.map((field) => {
+          const hasOwnLabel = field.key === 'plans_list' || field.key === 'integrations_json' || field.key === 'slides_json' || field.key.endsWith('_json');
+          return (
+            <div key={field.key} className={`bg-white rounded-xl border border-gray-100 shadow-sm hover:border-gray-200 transition-all ${hasOwnLabel ? 'p-0' : 'p-3'}`}>
+              {!hasOwnLabel && (
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                  {isAr ? field.label : field.labelEn}
+                </label>
+              )}
+              {renderField(sectionId, field)}
+            </div>
+          );
+        })}
       </div>
     );
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between bg-white rounded-xl p-4 shadow-sm border border-gray-100">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <Button variant="ghost" onClick={onBack} className="text-gray-500 hover:text-[#104E8B]">
+          <Button variant="ghost" onClick={onBack} className="text-gray-500 hover:text-[#104E8B] -ml-2">
             <ChevronDown className="w-4 h-4 rotate-90" />
             {isAr ? "العودة" : "Back"}
           </Button>
-          <span className="text-gray-300 hidden sm:inline">|</span>
-          <h2 className="text-base sm:text-lg text-[#104E8B] truncate">{isAr ? page.title : page.titleEn}</h2>
+          <span className="text-gray-200 hidden sm:inline">|</span>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{isAr ? page.title : page.titleEn}</h2>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${page.visible !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+            {page.visible !== false ? (isAr ? 'منشور' : 'Published') : (isAr ? 'مخفي' : 'Hidden')}
+          </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="border-gray-200 text-gray-600 h-9 w-full sm:w-auto" asChild>
+          <Button variant="outline" className="border-gray-200 text-gray-600 hover:bg-gray-50 h-9 w-full sm:w-auto" asChild>
             <a href={page.path} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="w-4 h-4" />
               {isAr ? "معاينة" : "Preview"}
             </a>
           </Button>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#FFA502] hover:bg-[#E59400] text-white h-9 w-full sm:w-auto">
+          <Button onClick={handleSave} disabled={saving} className="bg-[#FFA502] hover:bg-[#E59400] text-white h-9 w-full sm:w-auto shadow-sm shadow-orange-200">
             <Save className="w-4 h-4" />
             {saving ? (isAr ? "جارِ الحفظ..." : "Saving...") : (isAr ? "حفظ ونشر" : "Save & Publish")}
           </Button>
@@ -1133,7 +1350,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="flex gap-2 bg-white rounded-lg p-1 shadow-sm border border-gray-100 w-full sm:w-fit">
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-full sm:w-fit">
           {[
             { id: 'content' as const, icon: FileText, label: isAr ? 'المحتوى' : 'Content' },
             { id: 'seo' as const, icon: Search, label: 'SEO' },
@@ -1142,8 +1359,8 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
             <button
               key={tab.id}
               onClick={() => setActiveEditorTab(tab.id)}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm transition-all flex items-center gap-2 ${
-                activeEditorTab === tab.id ? "bg-[#104E8B] text-white" : "text-gray-600 hover:bg-gray-100"
+              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                activeEditorTab === tab.id ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -1153,16 +1370,16 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         </div>
 
         {activeEditorTab === 'content' && (
-          <div className="flex gap-2 bg-white rounded-lg p-1 shadow-sm border border-gray-100 w-full sm:w-fit">
+          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-full sm:w-fit">
             <button
               onClick={() => setActiveLangTab("ar")}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm transition-all ${activeLangTab === "ar" ? "bg-[#104E8B] text-white" : "text-gray-600 hover:bg-gray-100"}`}
+              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeLangTab === "ar" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
             >
               العربية
             </button>
             <button
               onClick={() => setActiveLangTab("en")}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm transition-all ${activeLangTab === "en" ? "bg-[#104E8B] text-white" : "text-gray-600 hover:bg-gray-100"}`}
+              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeLangTab === "en" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
             >
               English
             </button>
@@ -1330,43 +1547,56 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         {page.sections.map((section, sIndex) => {
           const isExpanded = expandedSections.has(section.id);
           const isExternallyManagedSection = section.id === "sms-trust";
+          const theme = getSectionTheme(section.id);
           return (
-            <Card key={section.id} className={`border shadow-sm overflow-hidden ${!section.visible ? "opacity-60" : ""} ${isExpanded ? "border-[#104E8B]/30" : "border-gray-100"}`}>
-              <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/50 transition-colors gap-3"
-                onClick={() => toggleSection(section.id)}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100">
-                    {getSectionIcon(section.id)}
+            <div key={section.id} className={`rounded-xl overflow-hidden shadow-sm transition-all duration-200 ${isExpanded ? 'shadow-md' : 'shadow-sm'} ${!section.visible ? "opacity-50" : ""}`}>
+              <div className={`border ${isExpanded ? `border-gray-200` : 'border-gray-100'} border-l-4 ${theme.border} bg-white transition-colors`}>
+                <div
+                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/80 transition-colors gap-3"
+                  onClick={() => toggleSection(section.id)}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`flex items-center justify-center w-9 h-9 rounded-xl ${theme.bg} ${theme.color} transition-colors`}>
+                      {getSectionIcon(section.id)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {isExternallyManagedSection ? (
+                          <span className="text-[10px] text-amber-600 font-medium">{isAr ? "يُدار مركزياً" : "Managed centrally"}</span>
+                        ) : (
+                          <>
+                            <span className="text-[10px] text-gray-400 font-medium">{section.fields.length} {isAr ? "حقول" : "fields"}</span>
+                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                            <span className={`text-[10px] font-medium ${section.visible ? 'text-green-600' : 'text-gray-400'}`}>
+                              {section.visible ? (isAr ? 'منشور' : 'Published') : (isAr ? 'مخفي' : 'Hidden')}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
-                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                      {isExternallyManagedSection
-                        ? (isAr ? "يُدار مركزياً" : "Managed centrally")
-                        : `${section.fields.length} ${isAr ? "حقول" : "fields"}`}
-                    </p>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSectionVisibility(page.id, section.id); }}
+                      className={`p-1.5 rounded-lg transition-all ${section.visible ? "text-green-600 hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
+                      title={section.visible ? (isAr ? "إخفاء القسم" : "Hide section") : (isAr ? "إظهار القسم" : "Show section")}
+                    >
+                      {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                    <div className={`flex items-center justify-center w-7 h-7 rounded-md transition-all ${isExpanded ? 'bg-[#104E8B]/10' : 'bg-gray-100'}`}>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? "rotate-180 text-[#104E8B]" : "text-gray-400"}`} />
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); toggleSectionVisibility(page.id, section.id); }}
-                    className={`p-1.5 rounded-md transition-colors ${section.visible ? "text-green-600 hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
-                    title={section.visible ? (isAr ? "إخفاء القسم" : "Hide section") : (isAr ? "إظهار القسم" : "Show section")}
-                  >
-                    {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </button>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                 </div>
               </div>
 
               {isExpanded && !isExternallyManagedSection && (
-                <div className="p-4 bg-gray-50/50 border-t">
+                <div className="px-5 pb-5 pt-4 bg-gray-50/60 border-t border-gray-100">
                   {renderFields(section.id, section.fields)}
                 </div>
               )}
-            </Card>
+            </div>
           );
         })}
       </div>

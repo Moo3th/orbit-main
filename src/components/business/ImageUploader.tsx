@@ -104,7 +104,7 @@ export function ImageUploader({
   const aspectRatioClasses = {
     square: 'aspect-square',
     video: 'aspect-video',
-    auto: 'aspect-auto min-h-[200px]',
+    auto: 'aspect-auto min-h-[200px] max-h-[300px]',
   };
 
   return (
@@ -126,11 +126,11 @@ export function ImageUploader({
         onDrop={handleDrop}
       >
         {previewUrl ? (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full overflow-hidden">
             <img
               src={previewUrl}
               alt="Preview"
-              className="w-full h-full object-contain rounded-lg"
+              className="w-full h-full max-h-[280px] object-contain rounded-lg"
             />
             <button
               onClick={handleRemove}

@@ -215,9 +215,94 @@ export const SECTION_TYPES = [
   { value: 'testimonials', label: 'Testimonials', labelAr: 'شهادات العملاء' },
   { value: 'trust', label: 'Trust / Partners', labelAr: 'الثقة / الشركاء' },
   { value: 'custom', label: 'Custom Content', labelAr: 'محتوى مخصص' },
+  { value: 'schoolbit-trust', label: 'SchoolBit Trust Bar', labelAr: 'شريط الثقة - سكول بت' },
+  { value: 'schoolbit-problem', label: 'SchoolBit Problem/Value', labelAr: 'المشكلة والحل - سكول بت' },
+  { value: 'schoolbit-benefits', label: 'SchoolBit Benefits', labelAr: 'المميزات - سكول بت' },
+  { value: 'schoolbit-roles', label: 'SchoolBit Roles', labelAr: 'الأدوار - سكول بت' },
+  { value: 'schoolbit-modules', label: 'SchoolBit Modules', labelAr: 'الوحدات - سكول بت' },
+  { value: 'schoolbit-automation', label: 'SchoolBit Automation', labelAr: 'الأتمتة - سكول بت' },
+  { value: 'schoolbit-integrations', label: 'SchoolBit Integrations', labelAr: 'التكاملات - سكول بت' },
+  { value: 'schoolbit-security', label: 'SchoolBit Security', labelAr: 'الأمان - سكول بت' },
+  { value: 'schoolbit-outcomes', label: 'SchoolBit Outcomes', labelAr: 'النتائج - سكول بت' },
+  { value: 'schoolbit-faq', label: 'SchoolBit FAQ', labelAr: 'الأسئلة الشائعة - سكول بت' },
 ] as const;
 
 export type SectionType = typeof SECTION_TYPES[number]['value'];
+
+const schoolbitTrustFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'items_json', value: '', richText: true },
+  { key: 'items_json_en', value: '', richText: true },
+];
+
+const schoolbitProblemFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'problems_json', value: '', richText: true },
+  { key: 'problems_json_en', value: '', richText: true },
+  { key: 'solution_text', value: '', richText: true },
+  { key: 'solution_text_en', value: '', richText: true },
+];
+
+const schoolbitBenefitsFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'items_json', value: '', richText: true },
+  { key: 'items_json_en', value: '', richText: true },
+];
+
+const schoolbitRolesFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'roles_json', value: '', richText: true },
+];
+
+const schoolbitModulesFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'modules_json', value: '', richText: true },
+];
+
+const schoolbitAutomationFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'items_json', value: '', richText: true },
+  { key: 'items_json_en', value: '', richText: true },
+  { key: 'highlight_text', value: '', richText: true },
+  { key: 'highlight_text_en', value: '', richText: true },
+];
+
+const schoolbitIntegrationsFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'description', value: '', richText: true },
+  { key: 'description_en', value: '', richText: true },
+  { key: 'items_json', value: '', richText: true },
+];
+
+const schoolbitSecurityFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'description', value: '', richText: true },
+  { key: 'description_en', value: '', richText: true },
+  { key: 'features_json', value: '', richText: true },
+  { key: 'highlight_text', value: '', richText: true },
+  { key: 'highlight_text_en', value: '', richText: true },
+];
+
+const schoolbitOutcomesFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'items_json', value: '', richText: true },
+  { key: 'items_json_en', value: '', richText: true },
+];
+
+const schoolbitFaqFields: ICmsField[] = [
+  { key: 'title', value: '', richText: false },
+  { key: 'title_en', value: '', richText: false },
+  { key: 'faq_json', value: '', richText: true },
+];
 
 export function generateSectionId(): string {
   return `section_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -294,6 +379,16 @@ export function createEmptySection(type: SectionType, order: number): ICmsSectio
         { key: 'content_en', value: '', richText: true },
       ],
     },
+    'schoolbit-trust': { fields: schoolbitTrustFields },
+    'schoolbit-problem': { fields: schoolbitProblemFields },
+    'schoolbit-benefits': { fields: schoolbitBenefitsFields },
+    'schoolbit-roles': { fields: schoolbitRolesFields },
+    'schoolbit-modules': { fields: schoolbitModulesFields },
+    'schoolbit-automation': { fields: schoolbitAutomationFields },
+    'schoolbit-integrations': { fields: schoolbitIntegrationsFields },
+    'schoolbit-security': { fields: schoolbitSecurityFields },
+    'schoolbit-outcomes': { fields: schoolbitOutcomesFields },
+    'schoolbit-faq': { fields: schoolbitFaqFields },
   };
 
   return {

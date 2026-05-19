@@ -88,6 +88,7 @@ const ACTIVE_PAGE_BLUEPRINTS: PageBlueprint[] = [
   { id: 'whatsapp', path: '/products/whatsapp', title: 'واتساب أعمال API', titleEn: 'WhatsApp Business API', seo: { title: 'واتساب أعمال API | المدار', titleEn: 'WhatsApp Business API | ORBIT', description: 'واتساب أعمال API من المدار - تواصل مع عملائك عبر واتساب بشكل احترافي وآمن.', descriptionEn: 'WhatsApp Business API by ORBIT - Connect with your customers professionally and securely via WhatsApp.', keywords: 'واتساب, WhatsApp, واتساب أعمال, API, المدار, تسويق', keywordsEn: 'WhatsApp, WhatsApp Business, API, ORBIT, marketing, messaging', canonical: 'https://orbit.sa/products/whatsapp', noIndex: false, ogImage: '' } },
   { id: 'otime', path: '/products/o-time', title: 'O-Time برنامج الموارد البشرية', titleEn: 'O-Time HR Software', seo: { title: 'O-Time برنامج الموارد البشرية | المدار', titleEn: 'O-Time HR Software | ORBIT', description: 'برنامج O-Time لإدارة الموارد البشرية - منصة متكاملة للحضور والرواتب ودورة حياة الموظف.', descriptionEn: 'O-Time HR Software - Complete platform for attendance, payroll, and employee lifecycle management.', keywords: 'O-Time, موارد بشرية, إدارة حضور, رواتب, المدار', keywordsEn: 'O-Time, HR, attendance, payroll, ORBIT, employee management', canonical: 'https://orbit.sa/products/o-time', noIndex: false, ogImage: '' } },
   { id: 'govgate', path: '/products/gov-gate', title: 'Gov Gate', titleEn: 'Gov Gate', seo: { title: 'Gov Gate بوابة حكومية | المدار', titleEn: 'Gov Gate | ORBIT', description: 'بوابة Gov Gate للحوسبة المؤسسية - منصة مراسلة آمنة ومتخصصة للجهات الحكومية.', descriptionEn: 'Gov Gate - Secure enterprise messaging gateway for government entities.', keywords: 'Gov Gate, بوابة حكومية, مراسلة, حكومة, المدار', keywordsEn: 'Gov Gate, government gateway, messaging, ORBIT, secure', canonical: 'https://orbit.sa/products/gov-gate', noIndex: false, ogImage: '' } },
+  { id: 'schoolbit', path: '/products/schoolbit', title: 'SchoolBit إدارة المدارس', titleEn: 'SchoolBit School Management', seo: { title: 'SchoolBit | منصة إدارة المدارس والحضور والتواصل والتقارير', titleEn: 'SchoolBit | Smart School Management Platform', description: 'منصة ذكية لإدارة المدارس تجمع الطلاب، الحضور، الكادر، الجداول، الاختبارات، الرسائل، والتقارير في نظام واحد متكامل.', descriptionEn: 'A smart school management platform that brings together students, attendance, staff, schedules, exams, messaging, and reports in one integrated system.', keywords: 'SchoolBit, إدارة مدارس, حضور, تواصل, تقارير, المدار', keywordsEn: 'SchoolBit, school management, attendance, communication, reports, ORBIT', canonical: 'https://orbit.sa/products/schoolbit', noIndex: false, ogImage: '' } },
   { id: 'contact', path: '/contact', title: 'تواصل معنا', titleEn: 'Contact Us', seo: { title: 'تواصل معنا | المدار', titleEn: 'Contact Us | ORBIT', description: 'تواصل معنا - المدار لحلول التقنية. نحن هنا لمساعدتك في جميع استفساراتك.', descriptionEn: 'Contact ORBIT - We are here to help with all your inquiries.', keywords: 'تواصل معنا, المدار, اتصل بنا, دعم فني', keywordsEn: 'contact us, ORBIT, support, inquiry', canonical: 'https://orbit.sa/contact', noIndex: false, ogImage: '' } },
   { id: 'blog', path: '/blog', title: 'المدونة', titleEn: 'Blog', seo: { title: 'المدونة | المدار', titleEn: 'Blog | ORBIT', description: 'مدونة المدار - أحدث الأخبار والمقالات عن الحلول التقنية والاتصالات.', descriptionEn: 'ORBIT Blog - Latest news and articles about technology solutions and communications.', keywords: 'مدونة, المدار, أخبار تقنية, مقالات', keywordsEn: 'blog, ORBIT, tech news, articles', canonical: 'https://orbit.sa/blog', noIndex: false, ogImage: '' } },
 ];
@@ -393,6 +394,61 @@ const defaultPageSectionsById: Record<string, SeedSection[]> = {
     { id: 'gg-cta', name: 'دعوة الإجراء', nameEn: 'CTA Section', visible: true, fields: [
       { key: 'cta_text', label: 'نص الزر', labelEn: 'CTA Text', type: 'text', value: 'ابدأ الآن', valueEn: 'Start now' },
       { key: 'cta_url', label: 'رابط الزر', labelEn: 'CTA URL', type: 'url', value: 'https://wa.me/966920006900', valueEn: 'https://wa.me/966920006900' },
+    ] },
+  ],
+  schoolbit: [
+    { id: 'schoolbit-hero', name: 'SchoolBit الرئيسي', nameEn: 'SchoolBit Hero', visible: true, fields: [
+      { key: 'eyebrow', label: 'شارة أعلى العنوان', labelEn: 'Eyebrow Badge', type: 'text', value: 'منصة إدارة المدارس الذكية', valueEn: 'Smart School Management Platform' },
+      { key: 'title', label: 'العنوان الرئيسي', labelEn: 'Main Title', type: 'text', value: 'إدارة مدرستك بالكامل من منصة واحدة', valueEn: 'Manage Your Entire School from One Platform' },
+      { key: 'description', label: 'الوصف', labelEn: 'Description', type: 'textarea', value: 'SchoolBit تجمع الحضور، الطلاب، الكادر، الجداول، الاختبارات، الرسائل، والتقارير في نظام ذكي يساعدك على تقليل العمل اليدوي، رفع الانضباط، واتخاذ قرارات أسرع.', valueEn: 'SchoolBit brings together attendance, students, staff, schedules, exams, messaging, and reports in a smart system that helps you reduce manual work, improve discipline, and make faster decisions.' },
+      { key: 'cta1_text', label: 'نص الزر الأول', labelEn: 'Primary CTA Text', type: 'text', value: 'اطلب عرضاً توضيحياً', valueEn: 'Request a Demo' },
+      { key: 'cta1_url', label: 'رابط الزر الأول', labelEn: 'Primary CTA URL', type: 'url', value: '#contact', valueEn: '#contact' },
+      { key: 'cta2_text', label: 'نص الزر الثاني', labelEn: 'Secondary CTA Text', type: 'text', value: 'اكتشف المميزات', valueEn: 'Explore Features' },
+      { key: 'cta2_url', label: 'رابط الزر الثاني', labelEn: 'Secondary CTA URL', type: 'url', value: '#features', valueEn: '#features' },
+    ] },
+    { id: 'schoolbit-trust', name: 'شريط الثقة', nameEn: 'Trust Bar', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'كل ما تحتاجه المدرسة لتعمل بكفاءة أعلى:', valueEn: 'Everything your school needs to run more efficiently:' },
+    ] },
+    { id: 'schoolbit-problem', name: 'المشكلة والحل', nameEn: 'Problem & Value', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'هل ما زالت إدارة المدرسة موزعة بين ملفات ورسائل وأنظمة متفرقة؟', valueEn: 'Is your school management still scattered across files, messages, and disconnected systems?' },
+      { key: 'solution_text', label: 'نص الحل', labelEn: 'Solution Text', type: 'textarea', value: 'SchoolBit تحول إدارة المدرسة إلى عملية موحدة، سريعة، وذكية.', valueEn: 'SchoolBit transforms school management into a unified, fast, and smart operation.' },
+    ] },
+    { id: 'schoolbit-benefits', name: 'المميزات', nameEn: 'Benefits', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'لماذا SchoolBit؟', valueEn: 'Why SchoolBit?' },
+    ] },
+    { id: 'schoolbit-roles', name: 'الأدوار', nameEn: 'Roles', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'كيف تساعد كل إدارة داخل المدرسة؟', valueEn: 'How does it help each department in the school?' },
+    ] },
+    { id: 'schoolbit-modules', name: 'الوحدات', nameEn: 'Modules', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'الوحدات الرئيسية', valueEn: 'Core Modules' },
+    ] },
+    { id: 'schoolbit-automation', name: 'الأتمتة', nameEn: 'Automation', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'دع المهام المتكررة تعمل تلقائيًا', valueEn: 'Let repetitive tasks work automatically' },
+      { key: 'highlight_text', label: 'نص بارز', labelEn: 'Highlight Text', type: 'textarea', value: 'SchoolBit لا تحفظ البيانات فقط، بل تساعد المدرسة على التصرف بناءً عليها.', valueEn: "SchoolBit doesn't just store data — it helps the school act on it." },
+    ] },
+    { id: 'schoolbit-integrations', name: 'التكاملات', nameEn: 'Integrations', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'يتكامل مع الأنظمة التي تعتمد عليها المدرسة', valueEn: 'Integrates with the systems your school relies on' },
+      { key: 'description', label: 'الوصف', labelEn: 'Description', type: 'textarea', value: 'تقليل إدخال البيانات يدويًا، وتسهيل انتقال المدرسة إلى إدارة أكثر تكاملًا.', valueEn: 'Reduce manual data entry and make the transition to more integrated school management easier.' },
+    ] },
+    { id: 'schoolbit-security', name: 'الأمان', nameEn: 'Security', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'تحكم دقيق، وأمان أعلى', valueEn: 'Precise Control, Higher Security' },
+      { key: 'description', label: 'الوصف', labelEn: 'Description', type: 'textarea', value: 'كل مستخدم يعمل ضمن ما يحتاجه فقط، والإدارة تحتفظ بالسيطرة.', valueEn: 'Every user works within only what they need, and administration retains full control.' },
+    ] },
+    { id: 'schoolbit-pricing', name: 'الأسعار', nameEn: 'Pricing', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'باقات تناسب كل مدرسة', valueEn: 'Packages for Every School' },
+      { key: 'subtitle', label: 'العنوان الفرعي', labelEn: 'Subtitle', type: 'text', value: 'اختر الباقة المناسبة لحجم مدرستك واحتياجاتك', valueEn: 'Choose the package that fits your school size and needs' },
+    ] },
+    { id: 'schoolbit-outcomes', name: 'النتائج', nameEn: 'Outcomes', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'ماذا تكسب المدرسة مع SchoolBit؟', valueEn: 'What does the school gain with SchoolBit?' },
+    ] },
+    { id: 'schoolbit-cta', name: 'دعوة للإجراء', nameEn: 'Call to Action', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'ابدأ بإدارة مدرستك بطريقة أكثر ذكاءً', valueEn: 'Start Managing Your School Smarter' },
+      { key: 'description', label: 'الوصف', labelEn: 'Description', type: 'textarea', value: 'احصل على عرض توضيحي لمنصة SchoolBit، واكتشف كيف يمكن تحويل العمليات اليومية إلى نظام أكثر سرعة، دقة، وتنظيمًا.', valueEn: 'Get a demo of the SchoolBit platform and discover how daily operations can become a faster, more accurate, and organized system.' },
+      { key: 'button_text', label: 'نص الزر', labelEn: 'Button Text', type: 'text', value: 'اطلب عرضاً توضيحياً', valueEn: 'Request a Demo' },
+      { key: 'button_url', label: 'رابط الزر', labelEn: 'Button URL', type: 'url', value: 'https://app.mobile.net.sa/reg', valueEn: 'https://app.mobile.net.sa/reg' },
+    ] },
+    { id: 'schoolbit-faq', name: 'الأسئلة الشائعة', nameEn: 'FAQ', visible: true, fields: [
+      { key: 'title', label: 'العنوان', labelEn: 'Title', type: 'text', value: 'الأسئلة الشائعة', valueEn: 'Frequently Asked Questions' },
     ] },
   ],
   contact: defaultContactSections,

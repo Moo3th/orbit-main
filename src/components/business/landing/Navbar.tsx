@@ -55,6 +55,7 @@ export const Navbar = () => {
   const productLinks = [
     { name: "الرسائل النصية SMS", href: "/business/products/sms" },
     { name: "واتساب أعمال API", href: "/business/products/whatsapp" },
+    { name: "SchoolBit إدارة المدارس", href: "/products/schoolbit" },
     { name: "O-Time برنامج الموارد البشرية", href: "/business/products/o-time" },
     { name: "Gov Gate", href: "/business/products/gov-gate" },
   ];
