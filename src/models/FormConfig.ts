@@ -8,7 +8,7 @@ const formFieldOptionSchema = new mongoose.Schema({
 
 const formFieldSchema = new mongoose.Schema({
   id: { type: String, required: true, trim: true },
-  type: { type: String, required: true, enum: ['text', 'textarea', 'email', 'tel', 'number', 'select', 'multiselect', 'radio', 'rating', 'scale', 'date', 'time', 'file'], default: 'text' },
+  type: { type: String, required: true, enum: ['text', 'textarea', 'email', 'tel', 'number', 'select', 'multiselect', 'radio', 'rating', 'scale', 'date', 'time', 'file', 'richtext', 'spacing', 'divider'], default: 'text' },
   labelAr: { type: String, required: true, trim: true },
   labelEn: { type: String, required: true, trim: true },
   placeholderAr: { type: String, default: '', trim: true },
@@ -19,6 +19,8 @@ const formFieldSchema = new mongoose.Schema({
   max: { type: Number, default: 10 },
   stepSize: { type: Number, default: 1 },
   ratingType: { type: String, enum: ['star', 'emoji', 'number'], default: 'number' },
+  htmlContent: { type: String, default: '' },
+  spacingSize: { type: String, enum: ['sm', 'md', 'lg', 'xl'], default: 'md' },
   options: { type: [formFieldOptionSchema], default: [] },
 }, { _id: false });
 
@@ -41,6 +43,18 @@ const formConfigSchema = new mongoose.Schema({
   primaryColor: { type: String, default: '#7A1E2E' },
   buttonTextColor: { type: String, default: '#FFFFFF' },
   buttonHoverColor: { type: String, default: '#601824' },
+  optionSelectedTextColor: { type: String, default: '#FFFFFF' },
+  formBgColor: { type: String, default: '#f9fafb' },
+  formCardBgColor: { type: String, default: '#ffffff' },
+  formTitleColor: { type: String, default: '#161616' },
+  fieldLabelColor: { type: String, default: '#374151' },
+  fieldBorderColor: { type: String, default: '#d1d5db' },
+  optionBgColor: { type: String, default: '#ffffff' },
+  optionBorderColor: { type: String, default: '#e5e7eb' },
+  optionTextColor: { type: String, default: '#111827' },
+  successColor: { type: String, default: '#16a34a' },
+  showRefillButton: { type: Boolean, default: false },
+  showBackToFormButton: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
   fields: { type: [formFieldSchema], default: [] },
 }, { timestamps: true });

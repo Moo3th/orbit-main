@@ -84,6 +84,18 @@ export async function PUT(
     if (data.primaryColor !== undefined) updateData.primaryColor = data.primaryColor;
     if (data.buttonTextColor !== undefined) updateData.buttonTextColor = data.buttonTextColor;
     if (data.buttonHoverColor !== undefined) updateData.buttonHoverColor = data.buttonHoverColor;
+    if (data.showRefillButton !== undefined) updateData.showRefillButton = data.showRefillButton;
+    if (data.showBackToFormButton !== undefined) updateData.showBackToFormButton = data.showBackToFormButton;
+    if (data.optionSelectedTextColor !== undefined) updateData.optionSelectedTextColor = data.optionSelectedTextColor;
+    if (data.formBgColor !== undefined) updateData.formBgColor = data.formBgColor;
+    if (data.formCardBgColor !== undefined) updateData.formCardBgColor = data.formCardBgColor;
+    if (data.formTitleColor !== undefined) updateData.formTitleColor = data.formTitleColor;
+    if (data.fieldLabelColor !== undefined) updateData.fieldLabelColor = data.fieldLabelColor;
+    if (data.fieldBorderColor !== undefined) updateData.fieldBorderColor = data.fieldBorderColor;
+    if (data.optionBgColor !== undefined) updateData.optionBgColor = data.optionBgColor;
+    if (data.optionBorderColor !== undefined) updateData.optionBorderColor = data.optionBorderColor;
+    if (data.optionTextColor !== undefined) updateData.optionTextColor = data.optionTextColor;
+    if (data.successColor !== undefined) updateData.successColor = data.successColor;
 
     const config = await FormConfig.findOneAndUpdate(
       { productId },

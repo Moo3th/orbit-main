@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export type FormFieldType = 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio' | 'rating' | 'scale' | 'date' | 'time' | 'file';
+export type FormFieldType = 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio' | 'rating' | 'scale' | 'date' | 'time' | 'file' | 'richtext' | 'spacing' | 'divider';
 
 export interface FormFieldOption {
   value: string;
@@ -39,6 +39,8 @@ export interface FormField {
   stepSize: number;
   ratingType?: 'star' | 'emoji' | 'number';
   options: FormFieldOption[];
+  htmlContent?: string;
+  spacingSize?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export interface FormConfigData {
@@ -57,6 +59,18 @@ export interface FormConfigData {
   primaryColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
+  showRefillButton?: boolean;
+  showBackToFormButton?: boolean;
+  optionSelectedTextColor?: string;
+  formBgColor?: string;
+  formCardBgColor?: string;
+  formTitleColor?: string;
+  fieldLabelColor?: string;
+  fieldBorderColor?: string;
+  optionBgColor?: string;
+  optionBorderColor?: string;
+  optionTextColor?: string;
+  successColor?: string;
   slug: string;
   customDomain?: string;
   notificationEmails: string;
@@ -103,6 +117,9 @@ const FIELD_TYPES: { value: FormFieldType; labelAr: string; labelEn: string }[] 
   { value: 'date', labelAr: 'تاريخ', labelEn: 'Date' },
   { value: 'time', labelAr: 'وقت', labelEn: 'Time' },
   { value: 'file', labelAr: 'رفع ملف', labelEn: 'File Upload' },
+  { value: 'richtext', labelAr: 'نص مخصص (HTML)', labelEn: 'Custom Text (HTML)' },
+  { value: 'spacing', labelAr: 'مسافة', labelEn: 'Spacing' },
+  { value: 'divider', labelAr: 'خط فاصل', labelEn: 'Divider' },
 ];
 
 const DEFAULT_WHATSAPP_FIELDS: FormField[] = [
@@ -166,6 +183,18 @@ export const FormBuilderView = ({ isAr }: Props) => {
   const [primaryColor, setPrimaryColor] = useState('#7A1E2E');
   const [buttonTextColor, setButtonTextColor] = useState('#FFFFFF');
   const [buttonHoverColor, setButtonHoverColor] = useState('#601824');
+  const [optionSelectedTextColor, setOptionSelectedTextColor] = useState('#FFFFFF');
+  const [formBgColor, setFormBgColor] = useState('#f9fafb');
+  const [formCardBgColor, setFormCardBgColor] = useState('#ffffff');
+  const [formTitleColor, setFormTitleColor] = useState('#161616');
+  const [fieldLabelColor, setFieldLabelColor] = useState('#374151');
+  const [fieldBorderColor, setFieldBorderColor] = useState('#d1d5db');
+  const [optionBgColor, setOptionBgColor] = useState('#ffffff');
+  const [optionBorderColor, setOptionBorderColor] = useState('#e5e7eb');
+  const [optionTextColor, setOptionTextColor] = useState('#111827');
+  const [successColor, setSuccessColor] = useState('#16a34a');
+  const [showRefillButton, setShowRefillButton] = useState(false);
+  const [showBackToFormButton, setShowBackToFormButton] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -219,6 +248,18 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setPrimaryColor(config.primaryColor || (config.formType === 'survey' ? '#8B5CF6' : '#7A1E2E'));
       setButtonTextColor(config.buttonTextColor || '#FFFFFF');
       setButtonHoverColor(config.buttonHoverColor || (config.formType === 'survey' ? '#7C3AED' : '#601824'));
+      setShowRefillButton(config.showRefillButton || false);
+      setShowBackToFormButton(config.showBackToFormButton || false);
+      setOptionSelectedTextColor(config.optionSelectedTextColor || '#FFFFFF');
+      setFormBgColor(config.formBgColor || '#f9fafb');
+      setFormCardBgColor(config.formCardBgColor || '#ffffff');
+      setFormTitleColor(config.formTitleColor || '#161616');
+      setFieldLabelColor(config.fieldLabelColor || '#374151');
+      setFieldBorderColor(config.fieldBorderColor || '#d1d5db');
+      setOptionBgColor(config.optionBgColor || '#ffffff');
+      setOptionBorderColor(config.optionBorderColor || '#e5e7eb');
+      setOptionTextColor(config.optionTextColor || '#111827');
+      setSuccessColor(config.successColor || '#16a34a');
     } else {
       setFields(productId === 'whatsapp' ? DEFAULT_WHATSAPP_FIELDS : []);
       setSlug(FORM_URLS[productId]?.replace('/products/', '').replace('/form', '').replace('/request', '') || productId);
@@ -237,15 +278,28 @@ export const FormBuilderView = ({ isAr }: Props) => {
       setPrimaryColor('#7A1E2E');
       setButtonTextColor('#FFFFFF');
       setButtonHoverColor('#601824');
+      setShowRefillButton(false);
+      setShowBackToFormButton(false);
+      setOptionSelectedTextColor('#FFFFFF');
+      setFormBgColor('#f9fafb');
+      setFormCardBgColor('#ffffff');
+      setFormTitleColor('#161616');
+      setFieldLabelColor('#374151');
+      setFieldBorderColor('#d1d5db');
+      setOptionBgColor('#ffffff');
+      setOptionBorderColor('#e5e7eb');
+      setOptionTextColor('#111827');
+      setSuccessColor('#16a34a');
     }
     setViewMode('edit');
   }, [configs]);
 
   const handleAddField = () => {
-    setFields([...fields, {
+    const newField: FormField = {
       id: generateId(), type: 'text', labelAr: '', labelEn: '', placeholderAr: '', placeholderEn: '',
       required: false, step: 2, min: 1, max: 10, stepSize: 1, options: [],
-    }]);
+    };
+    setFields([...fields, newField]);
   };
 
   const handleUpdateField = (index: number, updates: Partial<FormField>) => {
@@ -318,6 +372,18 @@ export const FormBuilderView = ({ isAr }: Props) => {
         primaryColor,
         buttonTextColor,
         buttonHoverColor,
+        showRefillButton,
+        showBackToFormButton,
+        optionSelectedTextColor,
+        formBgColor,
+        formCardBgColor,
+        formTitleColor,
+        fieldLabelColor,
+        fieldBorderColor,
+        optionBgColor,
+        optionBorderColor,
+        optionTextColor,
+        successColor,
         fields,
       };
 
@@ -513,7 +579,7 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                   <td className="px-4 py-3 text-center text-gray-400">-</td>
                   <td className="px-4 py-3 text-center"><Badge className="bg-gray-100 text-gray-400 text-[10px]">{t('غير منشأ', 'Not Created')}</Badge></td>
                   <td className="px-4 py-3 text-center">
-                    <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(product.id); }} title={t('إنشاء', 'Create')}><Plus className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(product.id); }} title={t('إنشاء', 'Create')} className="text-gray-600 hover:text-gray-900"><Plus className="w-4 h-4" /></Button>
                   </td>
                 </tr>
               ))}
@@ -559,15 +625,15 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex gap-1 justify-center flex-wrap">
-                        <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(config.productId); }} title={t('تعديل', 'Edit')}><Edit3 className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => { setNewFormMode(false); loadProductConfig(config.productId); }} title={t('تعديل', 'Edit')} className="text-gray-600 hover:text-gray-900"><Edit3 className="w-4 h-4" /></Button>
                         <Button variant="ghost" size="sm" onClick={() => toggleFormActive(config.productId, config.isActive !== false)} title={config.isActive !== false ? t('تعطيل', 'Disable') : t('تفعيل', 'Enable')}>
                           {config.isActive !== false ? <ToggleRight className="w-4 h-4 text-green-500" /> : <ToggleLeft className="w-4 h-4 text-gray-400" />}
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(config.productId)} title={t('الطلبات', 'Submissions')}><Inbox className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => fetchSubmissions(config.productId)} title={t('الطلبات', 'Submissions')} className="text-gray-600 hover:text-gray-900"><Inbox className="w-4 h-4" /></Button>
                         {!isProduct && config.formType === 'survey' && (
                           <Button variant="ghost" size="sm" onClick={() => { setSelectedProduct(config.productId); fetchSubmissions(config.productId); setViewMode('analytics'); }} title={t('التحليلات', 'Analytics')} className="text-purple-600"><BarChart3 className="w-4 h-4" /></Button>
                         )}
-                        <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm" title={t('معاينة', 'Preview')}><Eye className="w-4 h-4" /></Button></a>
+                        <a href={getFormUrl(config.slug || config.productId, config.productId, config.customDomain)} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm" title={t('معاينة', 'Preview')} className="text-gray-600 hover:text-gray-900"><Eye className="w-4 h-4" /></Button></a>
                         {!isProduct && (
                           <Button variant="ghost" size="sm" onClick={() => handleDeleteConfig(config.productId)} title={t('حذف', 'Delete')} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></Button>
                         )}
@@ -1046,9 +1112,31 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
               </div>
             </div>
 
+            <div className="space-y-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+              <h4 className="text-xs font-bold text-blue-700 uppercase tracking-wider">{t('أزرار صفحة الشكر', 'Thank You Page Buttons')}</h4>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
+                <div className="flex-1">
+                  <label className="text-sm font-bold text-gray-700">{t('إظهار زر تعبئة النموذج مرة أخرى', 'Show Refill Form Button')}</label>
+                  <p className="text-[10px] text-gray-500">{t('عند التفعيل يظهر زر في صفحة الشكر يسمح للمستخدم بتعبئة النموذج من جديد', 'When enabled, a button appears on the thank you page allowing users to fill the form again')}</p>
+                </div>
+                <button onClick={() => setShowRefillButton(!showRefillButton)} className="text-2xl">
+                  {showRefillButton ? <ToggleRight className="w-10 h-10 text-[#128C7E]" /> : <ToggleLeft className="w-10 h-10 text-gray-300" />}
+                </button>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
+                <div className="flex-1">
+                  <label className="text-sm font-bold text-gray-700">{t('إظهار زر العودة للنموذج', 'Show Back to Form Button')}</label>
+                  <p className="text-[10px] text-gray-500">{t('عند التفعيل يظهر زر في صفحة الشكر يسمح للمستخدم بالعودة للنموذج', 'When enabled, a button appears on the thank you page allowing users to go back to the form')}</p>
+                </div>
+                <button onClick={() => setShowBackToFormButton(!showBackToFormButton)} className="text-2xl">
+                  {showBackToFormButton ? <ToggleRight className="w-10 h-10 text-[#128C7E]" /> : <ToggleLeft className="w-10 h-10 text-gray-300" />}
+                </button>
+              </div>
+            </div>
+
             <div className="pt-2 space-y-3 border-t">
-              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('تخصيص الألوان', 'Theme Customization')}</h4>
-              <div className="grid grid-cols-3 gap-3">
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('ألوان الأزرار والخيارات', 'Buttons & Options Colors')}</h4>
+              <div className="grid grid-cols-4 gap-3">
                 <div>
                   <label className="text-[10px] text-gray-500 block mb-1">{t('اللون الأساسي', 'Primary Color')}</label>
                   <div className="flex items-center gap-2">
@@ -1070,8 +1158,15 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                     <input type="text" value={buttonHoverColor} onChange={(e) => setButtonHoverColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
                   </div>
                 </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون نص الخيار المحدد', 'Option Selected Text')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={optionSelectedTextColor} onChange={(e) => setOptionSelectedTextColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={optionSelectedTextColor} onChange={(e) => setOptionSelectedTextColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
               </div>
-              <div className="p-3 rounded-lg border flex items-center justify-center gap-4" style={{ backgroundColor: '#f9fafb' }}>
+              <div className="p-3 rounded-lg border flex items-center justify-center gap-4 flex-wrap" style={{ backgroundColor: formBgColor || '#f9fafb' }}>
                 <span className="text-[10px] text-gray-400">{t('معاينة الزر:', 'Button Preview:')}</span>
                 <button 
                   className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm"
@@ -1081,6 +1176,104 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                 >
                   {t('زر الإرسال', 'Submit Button')}
                 </button>
+                <span className="text-[10px] text-gray-400 mx-2">|</span>
+                <span className="text-[10px] text-gray-400">{t('معاينة الخيار:', 'Option Preview:')}</span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl border-2" style={{ backgroundColor: primaryColor, color: optionSelectedTextColor, borderColor: primaryColor }}>
+                  <span className="text-sm font-medium">{t('خيار محدد', 'Selected Option')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 space-y-3 border-t">
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('ألوان النموذج والخلفية', 'Form & Background Colors')}</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('خلفية الصفحة', 'Page Background')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={formBgColor} onChange={(e) => setFormBgColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={formBgColor} onChange={(e) => setFormBgColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('خلفية البطاقة', 'Card Background')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={formCardBgColor} onChange={(e) => setFormCardBgColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={formCardBgColor} onChange={(e) => setFormCardBgColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون العنوان', 'Title Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={formTitleColor} onChange={(e) => setFormTitleColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={formTitleColor} onChange={(e) => setFormTitleColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون عناوين الحقول', 'Field Label Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={fieldLabelColor} onChange={(e) => setFieldLabelColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={fieldLabelColor} onChange={(e) => setFieldLabelColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون حدود الحقول', 'Field Border Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={fieldBorderColor} onChange={(e) => setFieldBorderColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={fieldBorderColor} onChange={(e) => setFieldBorderColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون النجاح', 'Success Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={successColor} onChange={(e) => setSuccessColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={successColor} onChange={(e) => setSuccessColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg border" style={{ backgroundColor: formBgColor || '#f9fafb' }}>
+                <div className="rounded-xl shadow-sm p-4" style={{ backgroundColor: formCardBgColor || '#ffffff' }}>
+                  <h4 className="text-lg font-extrabold mb-2" style={{ color: formTitleColor || '#161616' }}>{isAr ? 'عنوان النموذج' : 'Form Title'}</h4>
+                  <div className="w-12 h-1 rounded-full mb-3" style={{ backgroundColor: primaryColor }} />
+                  <label className="text-sm font-medium block mb-1" style={{ color: fieldLabelColor || '#374151' }}>{isAr ? 'عنوان الحقل' : 'Field Label'}</label>
+                  <div className="rounded-lg p-2 border" style={{ borderColor: fieldBorderColor || '#d1d5db', backgroundColor: '#ffffff' }}>
+                    <span style={{ color: fieldLabelColor || '#374151' }}>{isAr ? 'مثال لحقل إدخال' : 'Sample input field'}</span>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border-2" style={{ backgroundColor: primaryColor, color: optionSelectedTextColor, borderColor: primaryColor }}>
+                      <span className="text-sm font-medium">{isAr ? 'خيار محدد' : 'Selected'}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border-2" style={{ backgroundColor: optionBgColor || '#ffffff', color: optionTextColor || '#111827', borderColor: optionBorderColor || '#e5e7eb' }}>
+                      <span className="text-sm font-medium">{isAr ? 'خيار غير محدد' : 'Unselected'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 space-y-3 border-t">
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('ألوان الخيارات', 'Options Colors')}</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('خلفية الخيار', 'Option Background')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={optionBgColor} onChange={(e) => setOptionBgColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={optionBgColor} onChange={(e) => setOptionBgColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('حدود الخيار', 'Option Border')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={optionBorderColor} onChange={(e) => setOptionBorderColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={optionBorderColor} onChange={(e) => setOptionBorderColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">{t('لون نص الخيار', 'Option Text Color')}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={optionTextColor} onChange={(e) => setOptionTextColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 overflow-hidden" />
+                    <input type="text" value={optionTextColor} onChange={(e) => setOptionTextColor(e.target.value)} className="flex-1 text-[10px] border rounded px-1 py-1 uppercase" dir="ltr" />
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -1128,7 +1321,9 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                     <div className="grid grid-cols-4 gap-3">
                       <div><label className="text-xs text-gray-500">{t('نوع الحقل', 'Type')}</label><select value={field.type} onChange={e => handleUpdateField(index, { type: e.target.value as FormFieldType })} className="w-full border rounded p-1.5 text-sm bg-white">{FIELD_TYPES.map(ft => <option key={ft.value} value={ft.value}>{isAr ? ft.labelAr : ft.labelEn}</option>)}</select></div>
                       <div><label className="text-xs text-gray-500">{t('الخطوة', 'Step')}</label><input type="number" min={2} value={field.step} onChange={e => handleUpdateField(index, { step: Math.max(2, parseInt(e.target.value) || 2) })} className="w-full border rounded p-1.5 text-sm" /></div>
-                      <div className="flex items-end gap-3 pt-1"><label className="flex items-center gap-1.5 text-sm cursor-pointer"><input type="checkbox" checked={field.required} onChange={e => handleUpdateField(index, { required: e.target.checked })} className="w-4 h-4 accent-[#7A1E2E]" />{t('إجباري', 'Required')}</label></div>
+                      {!['richtext', 'spacing', 'divider'].includes(field.type) && (
+                        <div className="flex items-end gap-3 pt-1"><label className="flex items-center gap-1.5 text-sm cursor-pointer"><input type="checkbox" checked={field.required} onChange={e => handleUpdateField(index, { required: e.target.checked })} className="w-4 h-4 accent-[#7A1E2E]" />{t('إجباري', 'Required')}</label></div>
+                      )}
                       <div className="flex items-end gap-3 pt-1"><label className="flex items-center gap-1.5 text-sm cursor-pointer"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="w-4 h-4 accent-[#7A1E2E]" />{t('نشط', 'Active')}</label></div>
                     </div>
                     {['rating', 'scale'].includes(field.type) && (
@@ -1152,10 +1347,86 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                         <div><label className="text-xs text-gray-500">{t('الخطوة', 'Step Size')}</label><input type="number" value={field.stepSize} onChange={e => handleUpdateField(index, { stepSize: parseInt(e.target.value) || 1 })} className="w-full border rounded p-1.5 text-sm" /></div>
                       </div>
                     )}
-                    {!['radio', 'multiselect'].includes(field.type) && (
+                    {!['radio', 'multiselect', 'spacing', 'divider'].includes(field.type) && (
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="text-xs text-gray-500">{t('نص مساعد (عربي)', 'Placeholder (AR)')}</label><input type="text" value={field.placeholderAr} onChange={e => handleUpdateField(index, { placeholderAr: e.target.value })} className="w-full border rounded p-1.5 text-sm" /></div>
                         <div><label className="text-xs text-gray-500">{t('نص مساعد (إنجليزي)', 'Placeholder (EN)')}</label><input type="text" value={field.placeholderEn} onChange={e => handleUpdateField(index, { placeholderEn: e.target.value })} className="w-full border rounded p-1.5 text-sm" /></div>
+                      </div>
+                    )}
+                    {field.type === 'richtext' && (
+                      <div className="space-y-2 border rounded-lg p-3 bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-600">{t('محتوى النص المخصص', 'Custom Text Content')}</span>
+                          <button
+                            onClick={() => {
+                              const currentHtml = field.htmlContent || '';
+                              const isHtmlMode = (field as any)._htmlMode;
+                              handleUpdateField(index, { htmlContent: isHtmlMode ? currentHtml : currentHtml } as any);
+                              const newFields = [...fields];
+                              (newFields[index] as any)._htmlMode = !isHtmlMode;
+                              setFields(newFields);
+                            }}
+                            className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-100 text-gray-600"
+                          >
+                            {(field as any)._htmlMode ? t('المحرر المرئي', 'Visual Editor') : t('تعديل HTML', 'Edit HTML')}
+                          </button>
+                        </div>
+                        {(field as any)._htmlMode ? (
+                          <textarea
+                            value={field.htmlContent || ''}
+                            onChange={e => handleUpdateField(index, { htmlContent: e.target.value } as any)}
+                            className="w-full border rounded p-2 text-sm font-mono min-h-[200px]"
+                            placeholder="<p>أدخل محتوى HTML هنا</p>&#10;<p>Enter HTML content here</p>"
+                            dir="ltr"
+                          />
+                        ) : (
+                          <div className="border rounded bg-white min-h-[150px]">
+                            <div className="flex gap-1 p-1 border-b bg-gray-50 flex-wrap">
+                              <button type="button" onClick={() => {
+                                const textarea = document.createElement('textarea');
+                                document.execCommand('insertHTML', false, '<b>');
+                              }} className="px-2 py-1 rounded text-xs font-bold hover:bg-gray-200" title={t('عريض', 'Bold')}>B</button>
+                              <button type="button" onClick={() => document.execCommand('italic')} className="px-2 py-1 rounded text-xs italic hover:bg-gray-200" title={t('مائل', 'Italic')}>I</button>
+                              <button type="button" onClick={() => document.execCommand('underline')} className="px-2 py-1 rounded text-xs underline hover:bg-gray-200" title={t('تسطير', 'Underline')}>U</button>
+                              <div className="w-px h-5 bg-gray-300 mx-1 self-center" />
+                              <button type="button" onClick={() => document.execCommand('insertUnorderedList')} className="px-2 py-1 rounded text-xs hover:bg-gray-200" title={t('قائمة', 'List')}>•≡</button>
+                              <button type="button" onClick={() => document.execCommand('insertOrderedList')} className="px-2 py-1 rounded text-xs hover:bg-gray-200" title={t('قائمة مرقمة', 'Ordered List')}>1.</button>
+                              <div className="w-px h-5 bg-gray-300 mx-1 self-center" />
+                              <select onChange={e => { document.execCommand('formatBlock', false, e.target.value); e.target.value = ''; }} className="px-1 py-0.5 rounded text-xs border bg-white" defaultValue="">
+                                <option value="">{t('عنوان', 'Heading')}</option>
+                                <option value="h1">H1</option>
+                                <option value="h2">H2</option>
+                                <option value="h3">H3</option>
+                                <option value="p">{t('نص', 'Paragraph')}</option>
+                              </select>
+                            </div>
+                            <div
+                              contentEditable
+                              suppressContentEditableWarning
+                              onBlur={(e) => {
+                                handleUpdateField(index, { htmlContent: e.currentTarget.innerHTML } as any);
+                              }}
+                              dangerouslySetInnerHTML={{ __html: field.htmlContent || '' }}
+                              className="p-3 min-h-[120px] focus:outline-none prose prose-sm max-w-none"
+                              style={{ direction: isAr ? 'rtl' : 'ltr' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {field.type === 'spacing' && (
+                      <div>
+                        <label className="text-xs text-gray-500">{t('حجم المسافة', 'Spacing Size')}</label>
+                        <select
+                          value={field.spacingSize || 'md'}
+                          onChange={e => handleUpdateField(index, { spacingSize: e.target.value as 'sm' | 'md' | 'lg' | 'xl' } as any)}
+                          className="w-full border rounded p-1.5 text-sm bg-white"
+                        >
+                          <option value="sm">{t('صغير (16px)', 'Small (16px)')}</option>
+                          <option value="md">{t('متوسط (32px)', 'Medium (32px)')}</option>
+                          <option value="lg">{t('كبير (64px)', 'Large (64px)')}</option>
+                          <option value="xl">{t('كبير جداً (96px)', 'Extra Large (96px)')}</option>
+                        </select>
                       </div>
                     )}
                     {['select', 'multiselect', 'radio'].includes(field.type) && (

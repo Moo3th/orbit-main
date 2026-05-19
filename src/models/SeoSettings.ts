@@ -38,6 +38,13 @@ export interface ISeoAnalytics {
   clarityProjectId: string;
 }
 
+export interface ISeoAppearance {
+  adminPrimaryColor: string;
+  adminButtonTextColor: string;
+  adminAccentColor: string;
+  adminSidebarColor: string;
+}
+
 export interface ISeoSettings {
   key: string;
   siteName: { en: string; ar: string };
@@ -51,6 +58,7 @@ export interface ISeoSettings {
   };
   organization: ISeoOrganization;
   analytics: ISeoAnalytics;
+  appearance: ISeoAppearance;
   robotsTxt: string;
   isActive: boolean;
   createdAt: Date;
@@ -96,6 +104,13 @@ const seoEmailConfigSchema = new Schema<ISeoEmailConfig>({
   smtpPort: { type: Number, default: 587 },
   smtpUser: { type: String, default: '' },
   smtpPassword: { type: String, default: '' },
+});
+
+const seoAppearanceSchema = new Schema<ISeoAppearance>({
+  adminPrimaryColor: { type: String, default: '#7A1E2E' },
+  adminButtonTextColor: { type: String, default: '#FFFFFF' },
+  adminAccentColor: { type: String, default: '#128C7E' },
+  adminSidebarColor: { type: String, default: '#1f2937' },
 });
 
 const seoSettingsSchema = new Schema<ISeoSettings>(
@@ -157,6 +172,15 @@ const seoSettingsSchema = new Schema<ISeoSettings>(
         facebookPixelId: '',
         facebookAccessToken: '',
         clarityProjectId: '',
+      }),
+    },
+    appearance: {
+      type: seoAppearanceSchema,
+      default: () => ({
+        adminPrimaryColor: '#7A1E2E',
+        adminButtonTextColor: '#FFFFFF',
+        adminAccentColor: '#128C7E',
+        adminSidebarColor: '#1f2937',
       }),
     },
     robotsTxt: {

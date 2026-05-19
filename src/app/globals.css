@@ -23,11 +23,44 @@
   --color-neutral: #A7A9AC; /* Cool Gray */
   --color-black: #161616; /* ORBIT Black */
   --color-white: #FFFFFF;
+  /* shadcn/ui CSS Variables */
+  --primary-foreground: #ffffff;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --ring: #7A1E2E;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --muted: #f1f5f9;
+  --muted-foreground: #6b7280;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
 }
 
 .dark {
   --background: #111827;
   --foreground: #f9fafb;
+  --primary-foreground: #ffffff;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --ring: #9f1239;
+  --border: #374151;
+  --input: #374151;
+  --muted: #1e293b;
+  --muted-foreground: #9ca3af;
+  --card: #1f2937;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
 }
 
 html {

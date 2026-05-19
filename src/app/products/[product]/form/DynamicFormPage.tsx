@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/business/ui/button';
 import { Input } from '@/components/business/ui/input';
 import { Textarea } from '@/components/business/ui/textarea';
@@ -24,6 +24,8 @@ interface FormField {
   stepSize: number;
   ratingType?: 'star' | 'emoji' | 'number';
   options: { value: string; labelAr: string; labelEn: string }[];
+  htmlContent?: string;
+  spacingSize?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 interface Props {
@@ -52,6 +54,19 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     buttonText: '#FFFFFF',
     buttonHover: '#601824'
   });
+  const [optionSelectedTextColor, setOptionSelectedTextColor] = useState('#FFFFFF');
+  const [showRefillButton, setShowRefillButton] = useState(false);
+  const [showBackToFormButton, setShowBackToFormButton] = useState(false);
+  const [formBgColor, setFormBgColor] = useState('#f9fafb');
+  const [formCardBgColor, setFormCardBgColor] = useState('#ffffff');
+  const [formTitleColor, setFormTitleColor] = useState('#161616');
+  const [fieldLabelColor, setFieldLabelColor] = useState('#374151');
+  const [fieldBorderColor, setFieldBorderColor] = useState('#d1d5db');
+  const [optionBgColor, setOptionBgColor] = useState('#ffffff');
+  const [optionBorderColor, setOptionBorderColor] = useState('#e5e7eb');
+  const [optionTextColor, setOptionTextColor] = useState('#111827');
+  const [successColor, setSuccessColor] = useState('#16a34a');
+  const formRef = useRef<HTMLDivElement>(null);
 
   // Theme configuration using CSS variables
   const theme = {
@@ -90,6 +105,18 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
               buttonText: data.config.buttonTextColor || '#FFFFFF',
               buttonHover: data.config.buttonHoverColor || (isSurvey ? '#7C3AED' : '#601824')
             });
+            setOptionSelectedTextColor(data.config.optionSelectedTextColor || '#FFFFFF');
+            setShowRefillButton(data.config.showRefillButton || false);
+            setShowBackToFormButton(data.config.showBackToFormButton || false);
+            setFormBgColor(data.config.formBgColor || '#f9fafb');
+            setFormCardBgColor(data.config.formCardBgColor || '#ffffff');
+            setFormTitleColor(data.config.formTitleColor || '#161616');
+            setFieldLabelColor(data.config.fieldLabelColor || '#374151');
+            setFieldBorderColor(data.config.fieldBorderColor || '#d1d5db');
+            setOptionBgColor(data.config.optionBgColor || '#ffffff');
+            setOptionBorderColor(data.config.optionBorderColor || '#e5e7eb');
+            setOptionTextColor(data.config.optionTextColor || '#111827');
+            setSuccessColor(data.config.successColor || '#16a34a');
 
             if (data.config.fields && data.config.fields.length > 0) {
               setFields(data.config.fields);
@@ -108,12 +135,24 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     fetchConfig();
   }, [productId]);
 
-  // Update CSS variables on color change
+  // Update CSS variables on color change - scoped to form element only
   useEffect(() => {
-    document.documentElement.style.setProperty('--primary-color', colors.primary);
-    document.documentElement.style.setProperty('--button-text-color', colors.buttonText);
-    document.documentElement.style.setProperty('--button-hover-color', colors.buttonHover);
-  }, [colors]);
+    const el = formRef.current;
+    if (!el) return;
+    el.style.setProperty('--primary-color', colors.primary);
+    el.style.setProperty('--button-text-color', colors.buttonText);
+    el.style.setProperty('--button-hover-color', colors.buttonHover);
+    el.style.setProperty('--option-selected-text-color', optionSelectedTextColor);
+    el.style.setProperty('--form-bg-color', formBgColor);
+    el.style.setProperty('--form-card-bg-color', formCardBgColor);
+    el.style.setProperty('--form-title-color', formTitleColor);
+    el.style.setProperty('--field-label-color', fieldLabelColor);
+    el.style.setProperty('--field-border-color', fieldBorderColor);
+    el.style.setProperty('--option-bg-color', optionBgColor);
+    el.style.setProperty('--option-border-color', optionBorderColor);
+    el.style.setProperty('--option-text-color', optionTextColor);
+    el.style.setProperty('--success-color', successColor);
+  }, [colors, optionSelectedTextColor, formBgColor, formCardBgColor, formTitleColor, fieldLabelColor, fieldBorderColor, optionBgColor, optionBorderColor, optionTextColor, successColor]);
 
   const stepNumbers = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
   const maxStep = stepNumbers.length > 0 ? stepNumbers[stepNumbers.length - 1] : 1;
@@ -154,6 +193,17 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
   };
   const handleBack = () => { if (currentStep > Math.min(...stepNumbers)) setCurrentStep(currentStep - 1); };
 
+  const handleRefill = () => {
+    const initial: Record<string, string | string[]> = {};
+    fields.forEach(f => {
+      initial[f.id] = f.type === 'multiselect' ? [] : '';
+    });
+    setFormData(initial);
+    setCurrentStep(Math.min(...fields.map(f => f.step), 2));
+    setErrors({});
+    setIsComplete(false);
+  };
+
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
     setIsSubmitting(true);
@@ -178,19 +228,19 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     const fieldContent = (() => {
       switch (field.type) {
         case 'textarea':
-          return <Textarea value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} rows={3} className={`border-gray-300 ${theme.focus}`} />;
+          return <Textarea value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} rows={3} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'email':
-          return <Input type="email" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
+          return <Input type="email" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'tel':
-          return <Input type="tel" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} dir="ltr" />;
+          return <Input type="tel" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} style={{ borderColor: 'var(--field-border-color)' }} dir="ltr" />;
         case 'number':
-          return <Input type="number" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
+          return <Input type="number" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'select':
-          return <select value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`w-full border border-gray-300 rounded-lg p-3 text-sm ${theme.focus}`}><option value="">{placeholder}</option>{field.options.map((opt, i) => <option key={i} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>)}</select>;
+          return <select value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="w-full rounded-lg p-3 text-sm" style={{ borderColor: 'var(--field-border-color)', color: 'var(--option-text-color)' }}><option value="">{placeholder}</option>{field.options.map((opt, i) => <option key={i} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>)}</select>;
         case 'multiselect':
-          return <div className="space-y-2">{field.options.map((opt, i) => { const selected = Array.isArray(value) ? value.includes(opt.value) : false; return <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${selected ? `${theme.border} bg-opacity-5 ${theme.primary.replace('bg-', 'bg-opacity-5 bg-')}` : 'border-gray-200 hover:border-opacity-30'}`}><input type="checkbox" checked={selected} onChange={() => { const arr = Array.isArray(value) ? [...value] : [];handleChange(field.id, selected ? arr.filter((v: string) => v !== opt.value) : [...arr, opt.value]);}} className={`w-4 h-4 ${theme.accent}`} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>;})}</div>;
+          return <div className="space-y-2">{field.options.map((opt, i) => { const selected = Array.isArray(value) ? value.includes(opt.value) : false; return <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all`} style={selected ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' } : { backgroundColor: 'var(--option-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}><input type="checkbox" checked={selected} onChange={() => { const arr = Array.isArray(value) ? [...value] : []; handleChange(field.id, selected ? arr.filter((v: string) => v !== opt.value) : [...arr, opt.value]); }} className={`w-4 h-4 ${selected ? '' : theme.accent}`} style={selected ? { accentColor: 'var(--option-selected-text-color)' } : {}} /><span className={`text-sm font-medium`}>{isRTL ? opt.labelAr : opt.labelEn}</span></label>; })}</div>;
         case 'radio':
-          return <div className="space-y-2">{field.options.map((opt, i) => <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${value === opt.value ? `${theme.border} bg-opacity-5 ${theme.primary.replace('bg-', 'bg-opacity-5 bg-')}` : 'border-gray-200 hover:border-opacity-30'}`}><input type="radio" name={field.id} value={opt.value} checked={value === opt.value} onChange={() => handleChange(field.id, opt.value)} className={`w-4 h-4 ${theme.accent}`} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>)}</div>;
+          return <div className="space-y-2">{field.options.map((opt, i) => <label key={i} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all`} style={value === opt.value ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' } : { backgroundColor: 'var(--option-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}><input type="radio" name={field.id} value={opt.value} checked={value === opt.value} onChange={() => handleChange(field.id, opt.value)} className={`w-4 h-4 ${value === opt.value ? '' : theme.accent}`} style={value === opt.value ? { accentColor: 'var(--option-selected-text-color)' } : {}} /><span className="text-sm font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span></label>)}</div>;
         case 'rating':
           const ratingType = field.ratingType || 'number';
           const maxRating = field.max || 5;
@@ -234,21 +284,39 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
             </div>
           );
         case 'scale':
-          return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className={`w-full ${theme.accent}`} /><div className="flex justify-between text-xs text-gray-500"><span>{field.min || 1}</span><span className={`font-bold ${theme.text.replace('text-', 'text-')} text-lg`}>{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
+          return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className={`w-full ${theme.accent}`} /><div className="flex justify-between text-xs" style={{ color: 'var(--field-label-color)' }}><span>{field.min || 1}</span><span className="font-bold text-lg" style={{ color: 'var(--primary-color)' }}>{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
         case 'date':
-          return <Input type="date" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`border-gray-300 ${theme.focus}`} />;
+          return <Input type="date" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'time':
-          return <Input type="time" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className={`border-gray-300 ${theme.focus}`} />;
+          return <Input type="time" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'file':
-          return <Input type="file" onChange={e => { const f = (e.target as HTMLInputElement).files?.[0]; handleChange(field.id, f?.name || ''); }} className="border-gray-300" />;
+          return <Input type="file" onChange={e => { const f = (e.target as HTMLInputElement).files?.[0]; handleChange(field.id, f?.name || ''); }} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
+        case 'richtext':
+          return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: field.htmlContent || '' }} />;
+        case 'spacing': {
+          const spacingMap: Record<string, string> = { sm: 'h-4', md: 'h-8', lg: 'h-16', xl: 'h-24' };
+          return <div className={spacingMap[field.spacingSize || 'md'] || 'h-8'} />;
+        }
+        case 'divider':
+          return <div className="border-t my-4" style={{ borderColor: 'var(--primary-color)', opacity: 0.3 }} />;
         default:
-          return <Input type="text" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className={`border-gray-300 ${theme.focus}`} />;
+          return <Input type="text" value={value as string} onChange={e => handleChange(field.id, e.target.value)} placeholder={placeholder} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
       }
     })();
 
+    const isDisplayOnly = ['richtext', 'spacing', 'divider'].includes(field.type);
+
+    if (isDisplayOnly) {
+      return (
+        <div key={field.id}>
+          {fieldContent}
+        </div>
+      );
+    }
+
     return (
       <div key={field.id} className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium" style={{ color: 'var(--field-label-color)' }}>
           {label}
           {field.required && <span className="text-red-500 mr-1">*</span>}
         </label>
@@ -258,8 +326,11 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     );
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="w-8 h-8 animate-spin text-[#7A1E2E]" /></div>;
-  if (isFormInactive) return (
+  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--primary-color)' }} /></div>;
+
+  return (
+    <div ref={formRef} style={{ '--primary-color': colors.primary, '--button-text-color': colors.buttonText, '--button-hover-color': colors.buttonHover, '--option-selected-text-color': optionSelectedTextColor, '--form-bg-color': formBgColor, '--form-card-bg-color': formCardBgColor, '--form-title-color': formTitleColor, '--field-label-color': fieldLabelColor, '--field-border-color': fieldBorderColor, '--option-bg-color': optionBgColor, '--option-border-color': optionBorderColor, '--option-text-color': optionTextColor, '--success-color': successColor } as React.CSSProperties}>
+    {isFormInactive ? (
     <div className={`min-h-[60vh] flex flex-col items-center justify-center gap-6 text-center p-8 ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <Ban className="w-16 h-16 text-red-400" />
       <h2 className="text-2xl font-bold text-gray-900">{isRTL ? 'هذه الخدمة غير متاحة حالياً' : 'This service is currently unavailable'}</h2>
@@ -281,8 +352,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
         </a>
       </div>
     </div>
-  );
-  if (isClosed) return (
+    ) : isClosed ? (
     <div className={`min-h-[60vh] flex flex-col items-center justify-center gap-6 text-center p-8 ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2">
         <Ban className="w-10 h-10" />
@@ -297,10 +367,9 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
       </p>
       <Link href="/" className="mt-4 hover:underline font-medium" style={{ color: 'var(--primary-color)' }}>{isRTL ? 'العودة للرئيسية' : 'Go to Home'}</Link>
     </div>
-  );
-  if (isComplete) return (
+    ) : isComplete ? (
     <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center p-8">
-      <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'color-mix(in srgb, var(--success-color) 15%, transparent)', color: 'var(--success-color)' }}>
         <CheckCircle className="w-12 h-12" />
       </div>
       <h2 className="text-3xl font-extrabold text-gray-900">
@@ -311,30 +380,60 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
       {!thankYouMessage.ar && !thankYouMessage.en && (
         <p className="text-gray-600 text-lg">{isRTL ? 'سنتواصل معك قريباً' : 'We will contact you soon'}</p>
       )}
-      <Link 
-        href="/" 
-        className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium"
-        style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
-      >
-        {isRTL ? 'العودة للرئيسية' : 'Go to Home'}
-      </Link>
+      <div className="flex flex-wrap gap-3 mt-6 justify-center">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium border-2"
+          style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
+        >
+          {isRTL ? 'العودة للرئيسية' : 'Go to Home'}
+        </Link>
+        {showRefillButton && (
+          <button
+            onClick={handleRefill}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium"
+            style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+          >
+            {isRTL ? 'تعبئة النموذج مرة أخرى' : 'Fill Form Again'}
+          </button>
+        )}
+        {showBackToFormButton && !showRefillButton && (
+          <button
+            onClick={handleRefill}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium"
+            style={{ backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--button-hover-color)')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)')}
+          >
+            {isRTL ? 'العودة للنموذج' : 'Back to Form'}
+          </button>
+        )}
+        {showBackToFormButton && showRefillButton && (
+          <button
+            onClick={handleRefill}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium border-2"
+            style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-color)', e.currentTarget.style.color = 'var(--button-text-color)')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent', e.currentTarget.style.color = 'var(--primary-color)')}
+          >
+            {isRTL ? 'العودة للنموذج' : 'Back to Form'}
+          </button>
+        )}
+      </div>
     </div>
-  );
-  if (fields.length === 0) return (
+    ) : fields.length === 0 ? (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center p-8">
       <p className="text-gray-500 text-lg">{isRTL ? 'لا يوجد نموذج متاح لهذا المنتج حالياً' : 'No form available for this product at the moment'}</p>
       <Link href="/contact" className="text-[#7A1E2E] hover:underline font-medium">{isRTL ? 'تواصل معنا' : 'Contact Us'}</Link>
     </div>
-  );
-
-  return (
-    <div className={`${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} bg-gray-50 py-12 md:py-20`} dir={isRTL ? 'rtl' : 'ltr'}>
+    ) : (
+    <div className={`${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} py-12 md:py-20`} style={{ backgroundColor: 'var(--form-bg-color)' }} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto px-4">
         {(title.ar || title.en) && (
           <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#161616]">
+            <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--form-title-color)' }}>
               {isRTL ? (title.ar || title.en) : (title.en || title.ar)}
             </h1>
             <div className="w-20 h-1.5 mx-auto mt-4 rounded-full" style={{ backgroundColor: 'var(--primary-color)' }} />
@@ -354,7 +453,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-5">
+            <div className="rounded-2xl shadow-lg p-6 md:p-8 space-y-5" style={{ backgroundColor: 'var(--form-card-bg-color)' }}>
               {stepFields(currentStep).map(field => renderField(field))}
 
               <div className="flex justify-between pt-6">
@@ -388,7 +487,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
             </div>
           </>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-8">
+          <div className="rounded-2xl shadow-lg p-6 md:p-8 space-y-8" style={{ backgroundColor: 'var(--form-card-bg-color)' }}>
             <div className="space-y-6">
               {fields.map(field => renderField(field))}
             </div>
@@ -408,6 +507,8 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
           </div>
         )}
       </div>
+    </div>
+    )}
     </div>
   );
 };

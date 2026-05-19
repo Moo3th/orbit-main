@@ -10,12 +10,47 @@ module.exports = {
     extend: {
       colors: {
         // ORBIT Brand Colors (Verified from PDF)
-        primary: '#7A1E2E', // Burgundy - Main brand color
-        secondary: '#E8DCCB', // Beige - Complementary color
-        neutral: '#A7A9AC', // Cool Gray - Balance color
+        primary: {
+          DEFAULT: '#7A1E2E',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: {
+          DEFAULT: '#E8DCCB',
+          foreground: 'var(--secondary-foreground)',
+        },
+        neutral: '#A7A9AC',
         // Standard colors
-        black: '#161616', // ORBIT Black
+        black: '#161616',
         white: '#FFFFFF',
+        // shadcn/ui CSS variable-based colors
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        border: 'var(--border)',
+        input: {
+          DEFAULT: 'var(--input)',
+          background: 'var(--background)',
+        },
+        ring: 'var(--ring)',
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
       },
       fontFamily: {
         // ORBIT Brand Fonts - IBM Plex Sans for both English and Arabic

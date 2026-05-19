@@ -95,6 +95,12 @@ const normalizeSeoSettings = (doc: unknown): ISeoSettings | null => {
       facebookAccessToken: String(analyticsData.facebookAccessToken || ''),
       clarityProjectId: String(analyticsData.clarityProjectId || ''),
     },
+    appearance: {
+      adminPrimaryColor: String((settings.appearance as Record<string, string>)?.adminPrimaryColor || '#7A1E2E'),
+      adminButtonTextColor: String((settings.appearance as Record<string, string>)?.adminButtonTextColor || '#FFFFFF'),
+      adminAccentColor: String((settings.appearance as Record<string, string>)?.adminAccentColor || '#128C7E'),
+      adminSidebarColor: String((settings.appearance as Record<string, string>)?.adminSidebarColor || '#1f2937'),
+    },
     robotsTxt: String(settings.robotsTxt || ''),
     isActive: Boolean(settings.isActive),
     createdAt: settings.createdAt ? new Date(settings.createdAt as string) : new Date(),
