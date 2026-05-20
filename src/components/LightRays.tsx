@@ -74,6 +74,17 @@ const LightRays: React.FC<LightRaysProps> = ({
   const cleanupFunctionRef = useRef<(() => void) | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const [isLowEndMobile, setIsLowEndMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isLowDPR = (window.devicePixelRatio || 1) > 1.5;
+      const isLowMemory = !(navigator as any).deviceMemory || (navigator as any).deviceMemory < 4;
+      const hasFewCores = !(navigator as any).hardwareConcurrency || (navigator as any).hardwareConcurrency <= 4;
+      setIsLowEndMobile(isAndroid && (isLowDPR || isLowMemory || hasFewCores));
+    }
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -97,10 +108,11 @@ const LightRays: React.FC<LightRaysProps> = ({
   }, []);
 
   useEffect(() => {
-    // Completely disable LightRays on iOS - causes crashes
     if (typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
       return;
     }
+    
+    if (isLowEndMobile) return;
     
     if (!isVisible || !containerRef.current) return;
 
@@ -415,6 +427,17 @@ void main() {
       return () => window.removeEventListener('mousemove', handleMouseMove);
     }
   }, [followMouse]);
+
+  if (isLowEndMobile) {
+    return (
+      <div 
+        className={`light-rays-container ${className}`.trim()}
+        style={{
+          background: 'linear-gradient(180deg, rgba(122, 30, 46, 0.08) 0%, transparent 60%)',
+        }}
+      />
+    );
+  }
 
   return <div ref={containerRef} className={`light-rays-container ${className}`.trim()} />;
 };

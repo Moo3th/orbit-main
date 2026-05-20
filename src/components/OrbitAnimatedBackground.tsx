@@ -19,12 +19,14 @@ export default function OrbitAnimatedBackground({
 }: OrbitAnimatedBackgroundProps) {
   const { isDark } = useTheme();
   const [isIOS, setIsIOS] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // CRITICAL: Detect iOS and completely disable animations
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      setIsMobile(window.innerWidth < 768 || isAndroid);
     }
   }, []);
   
@@ -45,7 +47,7 @@ export default function OrbitAnimatedBackground({
     : 'rgba(122, 30, 46, 0.08)'); // Lighter burgundy for light mode
 
   // CRITICAL: Return simple static version on iOS
-  if (isIOS) {
+  if (isIOS || isMobile) {
     return (
       <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <div className="absolute inset-0 bg-gradient-radial from-primary/5 to-transparent" />

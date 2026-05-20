@@ -167,10 +167,10 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                   {getCmsField(cmsPage, 'schoolbit-hero', 'description', isRTL, st.hero.description)}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-                  <Button className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#FF7A1A]/20 w-full sm:w-auto transform transition-transform hover:scale-105">
+                  <Button className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#FF7A1A]/20 w-full sm:w-auto transform transition-transform hover:scale-105 [&>a]:text-white [&>a]:hover:text-white">
                     <a href={getCmsField(cmsPage, 'schoolbit-hero', 'cta1_url', isRTL, '#contact')}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta1_text', isRTL, st.hero.cta1)}</a>
                   </Button>
-                  <Button variant="outline" className="border-2 border-[#021E4A] text-[#021E4A] hover:bg-[#021E4A]/5 h-14 px-10 text-lg font-bold rounded-2xl w-full sm:w-auto">
+                  <Button className="bg-transparent border-2 border-[#021E4A] text-[#021E4A] hover:bg-[#021E4A] hover:text-white h-14 px-10 text-lg font-bold rounded-2xl w-full sm:w-auto [&>a]:text-[#021E4A] [&>a]:hover:text-white">
                     <a href={getCmsField(cmsPage, 'schoolbit-hero', 'cta2_url', isRTL, '#features')}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta2_text', isRTL, st.hero.cta2)}</a>
                   </Button>
                 </div>
@@ -758,20 +758,24 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                       <div className="mb-6 text-center">
                         <div className="flex items-baseline justify-center gap-1">
                           <span className="text-4xl font-extrabold text-[#021E4A]">
-                            {billingToggle === 'yearly' && plan.priceYearly ? plan.priceYearly : plan.price}
+                            {billingToggle === '3months' && plan.price3Months != null && plan.price3Months > 0
+                              ? plan.price3Months
+                              : billingToggle === 'yearly' && plan.priceYearly
+                                ? plan.priceYearly
+                                : plan.price}
                           </span>
                           <Image src="/trustedby/Saudi_Riyal_Symbol.svg.png" alt="ر.س" width={18} height={18} className="w-[18px] h-[18px] object-contain opacity-70" />
                         </div>
                         <p className="text-sm text-slate-500 mt-1">
-                          /{billingToggle === 'yearly' && plan.priceYearly ? getCmsField(cmsPage, 'schoolbit-pricing', 'monthly_label', isRTL, isRTL ? 'شهر' : 'month') : getCmsField(cmsPage, 'schoolbit-pricing', 'monthly_label', isRTL, isRTL ? 'شهر' : 'month')}
+                          /{getCmsField(cmsPage, 'schoolbit-pricing', 'monthly_label', isRTL, isRTL ? 'شهر' : 'month')}
                         </p>
                         {billingToggle === '3months' && plan.price3Months != null && plan.price3Months > 0 && (
                           <div className="mt-2 bg-[#0EA8F1]/10 rounded-lg py-1.5 px-3">
                             <p className="text-sm font-bold text-[#0EA8F1]">
-                              {plan.price3Months} <Image src="/trustedby/Saudi_Riyal_Symbol.svg.png" alt="ر.س" width={12} height={12} className="w-[12px] h-[12px] object-contain opacity-70 inline" />
+                              {get3MonthTotal(plan.price ?? 0, plan.price3Months)} <Image src="/trustedby/Saudi_Riyal_Symbol.svg.png" alt="ر.س" width={12} height={12} className="w-[12px] h-[12px] object-contain opacity-70 inline" />
                               <span className="text-xs text-[#0EA8F1]"> {getCmsField(cmsPage, 'schoolbit-pricing', '_3months_label', isRTL, isRTL ? '/3 أشهر' : '/3 months')}</span>
                             </p>
-                            {plan.price && plan.price3Months && (plan.price * 3) > plan.price3Months && (
+                            {plan.price && plan.price3Months && plan.price > plan.price3Months && (
                               <p className="text-xs text-green-600 font-medium mt-0.5">
                                 {getCmsField(cmsPage, 'schoolbit-pricing', 'save_label', isRTL, isRTL ? 'وفر' : 'Save')} {get3MonthDiscountPercent(plan.price, plan.price3Months)}%
                               </p>
@@ -927,10 +931,10 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
               {getCmsField(cmsPage, 'schoolbit-cta', 'description', isRTL, st.finalCta.description)}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-2xl shadow-[#FF7A1A]/20">
+              <Button asChild className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#FF7A1A]/20 transform transition-transform hover:scale-105">
                 <a href={getCmsField(cmsPage, 'schoolbit-cta', 'button_url', isRTL, st.finalCta.ctaUrl)}>{getCmsField(cmsPage, 'schoolbit-cta', 'button_text', isRTL, st.finalCta.cta)}</a>
               </Button>
-              <Button asChild variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 h-14 px-10 text-lg font-bold rounded-2xl">
+              <Button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#021E4A] h-14 px-10 text-lg font-bold rounded-2xl [&>a]:text-white [&>a]:hover:text-[#021E4A]">
                 <a href={getCmsField(cmsPage, 'schoolbit-cta', 'secondary_url', isRTL, st.finalCta.secondaryUrl)}>{getCmsField(cmsPage, 'schoolbit-cta', 'secondary_text', isRTL, st.finalCta.secondary)}</a>
               </Button>
             </div>

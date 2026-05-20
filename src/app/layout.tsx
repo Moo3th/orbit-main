@@ -94,7 +94,7 @@ export default async function RootLayout({
   const hasClarity = Boolean(clarityProjectIdFromSettings);
 
   return (
-    <html lang="ar" className={`scroll-smooth overflow-x-hidden ${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
+    <html lang="ar" className={`scroll-smooth ${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
       <head>
         {gscVerification && (
           <meta name="google-site-verification" content={gscVerification} />
@@ -102,7 +102,7 @@ export default async function RootLayout({
         <OrganizationJsonLd data={organizationJsonLd} />
         <WebsiteJsonLd data={websiteJsonLd} />
       </head>
-      <body className="antialiased transition-colors duration-300 overflow-x-hidden" style={{ width: '100%', maxWidth: '100vw' }} suppressHydrationWarning>
+      <body className="antialiased transition-colors duration-300" style={{ width: '100%', maxWidth: '100vw' }} suppressHydrationWarning>
         {analyticsEnabled && hasGtm ? <GoogleTagManager gtmId={gtmIdFromSettings} /> : null}
         {analyticsEnabled && hasPixel ? (
           <MetaPixel pixelId={facebookPixelIdFromSettings} />

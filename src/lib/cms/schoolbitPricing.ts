@@ -14,19 +14,16 @@ export interface SchoolBitPlan {
 
 export function getDiscountPercent(monthlyPrice: number, yearlyPrice: number): number {
   if (monthlyPrice <= 0) return 0;
-  const yearlyNoDiscount = monthlyPrice * 12;
-  return Math.round(((yearlyNoDiscount - yearlyPrice) / yearlyNoDiscount) * 100);
+  return Math.round(((monthlyPrice - yearlyPrice) / monthlyPrice) * 100);
 }
 
 export function get3MonthDiscountPercent(monthlyPrice: number, price3Months: number): number {
   if (monthlyPrice <= 0) return 0;
-  const full3Months = monthlyPrice * 3;
-  if (full3Months <= 0) return 0;
-  return Math.round(((full3Months - price3Months) / full3Months) * 100);
+  return Math.round(((monthlyPrice - price3Months) / monthlyPrice) * 100);
 }
 
-export function get3MonthTotal(price3Months: number): number {
-  return price3Months;
+export function get3MonthTotal(monthlyPrice: number, price3Months: number): number {
+  return price3Months * 3;
 }
 
 export function getYearlyTotal(monthlyPrice: number, yearlyPrice: number): number {
@@ -129,7 +126,7 @@ export function getDefaultSchoolBitPlans(isRTL: boolean): SchoolBitPlan[] {
       name: 'الاحترافي',
       nameEn: 'Professional',
       price: 299,
-      price3Months: 799,
+      price3Months: 266,
       priceYearly: 239,
       description: 'للمدارس التي تريد إدارة متكاملة وذكية',
       descriptionEn: 'For schools seeking complete and smart management',

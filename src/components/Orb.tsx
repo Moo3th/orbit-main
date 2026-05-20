@@ -15,12 +15,19 @@ export default function Orb({
 }) {
   const ctnDom = useRef<HTMLDivElement>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [isLowEndMobile, setIsLowEndMobile] = useState(false);
 
-  // CRITICAL: Detect iOS immediately to prevent crashes
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
-              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+      const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      setIsIOS(isIOSDevice);
+      
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isLowDPR = (window.devicePixelRatio || 1) > 1.5;
+      const isLowMemory = !(navigator as any).deviceMemory || (navigator as any).deviceMemory < 4;
+      const hasFewCores = !(navigator as any).hardwareConcurrency || (navigator as any).hardwareConcurrency <= 4;
+      setIsLowEndMobile(isAndroid && (isLowDPR || isLowMemory || hasFewCores));
     }
   }, []);
 
@@ -188,8 +195,8 @@ export default function Orb({
   `;
 
   useEffect(() => {
-    // CRITICAL: Completely disable WebGL on iOS - causes Safari crashes
     if (isIOS) return;
+    if (isLowEndMobile) return;
     
     const container = ctnDom.current;
     if (!container) return;
@@ -219,10 +226,10 @@ export default function Orb({
 
     function resize() {
       if (!container) return;
-      const dpr = window.devicePixelRatio || 1;
+      const maxDPR = isLowEndMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       const width = container.clientWidth;
       const height = container.clientHeight;
-      renderer.setSize(width * dpr, height * dpr);
+      renderer.setSize(width * maxDPR, height * maxDPR);
       gl.canvas.style.width = width + 'px';
       gl.canvas.style.height = height + 'px';
       program.uniforms.iResolution.value.set(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height);
@@ -337,10 +344,9 @@ export default function Orb({
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, isIOS]);
+  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, isIOS, isLowEndMobile]);
 
-  // CRITICAL: Show simple gradient on iOS to prevent crashes
-  if (isIOS) {
+  if (isIOS || isLowEndMobile) {
     return (
       <div
         className="orb-container"

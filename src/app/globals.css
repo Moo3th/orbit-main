@@ -86,7 +86,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
   font-weight: 400;
   letter-spacing: -0.01em;
-  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
   /* iOS Safari smooth scrolling */
@@ -206,8 +205,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Mobile optimizations for smooth scrolling - iOS & Android */
 @media (max-width: 768px) {
-  /* Disable will-change on mobile to prevent glitches */
-  * {
+  /* Disable will-change on non-essential elements to prevent glitches */
+  div:not(.gpu-accelerated):not(.orb-container):not(.light-rays-container) {
     will-change: auto !important;
   }
   
@@ -237,7 +236,6 @@ h1, h2, h3, h4, h5, h6 {
   .gpu-accelerated {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    will-change: auto !important;
   }
   
   /* Prevent layout shifts */
@@ -246,7 +244,7 @@ h1, h2, h3, h4, h5, h6 {
     height: auto;
   }
   
-  /* Disable framer-motion animations on mobile for smooth scrolling */
+  /* Reduce framer-motion complexity on mobile */
   [data-framer-component] {
     will-change: auto !important;
   }

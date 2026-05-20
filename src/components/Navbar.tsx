@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import ThemeToggle from './ThemeToggle';
 import { encodeImagePath } from '@/utils/imagePath';
 
 // Nav items visibility - set true to re-enable
@@ -83,14 +82,8 @@ export default function Navbar() {
     };
   }, []);
 
-  // Lock body scroll when mobile menu is open
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    setIsOpen(prev => !prev);
   };
 
   // Close solutions dropdown when clicking outside
@@ -104,12 +97,7 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
+
 
   // Navigation items - ordered from right to left: الرئيسية - من نحن - حلولنا - الاخبار - العروض
   // Note: Items are rendered individually in the nav for proper ordering
@@ -123,9 +111,7 @@ export default function Navbar() {
   const isLandingPage = pathname === '/';
   const isWhatsAppPage = pathname === '/products/whatsapp';
 
-  // Routes where the dark theme button should be hidden
-  const hideThemeToggleRoutes = ['/', '/products/sms', '/products/whatsapp', '/products/o-time', '/products/gov-gate'];
-  const showThemeToggle = !hideThemeToggleRoutes.includes(pathname || '');
+
 
   // Navbar background opacity based on page
   const navbarBgOpacity = navbarIsDark
@@ -277,12 +263,11 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* Controls: Language Switcher, Theme Toggle, and Contact Button - Desktop only */}
+          {/* Controls: Language Switcher and Contact Button - Desktop only */}
           <div className={`hidden md:flex items-center gap-3 flex-shrink-0 min-w-0 order-3`}>
-            {/* Language & Theme Controls */}
+            {/* Language Controls */}
             <div className={`flex items-center rounded-full ${navbarIsDark ? 'bg-white/5 border border-white/10' : 'bg-secondary/40 border border-secondary/50'} p-1.5 backdrop-blur-md gap-1 shadow-sm flex-shrink-0`}>
               <LanguageSwitcher />
-              {showThemeToggle && <ThemeToggle />}
             </div>
 
             {/* Contact Button */}
@@ -380,7 +365,6 @@ export default function Navbar() {
             t={t}
             pathname={pathname}
             router={router}
-            showThemeToggle={showThemeToggle}
           />
         )}
       </AnimatePresence>
@@ -493,10 +477,9 @@ interface MobileMenuProps {
   pathname: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   router: any;
-  showThemeToggle: boolean;
 }
 
-function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorClass, needsHighContrast, t, pathname, router, showThemeToggle }: MobileMenuProps) {
+function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorClass, needsHighContrast, t, pathname, router }: MobileMenuProps) {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
 
   return (
@@ -533,11 +516,6 @@ function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorCl
               <div className={`p-1.5 rounded-lg ${navbarIsDark ? 'bg-black/50' : 'bg-white'}`}>
                 <LanguageSwitcher />
               </div>
-              {showThemeToggle && (
-                <div className={`p-1.5 rounded-lg ${navbarIsDark ? 'bg-black/50' : 'bg-white'}`}>
-                  <ThemeToggle />
-                </div>
-              )}
             </div>
           </div>
 
@@ -658,7 +636,6 @@ function MobileNavLink({ item, isRTL, navbarIsDark, textColorClass, setIsOpen }:
         href={item.href}
         onClick={(e) => {
           e.preventDefault();
-          document.body.style.overflow = 'unset';
           setIsOpen(false);
           const id = item.href.replace('#', '');
           setTimeout(() => {
@@ -691,7 +668,6 @@ function MobileNavLink({ item, isRTL, navbarIsDark, textColorClass, setIsOpen }:
     <Link
       href={item.href}
       onClick={() => {
-        document.body.style.overflow = 'unset';
         setIsOpen(false);
       }}
       className={`group flex items-center justify-between px-4 py-4 rounded-xl transition-all duration-300 ${navbarIsDark ? 'hover:bg-white/5 text-gray-100' : 'hover:bg-gray-100 text-gray-800'} ${isRTL ? 'font-ibm-plex-arabic' : 'font-heading'}`}
