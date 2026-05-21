@@ -497,6 +497,265 @@ const getSectionTheme = (sectionId: string) => {
   return { color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-l-gray-400', icon: FileText as typeof Globe };
 };
 
+const SPACING_PRESETS = [
+  { label: 'عادي', labelEn: 'Normal', value: 'py-16 md:py-20' },
+  { label: 'كبير', labelEn: 'Large', value: 'py-20 md:py-24' },
+  { label: 'ممتد', labelEn: 'Extra Large', value: 'py-24 md:py-32' },
+  { label: 'صغير', labelEn: 'Compact', value: 'py-10 md:py-14' },
+  { label: 'هيرو', labelEn: 'Hero', value: 'pt-24 pb-16 md:pt-32 md:pb-24' },
+  { label: 'مخصص', labelEn: 'Custom', value: '' },
+];
+
+const SectionSpacingEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  const matchingPreset = SPACING_PRESETS.find(p => p.value && value === p.value);
+  const [isCustom, setIsCustom] = useState(!matchingPreset);
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+    const match = SPACING_PRESETS.find(p => p.value && value === p.value);
+    setIsCustom(!match);
+  }, [value]);
+
+  const handlePreset = (presetValue: string) => {
+    if (presetValue === '') {
+      setIsCustom(true);
+    } else {
+      setIsCustom(false);
+      setLocalValue(presetValue);
+      onChange(presetValue);
+    }
+  };
+
+  const handleCustomChange = (val: string) => {
+    setLocalValue(val);
+    onChange(val);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {SPACING_PRESETS.map((preset) => (
+          <button
+            key={preset.value}
+            onClick={() => handlePreset(preset.value)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              (preset.value === '' && isCustom) || (preset.value && value === preset.value)
+                ? 'bg-[#104E8B] text-white shadow-sm'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {isAr ? preset.label : preset.labelEn}
+          </button>
+        ))}
+      </div>
+      {isCustom && (
+        <div className="space-y-1.5">
+          <label className="text-[10px] text-gray-400 block">{isAr ? 'فئات Tailwind مخصصة (مثل: py-20 md:py-24)' : 'Custom Tailwind classes (e.g. py-20 md:py-24)'}</label>
+          <input
+            type="text"
+            value={localValue}
+            onChange={(e) => handleCustomChange(e.target.value)}
+            className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all font-mono"
+            dir="ltr"
+            placeholder="py-20 md:py-24"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const COL_PRESETS = [
+  { label: '1', value: 1 },
+  { label: '2', value: 2 },
+  { label: '3', value: 3 },
+  { label: '4', value: 4 },
+];
+
+const SectionDisplayEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  const [cols, setCols] = useState<{ mobile: number; tablet: number; desktop: number }>({ mobile: 1, tablet: 2, desktop: 3 });
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed.columns) {
+        setCols(parsed.columns);
+      }
+    } catch {
+      // use defaults
+    }
+  }, [value]);
+
+  const update = (key: 'mobile' | 'tablet' | 'desktop', val: number) => {
+    const next = { ...cols, [key]: val };
+    setCols(next);
+    onChange(JSON.stringify({ columns: next }));
+  };
+
+  const devices: { key: 'mobile' | 'tablet' | 'desktop'; label: string; labelEn: string }[] = [
+    { key: 'mobile', label: 'جوال', labelEn: 'Mobile' },
+    { key: 'tablet', label: 'تابلت', labelEn: 'Tablet' },
+    { key: 'desktop', label: 'سطح المكتب', labelEn: 'Desktop' },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {devices.map(({ key, label, labelEn }) => (
+        <div key={key} className="space-y-1.5">
+          <label className="text-[10px] text-gray-400 font-medium block">{isAr ? label : labelEn}</label>
+          <div className="flex gap-1">
+            {COL_PRESETS.map((preset) => (
+              <button
+                key={preset.value}
+                onClick={() => update(key, preset.value)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  cols[key] === preset.value
+                    ? 'bg-[#104E8B] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MARGIN_PRESETS = [
+  { label: 'بدون', labelEn: 'None', value: '' },
+  { label: 'صغير', labelEn: 'Small', value: 'mt-4' },
+  { label: 'متوسط', labelEn: 'Medium', value: 'mt-8' },
+  { label: 'كبير', labelEn: 'Large', value: 'mt-12' },
+  { label: 'كبير جداً', labelEn: 'Extra Large', value: 'mt-16' },
+  { label: 'مخصص', labelEn: 'Custom', value: '__custom__' },
+];
+
+const MARGIN_DIR_LABELS = {
+  before: { label: 'هامش أعلى القسم (Margin Before)', labelEn: 'Margin Before Section' },
+  after: { label: 'هامش أسفل القسم (Margin After)', labelEn: 'Margin After Section' },
+};
+
+const SectionMarginEditor = ({ value, onChange, isAr, direction }: { value: string; onChange: (value: string) => void; isAr: boolean; direction: 'before' | 'after' }) => {
+  const matchingPreset = MARGIN_PRESETS.find(p => p.value !== '__custom__' && p.value === value) || (value && !MARGIN_PRESETS.find(p => p.value === value) ? MARGIN_PRESETS[MARGIN_PRESETS.length - 1] : null);
+  const isCustom = value !== '' && !MARGIN_PRESETS.find(p => p.value !== '__custom__' && p.value === value);
+  const [isCustomMode, setIsCustomMode] = useState(isCustom);
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+    const match = MARGIN_PRESETS.find(p => p.value !== '__custom__' && p.value === value);
+    setIsCustomMode(value !== '' && !match);
+  }, [value]);
+
+  const dirLabel = MARGIN_DIR_LABELS[direction];
+  const handlePreset = (presetValue: string) => {
+    if (presetValue === '__custom__') {
+      setIsCustomMode(true);
+    } else {
+      setIsCustomMode(false);
+      setLocalValue(presetValue);
+      onChange(presetValue);
+    }
+  };
+
+  const handleCustomChange = (val: string) => {
+    setLocalValue(val);
+    onChange(val);
+  };
+
+  const isNoneSelected = value === '';
+
+  return (
+    <div className="space-y-2.5">
+      <label className="text-xs font-medium text-gray-600 block">{isAr ? dirLabel.label : dirLabel.labelEn}</label>
+      <div className="flex flex-wrap gap-1.5">
+        {MARGIN_PRESETS.map((preset) => {
+          const isActive = preset.value === '__custom__'
+            ? isCustomMode
+            : preset.value === ''
+              ? isNoneSelected
+              : value === preset.value;
+          return (
+            <button
+              key={preset.value}
+              onClick={() => handlePreset(preset.value)}
+              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                isActive
+                  ? 'bg-[#104E8B] text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {isAr ? preset.label : preset.labelEn}
+            </button>
+          );
+        })}
+      </div>
+      {isCustomMode && (
+        <div className="space-y-1.5">
+          <div className="flex gap-2">
+            {direction === 'before' ? (
+              <>
+                <div className="flex-1">
+                  <label className="text-[10px] text-gray-400 block mb-0.5">{isAr ? 'جوال' : 'Mobile'}</label>
+                  <input
+                    type="text"
+                    value={localValue}
+                    onChange={(e) => handleCustomChange(e.target.value)}
+                    className="w-full h-8 border border-gray-200 rounded-lg px-2.5 text-[11px] bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all font-mono"
+                    dir="ltr"
+                    placeholder="mt-8"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[10px] text-gray-400 block mb-0.5">{isAr ? 'تابلت +' : 'Tablet+'}</label>
+                  <input
+                    type="text"
+                    value={localValue}
+                    onChange={(e) => handleCustomChange(e.target.value)}
+                    className="w-full h-8 border border-gray-200 rounded-lg px-2.5 text-[11px] bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all font-mono"
+                    dir="ltr"
+                    placeholder="md:mt-12"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex-1">
+                  <label className="text-[10px] text-gray-400 block mb-0.5">{isAr ? 'جوال' : 'Mobile'}</label>
+                  <input
+                    type="text"
+                    value={localValue}
+                    onChange={(e) => handleCustomChange(e.target.value)}
+                    className="w-full h-8 border border-gray-200 rounded-lg px-2.5 text-[11px] bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all font-mono"
+                    dir="ltr"
+                    placeholder="mb-8"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[10px] text-gray-400 block mb-0.5">{isAr ? 'تابلت +' : 'Tablet+'}</label>
+                  <input
+                    type="text"
+                    value={localValue}
+                    onChange={(e) => handleCustomChange(e.target.value)}
+                    className="w-full h-8 border border-gray-200 rounded-lg px-2.5 text-[11px] bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all font-mono"
+                    dir="ltr"
+                    placeholder="md:mb-12"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <p className="text-[10px] text-gray-400">{isAr ? 'فئات Tailwind مثل: mt-8 md:mt-12 أو mb-8 md:mb-12' : 'Tailwind classes e.g. mt-8 md:mt-12 or mb-8 md:mb-12'}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string; sectionId: string }) => {
   let items: any[] = [];
   try {
@@ -506,6 +765,7 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
   }
 
   const commit = (next: any[]) => onChange(JSON.stringify(next));
+  const [langTab, setLangTab] = useState<"ar" | "en">("ar");
 
   const updateItem = (index: number, patch: any) => {
     const next = [...items];
@@ -516,50 +776,108 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
   const addItem = () => commit([...items, { titleAr: "", titleEn: "", descAr: "", descEn: "", listAr: "", listEn: "", icon: "", image: "" }]);
   const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
 
+  const moveItem = (index: number, direction: "up" | "down") => {
+    const next = [...items];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= next.length) return;
+    [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+    commit(next);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <label className="text-xs text-gray-500 font-medium">{isAr ? "إدارة العناصر" : "Manage Items"}</label>
-        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
-          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة عنصر" : "Add Item"}
-        </Button>
-      </div>
-      <div className="space-y-4">
-        {items.map((item, idx) => (
-          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-4 relative shadow-sm hover:border-gray-200 transition-all">
-            <button onClick={() => removeItem(idx)} className="absolute top-2.5 left-2.5 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
-              <Plus className="w-3.5 h-3.5 rotate-45" />
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+            <button
+              onClick={() => setLangTab("ar")}
+              className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-all ${langTab === "ar" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              عربي
             </button>
+            <button
+              onClick={() => setLangTab("en")}
+              className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-all ${langTab === "en" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              EN
+            </button>
+          </div>
+          <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
+            <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة عنصر" : "Add Item"}
+          </Button>
+        </div>
+      </div>
+      <div className="space-y-3">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">
+                #{idx + 1}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => moveItem(idx, "up")}
+                  disabled={idx === 0}
+                  className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title={isAr ? "نقل للأعلى" : "Move up"}
+                >
+                  <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                </button>
+                <button
+                  onClick={() => moveItem(idx, "down")}
+                  disabled={idx === items.length - 1}
+                  className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title={isAr ? "نقل للأسفل" : "Move down"}
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => removeItem(idx)} className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title={isAr ? "حذف" : "Remove"}>
+                  <Plus className="w-3.5 h-3.5 rotate-45" />
+                </button>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-2">
+              {langTab === "ar" ? (
+                <div className="space-y-3">
                   <div>
-                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان (عربي)" : "Title (AR)"}</label>
-                    <input type="text" value={item.titleAr} onChange={e => updateItem(idx, { titleAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "العنوان" : "Title"} (AR)</label>
+                    <input type="text" value={item.titleAr || ""} onChange={e => updateItem(idx, { titleAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" />
                   </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف" : "Description"} (AR)</label>
+                    <textarea value={item.descAr || ""} onChange={e => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" />
+                  </div>
+                  {item.listAr !== undefined && (
+                    <div>
+                      <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نقاط فرعية" : "Sub-items"} (AR)</label>
+                      <input type="text" value={item.listAr || ""} onChange={e => updateItem(idx, { listAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" placeholder="ميزة 1, ميزة 2" />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
                   <div>
                     <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
-                    <input type="text" value={item.titleEn} onChange={e => updateItem(idx, { titleEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
+                    <input type="text" value={item.titleEn || ""} onChange={e => updateItem(idx, { titleEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
                   </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
+                    <textarea value={item.descEn || ""} onChange={e => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" dir="ltr" />
+                  </div>
+                  {item.listEn !== undefined && (
+                    <div>
+                      <label className="text-[10px] text-gray-400 block mb-1">Sub-items (EN)</label>
+                      <input type="text" value={item.listEn || ""} onChange={e => updateItem(idx, { listEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" placeholder="feature 1, feature 2" />
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الوصف (عربي)" : "Description (AR)"}</label>
-                  <textarea value={item.descAr} onChange={e => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none" />
-                </div>
-                <div>
-                  <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
-                  <textarea value={item.descEn} onChange={e => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all dir-ltr resize-none" dir="ltr" />
-                </div>
-                <div>
-                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "نقاط فرعية (مفصولة بفاصلة)" : "Sub-items (comma separated)"}</label>
-                  <input type="text" value={item.listAr || ""} onChange={e => updateItem(idx, { listAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" placeholder="ميزة 1, ميزة 2" />
-                </div>
-              </div>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-400 block">{isAr ? "الأيقونة" : "Icon"}</label>
                   <ImageUploader
-                    value={item.icon}
+                    value={item.icon || ""}
                     onChange={(url) => updateItem(idx, { icon: url })}
                     folder={`pages/${pageId}/${sectionId}`}
                     isAr={isAr}
@@ -569,7 +887,7 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-400 block">{isAr ? "الصورة" : "Image"}</label>
                   <ImageUploader
-                    value={item.image}
+                    value={item.image || ""}
                     onChange={(url) => updateItem(idx, { image: url })}
                     folder={`pages/${pageId}/${sectionId}`}
                     isAr={isAr}
@@ -687,6 +1005,8 @@ const SchoolBitPlansListEditor = ({ value, onChange, isAr }: { value: string; on
       features: [],
       featuresEn: [],
       isCustom: false,
+      ctaUrl: 'https://schoolbit.corbit.sa/',
+      ctaUrlEn: 'https://schoolbit.corbit.sa/',
     }]));
   };
 
@@ -739,6 +1059,16 @@ const SchoolBitPlansListEditor = ({ value, onChange, isAr }: { value: string; on
               </div>
             </div>
           )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-gray-400">{isAr ? "رابط الزر (عربي)" : "Button URL (AR)"}</label>
+              <input type="url" value={plan.ctaUrl || ''} onChange={(e) => updatePlan(pi, { ctaUrl: e.target.value })} placeholder={isAr ? "/contact أو https://..." : "/contact or https://..."} className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" dir="ltr" />
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-400">{isAr ? "رابط الزر (إنجليزي)" : "Button URL (EN)"}</label>
+              <input type="url" value={plan.ctaUrlEn || ''} onChange={(e) => updatePlan(pi, { ctaUrlEn: e.target.value })} placeholder="https://... or /contact" className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm" dir="ltr" />
+            </div>
+          </div>
           <div className="space-y-2">
             <span className="text-[10px] text-gray-400 font-medium">{isAr ? "المميزات" : "Features"}</span>
             {(isAr ? plan.features : plan.featuresEn).map((f, fi) => (
@@ -1166,6 +1496,41 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           onChange={(v) => handleFieldChange(sectionId, field.key, v)}
           isAr={isAr}
           pageId={page.id}
+        />
+      );
+    }
+
+    if (field.type === 'spacing') {
+      return (
+        <SectionSpacingEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
+
+    if (field.type === 'display') {
+      return (
+        <SectionDisplayEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
+
+    if (field.type === 'margin') {
+      const direction = field.key === 'margin_before' ? 'before' : 'after';
+      return (
+        <SectionMarginEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+          direction={direction}
         />
       );
     }

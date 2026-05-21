@@ -10,6 +10,8 @@ export interface SchoolBitPlan {
   features: string[];
   featuresEn: string[];
   isCustom: boolean;
+  ctaUrl?: string;
+  ctaUrlEn?: string;
 }
 
 export function getDiscountPercent(monthlyPrice: number, yearlyPrice: number): number {
@@ -85,6 +87,8 @@ export function parseSchoolBitPlans(raw: string, fallback: SchoolBitPlan[]): Sch
       features: Array.isArray(plan.features) ? plan.features.map(String) : [],
       featuresEn: Array.isArray(plan.featuresEn) ? plan.featuresEn.map(String) : Array.isArray(plan.features) ? plan.features.map(String) : [],
       isCustom: Boolean(plan.isCustom),
+      ctaUrl: String(plan.ctaUrl || ''),
+      ctaUrlEn: String(plan.ctaUrlEn || plan.ctaUrl || ''),
     }));
   } catch {
     return fallback;
@@ -121,6 +125,8 @@ export function getDefaultSchoolBitPlans(isRTL: boolean): SchoolBitPlan[] {
         'SMS messaging',
         'Simple reports',
       ],
+      ctaUrl: 'https://schoolbit.corbit.sa/',
+      ctaUrlEn: 'https://schoolbit.corbit.sa/',
     },
     {
       name: 'الاحترافي',
@@ -152,6 +158,8 @@ export function getDefaultSchoolBitPlans(isRTL: boolean): SchoolBitPlan[] {
         'Smart alerts',
         'Dedicated support',
       ],
+      ctaUrl: 'https://schoolbit.corbit.sa/',
+      ctaUrlEn: 'https://schoolbit.corbit.sa/',
     },
     {
       name: 'المؤسسي',
@@ -183,6 +191,8 @@ export function getDefaultSchoolBitPlans(isRTL: boolean): SchoolBitPlan[] {
         'Full training & onboarding',
         'Guaranteed SLA',
       ],
+      ctaUrl: '/contact',
+      ctaUrlEn: '/contact',
     },
   ];
 }

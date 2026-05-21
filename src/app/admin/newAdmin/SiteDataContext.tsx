@@ -126,7 +126,7 @@ export interface SectionField {
   key: string;
   label: string;
   labelEn: string;
-  type: "text" | "textarea" | "url" | "list" | "select" | "image";
+  type: "text" | "textarea" | "url" | "list" | "select" | "image" | "spacing" | "display" | "margin";
   value: string;
   valueEn?: string;
   options?: { value: string; label: string; labelEn: string }[];
@@ -726,6 +726,9 @@ const schoolbitHeroFields: SectionField[] = [
   { key: "chip_messages", label: "شارة الرسائل", labelEn: "Messages Chip", type: "text", value: "رسائل SMS و WhatsApp", valueEn: "SMS & WhatsApp" },
   { key: "chip_reports", label: "شارة التقارير", labelEn: "Reports Chip", type: "text", value: "تقارير تلقائية", valueEn: "Auto Reports" },
   { key: "hero_image", label: "صورة الهيرو", labelEn: "Hero Image", type: "image", value: "", valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "pt-24 pb-16 md:pt-32 md:pb-24", valueEn: "pt-24 pb-16 md:pt-32 md:pb-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitTrustFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "كل ما تحتاجه المدرسة لتعمل بكفاءة أعلى:", valueEn: "Everything your school needs to run more efficiently:" },
@@ -739,6 +742,9 @@ const schoolbitTrustFields: SectionField[] = [
   { key: "reports_desc", label: "تقارير - الوصف", labelEn: "Reports Desc", type: "text", value: "مؤشرات جاهزة للإدارة", valueEn: "Ready-made indicators" },
   { key: "integrations_label", label: "تكاملات - العنوان", labelEn: "Integrations Label", type: "text", value: "تكاملات", valueEn: "Integrations" },
   { key: "integrations_desc", label: "تكاملات - الوصف", labelEn: "Integrations Desc", type: "text", value: "نور، BioTime، Excel", valueEn: "Noor, BioTime, Excel" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-10 md:py-14", valueEn: "py-10 md:py-14" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitProblemFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "هل ما زالت إدارة المدرسة موزعة بين ملفات ورسائل وأنظمة متفرقة؟", valueEn: "Is your school management still scattered across files, messages, and disconnected systems?" },
@@ -749,6 +755,9 @@ const schoolbitProblemFields: SectionField[] = [
   { key: "p3_title", label: "مشكلة 3 - العنوان", labelEn: "Problem 3 Title", type: "text", value: "تواصل بطيء مع أولياء الأمور", valueEn: "Slow Parent Communication" },
   { key: "p3_desc", label: "مشكلة 3 - الوصف", labelEn: "Problem 3 Desc", type: "textarea", value: "الإشعارات المهمة تتأخر أو تعتمد على اجتهادات فردية.", valueEn: "Important notifications are delayed or rely on individual efforts." },
   { key: "solution_text", label: "نص الحل", labelEn: "Solution Text", type: "textarea", value: "SchoolBit تحول إدارة المدرسة إلى عملية موحدة، سريعة، وذكية.", valueEn: "SchoolBit transforms school management into a unified, fast, and smart operation." },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitBenefitsFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "لماذا SchoolBit؟", valueEn: "Why SchoolBit?" },
@@ -760,6 +769,10 @@ const schoolbitBenefitsFields: SectionField[] = [
     { icon: "Zap", title: "أتمتة تقلل الأخطاء وتوفر الوقت", titleEn: "Automation That Reduces Errors and Saves Time", desc: "توزيع ذكي للجداول، توزيع تلقائي للاختبارات، كشف تعارضات، وتنبيهات ذكية.", descEn: "Smart schedule distribution, automatic exam room assignment, conflict detection, and smart alerts." },
     { icon: "Globe", title: "تكامل مع بيئة المدرسة", titleEn: "Integration with Your School Environment", desc: "ربط مع نظام نور، أجهزة BioTime، ملفات Excel، وWebhooks للتكاملات المستقبلية.", descEn: "Connect with Noor system, BioTime devices, Excel files, and Webhooks for future integrations." },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
+  { key: "display", label: "إعدادات العرض", labelEn: "Display Settings", type: "display", value: '{"columns":{"mobile":1,"tablet":2,"desktop":3}}', valueEn: '{"columns":{"mobile":1,"tablet":2,"desktop":3}}' },
 ];
 const schoolbitRolesFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "كيف تساعد كل إدارة داخل المدرسة؟", valueEn: "How does it help each department in the school?" },
@@ -770,6 +783,10 @@ const schoolbitRolesFields: SectionField[] = [
     { key: "teacher", name: "المعلم", nameEn: "Teacher", icon: "BookOpen", bullets: ["الوصول للطلاب والفصول المرتبطة به", "متابعة الحضور والسلوك", "رفع ملفات الإنجاز", "استقبال التذكيرات والمتطلبات"], bulletsEn: ["Access assigned students and classes", "Track attendance and behavior", "Upload achievement files", "Receive reminders and requirements"] },
     { key: "counselor", name: "المرشد الطلابي", nameEn: "Counselor", icon: "AlertTriangle", bullets: ["رؤية الطلاب في خطر", "تتبع السجل السلوكي", "متابعة الغياب المتكرر", "تنفيذ تدخلات أسرع وأكثر دقة"], bulletsEn: ["See at-risk students", "Track behavioral records", "Monitor frequent absence", "Execute faster, more accurate interventions"] },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
+  { key: "display", label: "إعدادات العرض", labelEn: "Display Settings", type: "display", value: '{"columns":{"mobile":1,"tablet":2,"desktop":3}}', valueEn: '{"columns":{"mobile":1,"tablet":2,"desktop":3}}' },
 ];
 const schoolbitModulesFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "الوحدات الرئيسية", valueEn: "Core Modules" },
@@ -781,6 +798,9 @@ const schoolbitModulesFields: SectionField[] = [
     { key: "schedules", label: "جداول", labelEn: "Schedules", title: "الجداول والاختبارات", titleEn: "Schedules & Exams", subtitle: "تنظيم أكاديمي أقل تعقيدًا وأكثر دقة", subtitleEn: "Less complex, more accurate academic organization", icon: "CalendarDays", bullets: ["توزيع ذكي للحصص", "كشف التعارضات", "إدارة نصاب المعلمين", "توزيع الطلاب على قاعات الاختبارات", "تخطيط المقاعد وأرقام الجلوس"], bulletsEn: ["Smart class distribution", "Conflict detection", "Teacher workload management", "Student exam room distribution", "Seating plan and exam numbers"] },
     { key: "reports", label: "تقارير", labelEn: "Reports", title: "التقارير والتحليلات", titleEn: "Reports & Analytics", subtitle: "قرارات الإدارة تبدأ من بيانات واضحة", subtitleEn: "Administrative decisions start with clear data", icon: "BarChart3", bullets: ["تقارير حضور وتأخر", "تقارير الكادر", "تقارير المخالفات والاستدعاءات", "جدولة أسبوعية وشهرية", "إرسال تلقائي بالبريد", "تصدير PDF و Excel"], bulletsEn: ["Attendance and tardiness reports", "Staff reports", "Violation and summons reports", "Weekly and monthly scheduling", "Automatic email delivery", "PDF & Excel export"] },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitAutomationFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "دع المهام المتكررة تعمل تلقائيًا", valueEn: "Let repetitive tasks work automatically" },
@@ -793,6 +813,9 @@ const schoolbitAutomationFields: SectionField[] = [
     { icon: "ScanLine", title: "مزامنة البصمة", titleEn: "Biometric Sync", desc: "ربط مباشر مع أجهزة BioTime", descEn: "Direct connection with BioTime devices" },
     { icon: "AlertTriangle", title: "تنبيه الطلاب في خطر", titleEn: "At-Risk Student Alert", desc: "إشعار تلقائي عند تجاوز حد الغياب", descEn: "Automatic notification when absence threshold is exceeded" },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitIntegrationsFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "يتكامل مع الأنظمة التي تعتمد عليها المدرسة", valueEn: "Integrates with the systems your school relies on" },
@@ -805,6 +828,9 @@ const schoolbitIntegrationsFields: SectionField[] = [
     { name: "Excel", nameEn: "Excel" },
     { name: "Webhooks", nameEn: "Webhooks" },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitSecurityFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "تحكم دقيق، وأمان أعلى", valueEn: "Precise Control, Higher Security" },
@@ -818,6 +844,9 @@ const schoolbitSecurityFields: SectionField[] = [
     { text: "سجل دخول والأجهزة المتصلة", textEn: "Login log and connected devices" },
     { text: "إنهاء الجلسات من مكان واحد", textEn: "End sessions from one place" },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitPricingFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "باقات تناسب كل مدرسة", valueEn: "Packages for Every School" },
@@ -838,6 +867,9 @@ const schoolbitPricingFields: SectionField[] = [
   { key: "sms_subtitle", label: "عنوان فرعي للرسائل", labelEn: "SMS Plans Subtitle", type: "text", value: "تواصل مع أولياء الأمور بسهولة وفعالية", valueEn: "Communicate with parents easily and effectively" },
   { key: "sms_per_message", label: "نص لكل رسالة", labelEn: "Per Message", type: "text", value: "ر.س/رسالة", valueEn: "SAR/msg" },
   { key: "sms_plans_json", label: "باقات الرسائل", labelEn: "SMS Plans", type: "list", value: JSON.stringify(getDefaultSchoolBitSmsPlans(true)), valueEn: JSON.stringify(getDefaultSchoolBitSmsPlans(false)) },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-24", valueEn: "py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitOutcomesFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "ماذا تكسب المدرسة مع SchoolBit؟", valueEn: "What does the school gain with SchoolBit?" },
@@ -847,6 +879,9 @@ const schoolbitOutcomesFields: SectionField[] = [
     { icon: "Zap", title: "استجابة أسرع", titleEn: "Faster Response", desc: "للغياب والمخالفات", descEn: "To absence and violations" },
     { icon: "MessageCircle", title: "تواصل أفضل", titleEn: "Better Communication", desc: "مع أولياء الأمور", descEn: "With parents" },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitCtaFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "ابدأ بإدارة مدرستك بطريقة أكثر ذكاءً", valueEn: "Start Managing Your School Smarter" },
@@ -857,6 +892,9 @@ const schoolbitCtaFields: SectionField[] = [
   { key: "secondary_url", label: "رابط الزر الثانوي", labelEn: "Secondary Button URL", type: "url", value: "/contact", valueEn: "/contact" },
   { key: "disclaimer", label: "نص إخلاء المسؤولية", labelEn: "Disclaimer", type: "text", value: "لا حاجة لبطاقة ائتمانية — تفعيل فوري", valueEn: "No credit card required — Instant activation" },
   { key: "logo_image", label: "صورة الشعار", labelEn: "Logo Image", type: "image", value: "", valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 const schoolbitFaqFields: SectionField[] = [
   { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "الأسئلة الشائعة", valueEn: "Frequently Asked Questions" },
@@ -867,6 +905,9 @@ const schoolbitFaqFields: SectionField[] = [
     { q: "هل توفر تقارير جاهزة؟", qEn: "Does it provide ready-made reports?", a: "نعم، مع إمكان التصدير والجدولة والإرسال التلقائي.", aEn: "Yes, with the ability to export, schedule, and automatically send them." },
     { q: "هل يوجد تكامل مع نظام نور؟", qEn: "Is there integration with the Noor system?", a: "نعم، المنصة تتضمن مركز تكامل ومزامنة مع نظام نور.", aEn: "Yes, the platform includes an integration and synchronization center with the Noor system." },
   ]), valueEn: "" },
+  { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
+  { key: "margin_before", label: "هامش أعلى القسم", labelEn: "Margin Before Section", type: "margin", value: "", valueEn: "" },
+  { key: "margin_after", label: "هامش أسفل القسم", labelEn: "Margin After Section", type: "margin", value: "", valueEn: "" },
 ];
 
 const ensureSchoolBitFields = (pages: PageData[]): PageData[] => {

@@ -22,6 +22,80 @@ export function getCmsField(
   return value?.trim() ? value : fallback;
 }
 
+export function getCmsSpacing(
+  page: CmsPage | null,
+  sectionId: string,
+  fallback: string
+): string {
+  const raw = getCmsField(page, sectionId, 'spacing', false, '');
+  return raw.trim() || fallback;
+}
+
+export function getCmsMarginBefore(
+  page: CmsPage | null,
+  sectionId: string,
+  fallback: string
+): string {
+  const raw = getCmsField(page, sectionId, 'margin_before', false, '');
+  return raw.trim() || fallback;
+}
+
+export function getCmsMarginAfter(
+  page: CmsPage | null,
+  sectionId: string,
+  fallback: string
+): string {
+  const raw = getCmsField(page, sectionId, 'margin_after', false, '');
+  return raw.trim() || fallback;
+}
+
+export function getCmsDisplayColumns(
+  page: CmsPage | null,
+  sectionId: string,
+  breakpoint: 'mobile' | 'tablet' | 'desktop',
+  fallback: number
+): number {
+  const raw = getCmsField(page, sectionId, 'display', false, '');
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed?.columns?.[breakpoint] ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function getColumnClasses(
+  page: CmsPage | null,
+  sectionId: string,
+  defaults: { mobile?: number; tablet?: number; desktop?: number } = { mobile: 1, tablet: 2, desktop: 3 }
+): string {
+  const mobile = getCmsDisplayColumns(page, sectionId, 'mobile', defaults.mobile ?? 1);
+  const tablet = getCmsDisplayColumns(page, sectionId, 'tablet', defaults.tablet ?? 2);
+  const desktop = getCmsDisplayColumns(page, sectionId, 'desktop', defaults.desktop ?? 3);
+
+  const gridCols: Record<number, string> = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+  };
+  const mdGridCols: Record<number, string> = {
+    1: 'md:grid-cols-1',
+    2: 'md:grid-cols-2',
+    3: 'md:grid-cols-3',
+    4: 'md:grid-cols-4',
+  };
+  const lgGridCols: Record<number, string> = {
+    1: 'lg:grid-cols-1',
+    2: 'lg:grid-cols-2',
+    3: 'lg:grid-cols-3',
+    4: 'lg:grid-cols-4',
+  };
+
+  return `${gridCols[mobile] || 'grid-cols-1'} ${mdGridCols[tablet] || 'md:grid-cols-2'} ${lgGridCols[desktop] || 'lg:grid-cols-3'}`;
+}
+
 export interface PageSeoInput {
   seo?: Record<string, unknown> | null;
   title?: string;
