@@ -30,6 +30,8 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { encodeImagePath } from '@/utils/imagePath';
+import WANavbar from '../components/WANavbar';
+import WAFooter from '../components/WAFooter';
 
 function useCountUp(end: number, duration: number = 2000, trigger: boolean) {
   const [count, setCount] = useState(0);
@@ -211,10 +213,10 @@ const PRICING_PLANS = [
 ];
 
 const API_PRICING = [
-  { typeAr: 'محادثات خدمة العملاء', typeEn: 'Customer Service Conversations', price: 'مجانية', priceEn: 'Free', durationAr: '24 ساعة', durationEn: '24 Hours', descAr: 'الرد على استفسارات العملاء خلال 24 ساعة من آخر رسالة', descEn: 'Reply to customer inquiries within 24 hours of their last message', isFree: true, icon: '💬' },
-  { typeAr: 'رسائل التحقق (OTP)', typeEn: 'Verification Messages (OTP)', price: '0.04', priceEn: '0.04', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'رموز التحقق وتأكيد الهوية للمصادقة الآمنة', descEn: 'Verification codes and identity confirmation for secure authentication', isFree: false, icon: '🔐' },
-  { typeAr: 'محادثات التفعيل', typeEn: 'Activation Conversations', price: '0.08', priceEn: '0.08', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'تأكيد الطلبات، إشعارات الشحن، وتحديثات الحساب', descEn: 'Order confirmations, shipping notices, and account updates', isFree: false, icon: '📦' },
-  { typeAr: 'محادثات التسويق', typeEn: 'Marketing Conversations', price: '0.17', priceEn: '0.17', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'رسائل ترويجية وحملات إعلانية للعملاء', descEn: 'Promotional messages and ad campaigns for customers', isFree: false, icon: '📣' },
+  { typeAr: 'محادثات خدمة العملاء', typeEn: 'Customer Service Conversations', priceAr: 'مجانية', priceEn: 'Free', durationAr: '24 ساعة', durationEn: '24 Hours', descAr: 'الرد على استفسارات العملاء خلال 24 ساعة من آخر رسالة', descEn: 'Reply to customer inquiries within 24 hours of their last message', isFree: true, icon: '💬' },
+  { typeAr: 'رسائل التحقق (OTP)', typeEn: 'Verification Messages (OTP)', priceAr: '0.15', priceEn: '0.15', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رموز التحقق وتأكيد الهوية للمصادقة الآمنة', descEn: 'Verification codes and identity confirmation for secure authentication', isFree: false, icon: '🔐' },
+  { typeAr: 'محادثات التفعيل', typeEn: 'Utility Conversations', priceAr: '0.30', priceEn: '0.30', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'تأكيد الطلبات، إشعارات الشحن، وتحديثات الحساب', descEn: 'Order confirmations, shipping notices, and account updates', isFree: false, icon: '📦' },
+  { typeAr: 'محادثات التسويق', typeEn: 'Marketing Conversations', priceAr: '0.64', priceEn: '0.64', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رسائل ترويجية وحملات إعلانية للعملاء', descEn: 'Promotional messages and ad campaigns for customers', isFree: false, icon: '📣' },
 ];
 
 export default function WADesign3Page() {
@@ -254,32 +256,7 @@ export default function WADesign3Page() {
   return (
     <div style={{ fontFamily }} dir={isRTL ? 'rtl' : 'ltr'} className="bg-slate-950 text-white overflow-x-hidden selection:bg-emerald-500 selection:text-white">
 
-      {/* TOP BAR */}
-      <div className="bg-black/40 backdrop-blur-md text-white text-xs py-2 px-4 md:px-8 flex items-center justify-between flex-wrap gap-2 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>{isRTL ? 'معتمد من هيئة الاتصالات CST' : 'Certified by CST'}</span>
-        </div>
-        <button onClick={() => setIsRTL(!isRTL)} className="text-[10px] font-bold tracking-wider uppercase border border-white/20 rounded px-2 py-1 hover:bg-white/10 transition-colors">
-          {isRTL ? 'EN' : 'عربي'}
-        </button>
-      </div>
-
-      {/* NAVBAR */}
-      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 md:px-10 flex items-center justify-between h-16">
-          <Image src={encodeImagePath('/logo/شعار المدار-01.svg')} alt="Orbit" width={120} height={40} className="h-10 w-auto brightness-0 invert" />
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
-            <a href="#features" className="hover:text-emerald-400 transition-colors">{isRTL ? 'المميزات' : 'Features'}</a>
-            <a href="#pricing" className="hover:text-emerald-400 transition-colors">{isRTL ? 'الأسعار' : 'Pricing'}</a>
-            <a href="#green-tick" className="hover:text-emerald-400 transition-colors">{isRTL ? 'الشارة الخضراء' : 'Green Tick'}</a>
-            <a href="#api-pricing" className="hover:text-emerald-400 transition-colors">{isRTL ? 'تكلفة المحادثات' : 'API Pricing'}</a>
-          </div>
-          <a href="https://app.mobile.net.sa/reg" className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/25">
-            {isRTL ? 'ابدأ الآن' : 'Start Now'}
-          </a>
-        </div>
-      </nav>
+      <WANavbar isRTL={isRTL} setIsRTL={setIsRTL} variant="dark" />
 
       {/* HERO */}
       <section className="relative min-h-[600px] flex items-center overflow-hidden">
@@ -552,13 +529,15 @@ export default function WADesign3Page() {
                     )}
                     <div className={`p-6 ${plan.popular ? 'pt-4' : ''}`}>
                       <h3 className="text-xl md:text-2xl font-extrabold text-white text-center mb-4">{isRTL ? plan.nameAr : plan.nameEn}</h3>
-                      <div className="flex gap-1.5 justify-center mb-4">
-                        {plan.tiers.map((t, ti) => (
-                          <button key={ti} onClick={() => setSelectedTier(prev => ({ ...prev, [plan.id]: ti }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tierIndex === ti ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
-                            {isRTL ? t.nameAr : t.nameEn}
-                          </button>
-                        ))}
-                      </div>
+                      {plan.tiers.length > 1 && (
+                        <div className="flex gap-1.5 justify-center mb-4">
+                          {plan.tiers.map((t, ti) => (
+                            <button key={ti} onClick={() => setSelectedTier(prev => ({ ...prev, [plan.id]: ti }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tierIndex === ti ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
+                              {isRTL ? t.nameAr : t.nameEn}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                       <div className="bg-blue-500/10 backdrop-blur-sm rounded-xl p-3 border border-blue-500/20 mb-4">
                         <div className="flex items-center justify-center gap-1.5 text-[10px] md:text-xs font-bold text-blue-300 mb-2">
                           <BarChart3 className="w-3.5 h-3.5" />
@@ -631,7 +610,8 @@ export default function WADesign3Page() {
                     <div className="text-2xl font-extrabold text-emerald-400 mb-1">{isRTL ? 'مجانية' : 'Free'}</div>
                   ) : (
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-2xl font-extrabold text-white">${item.price}</span>
+                      <span className="text-2xl font-extrabold text-white">{isRTL ? item.priceAr : item.priceEn}</span>
+                      <span className="text-emerald-400 text-xs font-bold">{isRTL ? item.unitAr : item.unitEn}</span>
                       <span className="text-slate-400 text-xs">{isRTL ? item.durationAr : item.durationEn}</span>
                     </div>
                   )}
@@ -649,6 +629,7 @@ export default function WADesign3Page() {
                 <div>
                   <h4 className="font-bold text-white mb-1">💡 {isRTL ? 'نصيحة احترافية' : 'Pro Tip'}</h4>
                   <p className="text-slate-300 text-sm">{isRTL ? 'محادثات خدمة العملاء مجانية تماماً خلال 24 ساعة من آخر رسالة! استفد من هذه الميزة للرد على استفسارات عملائك دون أي تكلفة إضافية.' : 'Customer service conversations are completely free within 24 hours of the last message. Use this to answer customer questions with no extra cost.'}</p>
+                  <p className="text-slate-500 text-xs mt-2">{isRTL ? '* الأسعار قابلة للتغيير من Meta (واتساب) وقد تختلف حسب المنطقة والعملة.' : '* Prices are subject to change by Meta (WhatsApp) and may vary by region and currency.'}</p>
                 </div>
               </div>
             </div>
@@ -802,6 +783,8 @@ export default function WADesign3Page() {
           </div>
         </div>
       </section>
+
+      <WAFooter isRTL={isRTL} variant="dark" />
 
       <style jsx>{`
         @keyframes marquee {

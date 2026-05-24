@@ -33,6 +33,8 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { encodeImagePath } from '@/utils/imagePath';
+import WANavbar from '../components/WANavbar';
+import WAFooter from '../components/WAFooter';
 
 function useCountUp(end: number, duration: number = 2000, trigger: boolean) {
   const [count, setCount] = useState(0);
@@ -114,12 +116,63 @@ const PARTNER_LOGOS = [
 const MARQUEE_ROW1 = PARTNER_LOGOS.slice(0, 12);
 const MARQUEE_ROW2 = PARTNER_LOGOS.slice(12);
 
-const NOTIFICATIONS = [
-  { title: 'أحمد - قسم المبيعات', subtitle: 'مرحباً! كيف يمكنني مساعدتك اليوم؟' },
-  { title: 'طلب واتساب API', subtitle: 'أريد الاستفسار عن باقات واتساب API' },
-  { title: 'بوت آلي 🤖', subtitle: 'بالتأكيد! لدينا 3 باقات رئيسية تبدأ من 399 ر.س شهرياً...' },
-  { title: 'محمد من المبيعات 👤', subtitle: 'مرحباً! معك محمد من فريق المبيعات - المدار 👋' },
-];
+type ChatMsg =
+  | { id: number; type: 'bot'; textAr: string; textEn: string; delay: number }
+  | { id: number; type: 'quick_replies'; optionsAr: string[]; optionsEn: string[]; delay: number }
+  | { id: number; type: 'user'; textAr: string; textEn: string };
+
+type ChatNode = {
+  messages: ChatMsg[];
+  children?: Record<string, ChatNode>;
+};
+
+const CHAT_TREE: ChatNode = {
+  messages: [
+    { id: 1, type: 'bot', textAr: 'مرحباً بك! 👋 أنا بوت المدار، مساعدك الذكي لخدمات واتساب أعمال', textEn: "Hello! 👋 I'm Orbit Bot, your smart assistant for WhatsApp Business services", delay: 0 },
+    { id: 2, type: 'bot', textAr: 'كيف يمكنني مساعدتك اليوم؟', textEn: 'How can I help you today?', delay: 1800 },
+    { id: 3, type: 'quick_replies', optionsAr: ['الباقات والأسعار', 'تحدث مع المبيعات', 'استفسار عام'], optionsEn: ['Packages & Pricing', 'Talk to Sales', 'General Inquiry'], delay: 3200 },
+  ],
+  children: {
+    'الباقات والأسعار': {
+      messages: [
+        { id: 100, type: 'user', textAr: 'الباقات والأسعار', textEn: 'Packages & Pricing' },
+        { id: 101, type: 'bot', textAr: 'بالتأكيد! لدينا 3 باقات رئيسية 📋', textEn: 'Of course! We have 3 main packages 📋', delay: 1200 },
+        { id: 102, type: 'bot', textAr: '🟢 الأساسية: 399 ر.س\n🔵 النمو: 659 ر.س\n🟣 الاحترافية: 999 ر.س', textEn: '🟢 Basic: 399 SAR\n🔵 Growth: 659 SAR\n🟣 Professional: 999 SAR', delay: 2800 },
+        { id: 103, type: 'bot', textAr: 'هل تريد التحدث مع فريق المبيعات للحصول على عرض مخصص؟ 😊', textEn: 'Would you like to talk to our sales team for a custom offer? 😊', delay: 4500 },
+        { id: 104, type: 'quick_replies', optionsAr: ['نعم، أريد عرض مخصص', 'لا، شكراً'], optionsEn: ['Yes, custom offer', 'No, thanks'], delay: 5800 },
+      ],
+      children: {
+        'نعم، أريد عرض مخصص': {
+          messages: [
+            { id: 200, type: 'user', textAr: 'نعم، أريد عرض مخصص', textEn: 'Yes, custom offer' },
+            { id: 201, type: 'bot', textAr: 'رائع! 🎉 سيتواصل معك فريق المبيعات خلال دقائق لتحضير عرض مخصص يناسب احتياجاتك', textEn: 'Great! 🎉 Our sales team will contact you within minutes to prepare a custom offer', delay: 1500 },
+            { id: 202, type: 'bot', textAr: 'يمكنك أيضاً التواصل مباشرة عبر واتساب: wa.me/966920006900 📱', textEn: 'You can also reach us directly on WhatsApp: wa.me/966920006900 📱', delay: 3500 },
+          ],
+        },
+        'لا، شكراً': {
+          messages: [
+            { id: 210, type: 'user', textAr: 'لا، شكراً', textEn: 'No, thanks' },
+            { id: 211, type: 'bot', textAr: 'لا مشكلة! 😊 إذا احتجت أي مساعدة مستقبلاً، أنا هنا دائماً', textEn: 'No problem! 😊 If you need any help in the future, I\'m always here', delay: 1500 },
+          ],
+        },
+      },
+    },
+    'تحدث مع المبيعات': {
+      messages: [
+        { id: 110, type: 'user', textAr: 'تحدث مع المبيعات', textEn: 'Talk to Sales' },
+        { id: 111, type: 'bot', textAr: 'جاري تحويلك لفريق المبيعات... 🔄', textEn: 'Transferring you to our sales team... 🔄', delay: 1200 },
+        { id: 112, type: 'bot', textAr: 'مرحباً! 👋 معك محمد من فريق المبيعات. كيف يمكنني مساعدتك؟', textEn: 'Hello! 👋 This is Mohammed from sales. How can I help you?', delay: 3500 },
+      ],
+    },
+    'استفسار عام': {
+      messages: [
+        { id: 120, type: 'user', textAr: 'استفسار عام', textEn: 'General Inquiry' },
+        { id: 121, type: 'bot', textAr: 'بالطبع! يمكنك سؤالي عن أي شيء يتعلق بخدمات واتساب أعمال 📱', textEn: 'Of course! You can ask me anything about WhatsApp Business services 📱', delay: 1200 },
+        { id: 122, type: 'bot', textAr: 'أو يمكنك زيارة صفحة الأسئلة الشائعة على: ot.com.sa/faq', textEn: 'Or visit our FAQ page at: ot.com.sa/faq', delay: 3000 },
+      ],
+    },
+  },
+};
 
 const WHATSAPP_FEATURES = [
   { icon: Users, titleAr: 'رقم موحد للفريق', titleEn: 'Unified Team Number', descAr: 'لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية', descEn: 'No more scattered conversations, one number managed efficiently by the whole team' },
@@ -221,73 +274,82 @@ const PRICING_PLANS = [
 ];
 
 const API_PRICING = [
-  { typeAr: 'محادثات خدمة العملاء', typeEn: 'Customer Service Conversations', price: 'مجانية', priceEn: 'Free', durationAr: '24 ساعة', durationEn: '24 Hours', descAr: 'الرد على استفسارات العملاء خلال 24 ساعة من آخر رسالة', descEn: 'Reply to customer inquiries within 24 hours of their last message', isFree: true, color: 'bg-green-500/10 border-green-500/20' },
-  { typeAr: 'رسائل التحقق (OTP)', typeEn: 'Verification Messages (OTP)', price: '0.04', priceEn: '0.04', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'رموز التحقق وتأكيد الهوية للمصادقة الآمنة', descEn: 'Verification codes and identity confirmation for secure authentication', isFree: false, color: 'bg-purple-500/10 border-purple-500/20' },
-  { typeAr: 'محادثات التفعيل', typeEn: 'Activation Conversations', price: '0.08', priceEn: '0.08', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'تأكيد الطلبات، إشعارات الشحن، وتحديثات الحساب', descEn: 'Order confirmations, shipping notices, and account updates', isFree: false, color: 'bg-blue-500/10 border-blue-500/20' },
-  { typeAr: 'محادثات التسويق', typeEn: 'Marketing Conversations', price: '0.17', priceEn: '0.17', durationAr: 'للرسالة', durationEn: 'per msg', descAr: 'رسائل ترويجية وحملات إعلانية للعملاء', descEn: 'Promotional messages and ad campaigns for customers', isFree: false, color: 'bg-orange-500/10 border-orange-500/20' },
+  { typeAr: 'محادثات خدمة العملاء', typeEn: 'Customer Service Conversations', priceAr: 'مجانية', priceEn: 'Free', durationAr: '24 ساعة', durationEn: '24 Hours', descAr: 'الرد على استفسارات العملاء خلال 24 ساعة من آخر رسالة', descEn: 'Reply to customer inquiries within 24 hours of their last message', isFree: true, color: 'bg-green-500/10 border-green-500/20' },
+  { typeAr: 'رسائل التحقق (OTP)', typeEn: 'Verification Messages (OTP)', priceAr: '0.15', priceEn: '0.15', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رموز التحقق وتأكيد الهوية للمصادقة الآمنة', descEn: 'Verification codes and identity confirmation for secure authentication', isFree: false, color: 'bg-purple-500/10 border-purple-500/20' },
+  { typeAr: 'محادثات التفعيل', typeEn: 'Utility Conversations', priceAr: '0.30', priceEn: '0.30', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'تأكيد الطلبات، إشعارات الشحن، وتحديثات الحساب', descEn: 'Order confirmations, shipping notices, and account updates', isFree: false, color: 'bg-blue-500/10 border-blue-500/20' },
+  { typeAr: 'محادثات التسويق', typeEn: 'Marketing Conversations', priceAr: '0.64', priceEn: '0.64', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رسائل ترويجية وحملات إعلانية للعملاء', descEn: 'Promotional messages and ad campaigns for customers', isFree: false, color: 'bg-orange-500/10 border-orange-500/20' },
 ];
 
 export default function WADesign1Page() {
   const [isRTL, setIsRTL] = useState(true);
-  const [notificationIdx, setNotificationIdx] = useState(0);
-  const [showNotification, setShowNotification] = useState(true);
   const [activeTab, setActiveTab] = useState<'merchant' | 'developer'>('merchant');
   const [selectedTier, setSelectedTier] = useState<Record<string, number>>({});
-  const phoneRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentNode, setCurrentNode] = useState<ChatNode>(CHAT_TREE);
+  const [pendingQuickReplies, setPendingQuickReplies] = useState<{ optionsAr: string[]; optionsEn: string[] } | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowNotification(false);
+  const appendMessages = useCallback((node: ChatNode, startIdx: number = 0) => {
+    const msgs = node.messages;
+    let idx = startIdx;
+
+    const showNext = () => {
+      if (idx >= msgs.length) return;
+
+      const msg = msgs[idx];
+      const isUser = msg.type === 'user';
+
+      if (msg.type === 'quick_replies') {
+        setPendingQuickReplies({ optionsAr: msg.optionsAr, optionsEn: msg.optionsEn });
+        idx++;
+        return;
+      }
+
+      setIsTyping(true);
+      const waitMs = isUser ? 300 : (idx === 0 ? 800 : 1200);
+
       setTimeout(() => {
-        setNotificationIdx((prev) => (prev + 1) % NOTIFICATIONS.length);
-        setShowNotification(true);
-      }, 600);
-    }, 4000);
-    return () => clearInterval(interval);
+        setIsTyping(false);
+        setChatMessages(prev => [...prev, msg]);
+        idx++;
+        if (idx < msgs.length) {
+          showNext();
+        }
+      }, waitMs);
+    };
+
+    showNext();
   }, []);
 
-  const handlePhoneMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!phoneRef.current) return;
-      const rect = phoneRef.current.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 20;
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * -20;
-      setTilt({ x, y });
-    },
-    [],
-  );
+  useEffect(() => {
+    appendMessages(CHAT_TREE);
+  }, []);
 
-  const handlePhoneMouseLeave = useCallback(() => setTilt({ x: 0, y: 0 }), []);
+  useEffect(() => {
+    const el = chatEndRef.current?.parentElement;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [chatMessages, isTyping]);
+
+  const handleQuickReply = useCallback((optionAr: string, optionEn: string) => {
+    if (!currentNode.children) return;
+    const nextNode = currentNode.children[optionAr] || currentNode.children[optionEn];
+    if (!nextNode) return;
+
+    setPendingQuickReplies(null);
+    setCurrentNode(nextNode);
+    setChatMessages(prev => [...prev, { id: Date.now(), type: 'user', textAr: optionAr, textEn: optionEn }]);
+
+    setTimeout(() => {
+      appendMessages(nextNode, 1);
+    }, 500);
+  }, [currentNode, appendMessages]);
 
   const fontFamily = isRTL ? "'IBM Plex Sans Arabic', sans-serif" : "'IBM Plex Sans', sans-serif";
 
   return (
     <div style={{ fontFamily }} dir={isRTL ? 'rtl' : 'ltr'} className="bg-slate-950 text-white overflow-x-hidden selection:bg-green-500 selection:text-white">
-      {/* ================================================================= */}
-      {/* 1. TOP BAR                                                         */}
-      {/* ================================================================= */}
-      <div className="bg-black/40 backdrop-blur-md text-white text-xs py-2 px-4 md:px-8 flex items-center justify-between flex-wrap gap-2 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-green-400" />
-          <span className="text-green-400 font-bold">CST</span>
-          <span className="hidden sm:inline text-slate-400">
-            {isRTL ? 'معتمد من هيئة الاتصالات وتقنية المعلومات' : 'CST Certified — Communications & Information Technology Commission'}
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="tel:920006900" className="hover:text-green-400 transition-colors flex items-center gap-1">
-            <Smartphone className="w-3.5 h-3.5" />
-            920006900
-          </a>
-          <button
-            onClick={() => setIsRTL(!isRTL)}
-            className="bg-white/10 hover:bg-green-500/20 border border-white/20 transition-colors px-3 py-1 rounded-full text-xs font-semibold"
-          >
-            {isRTL ? 'English' : 'عربي'}
-          </button>
-        </div>
-      </div>
+      <WANavbar isRTL={isRTL} setIsRTL={setIsRTL} variant="dark" />
 
       {/* ================================================================= */}
       {/* 2. HERO SECTION - Glass Morphism                                   */}
@@ -387,132 +449,137 @@ export default function WADesign1Page() {
             </div>
           </ScrollReveal>
 
-          {/* RIGHT – PHONE MOCKUP with Glass effect */}
-          <div className="flex justify-center lg:justify-end perspective-[1200px]">
-            <motion.div
-              ref={phoneRef}
-              onMouseMove={handlePhoneMouseMove}
-              onMouseLeave={handlePhoneMouseLeave}
-              animate={{ rotateX: tilt.y, rotateY: tilt.x }}
-              transition={{ type: 'spring', stiffness: 150, damping: 15 }}
-              className="rounded-[3rem] border-[6px] border-slate-700 bg-slate-900/80 backdrop-blur-xl aspect-[9/19] max-w-[240px] sm:max-w-[280px] w-full relative shadow-2xl shadow-green-500/20 overflow-hidden cursor-default"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Glow effect behind phone */}
-              <div className="absolute -inset-4 bg-green-500/10 rounded-[3.5rem] blur-2xl -z-10" />
-
-              {/* Notch */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-7 bg-slate-900 rounded-b-2xl z-20" />
-
-              {/* Screen */}
-              <div className="absolute inset-[6px] rounded-[2.5rem] overflow-hidden bg-gradient-to-b from-slate-800 to-slate-900 flex flex-col">
-                {/* Status bar */}
-                <div className="pt-8 pb-1 px-5 flex justify-between items-center text-[10px] font-semibold text-slate-400">
-                  <span>9:41</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[9px]">●●●●○</span>
-                    <span>WiFi</span>
-                    <span className="ml-0.5">▮▮▮▮</span>
-                  </div>
-                </div>
-
-                {/* App header */}
-                <div className="px-5 pt-2 pb-3 flex items-center gap-2 border-b border-white/10">
-                  <div className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="currentColor">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.277.297-1.26 1.232-1.26 3.002s1.287 3.487 1.467 3.723c.18.232 2.544 3.887 6.162 5.453.86.372 1.53.595 2.054.768.862.274 1.647.236 2.267.144.69-.1 1.26-.708 1.563-1.389.302-.68.302-1.26.209-1.38-.09-.124-.347-.223-.644-.325z"/>
-                      <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.66 0-3.2-.505-4.486-1.377l-.254-.153-2.98.884.884-2.98-.153-.254A7.96 7.96 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
-                    </svg>
-                  </div>
-                  <span className="font-bold text-sm text-white">{isRTL ? 'واتساب أعمال' : 'WhatsApp Business'}</span>
-                  <div className="ml-auto rtl:mr-auto">
-                    <span className="text-[9px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">● متصل</span>
-                  </div>
-                </div>
-
-                {/* Dashboard content */}
-                <div className="flex-1 px-4 pt-4 space-y-3 overflow-y-auto pb-4">
-                  {/* WA Stats cards - Glass */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-2.5 text-center border border-white/10">
-                      <div className="text-lg font-extrabold text-green-400">98%</div>
-                      <div className="text-[8px] text-slate-500 mt-0.5">{isRTL ? 'نسبة فتح' : 'Open Rate'}</div>
-                    </div>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-2.5 text-center border border-white/10">
-                      <div className="text-lg font-extrabold text-green-400">2min</div>
-                      <div className="text-[8px] text-slate-500 mt-0.5">{isRTL ? 'متوسط رد' : 'Avg Reply'}</div>
-                    </div>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-2.5 text-center border border-white/10">
-                      <div className="text-lg font-extrabold text-green-400">5x</div>
-                      <div className="text-[8px] text-slate-500 mt-0.5">{isRTL ? 'أعلى من Email' : 'vs Email'}</div>
-                    </div>
-                  </div>
-
-                  {/* WA Chart - Glass */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-                    <div className="text-[10px] font-semibold text-slate-400 mb-2">
-                      {isRTL ? 'محادثات واتساب — آخر 7 أيام' : 'WhatsApp chats — Last 7 days'}
-                    </div>
-                    <div className="flex items-end gap-1.5 h-10">
-                      {[40, 60, 35, 80, 55, 90, 70].map((h, i) => (
-                        <div key={i} className="flex-1 bg-green-500/20 rounded-t-sm" style={{ height: `${h}%` }}>
-                          <div className="h-full w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-t-sm" style={{ height: `${h * 0.7}%` }} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Notification card - Glass */}
-                  <AnimatePresence mode="wait">
-                    {showNotification && (
-                      <motion.div
-                        key={notificationIdx}
-                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        transition={{ duration: 0.4, ease: 'easeInOut' }}
-                        className="bg-green-500/10 backdrop-blur-sm rounded-xl p-3 border border-green-500/20"
-                      >
-                        <div className="flex items-start gap-2">
-                          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-[11px] font-bold text-green-400">
-                              {NOTIFICATIONS[notificationIdx].title}
-                            </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5">
-                              {NOTIFICATIONS[notificationIdx].subtitle}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* WA Quick actions */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-2.5 text-center cursor-pointer hover:from-green-600 hover:to-emerald-700 transition-colors">
-                      <MessageCircle className="w-4 h-4 text-white mx-auto mb-0.5" />
-                      <div className="text-[9px] font-semibold text-white">
-                        {isRTL ? 'محادثة جديدة' : 'New Chat'}
-                      </div>
-                    </div>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-2.5 text-center border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
-                      <FileText className="w-4 h-4 text-green-400 mx-auto mb-0.5" />
-                      <div className="text-[9px] font-semibold text-slate-300">
-                        {isRTL ? 'القوالب' : 'Templates'}
-                      </div>
-                    </div>
-                  </div>
+          {/* RIGHT – PHONE MOCKUP */}
+          <div className="flex justify-center lg:justify-end">
+            <div className="w-[280px] sm:w-[340px] bg-slate-900 rounded-[2.5rem] shadow-2xl border-[6px] border-slate-700 overflow-hidden relative h-[520px] sm:h-[600px]">
+              {/* Phone notch */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-700 rounded-b-2xl z-10" />
+              {/* Status bar */}
+              <div className="bg-[#075E54] px-5 pt-8 pb-2 flex items-center justify-between text-white text-xs">
+                <span>9:41</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-2 border border-white/60 rounded-sm"><div className="w-3 h-full bg-white/80 rounded-sm" /></div>
                 </div>
               </div>
+              {/* Chat header */}
+              <div className="bg-[#075E54] px-4 pb-3 flex items-center gap-3 text-white">
+                <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm flex items-center gap-1.5">
+                    {isRTL ? 'بوت المدار 🤖' : 'Orbit Bot 🤖'}
+                    <BadgeCheck className="w-3.5 h-3.5 text-green-300" />
+                  </div>
+                  <div className="text-[10px] opacity-80">{isRTL ? 'متصل الآن' : 'Online'}</div>
+                </div>
+              </div>
+              {/* Chat messages */}
+              <div className="bg-[#0b141a] px-3 py-3 space-y-2.5 flex-1 overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'} style={{ height: 'calc(100% - 180px)' }}>
+                {/* Date separator */}
+                <div className="flex justify-center">
+                  <span className="text-[9px] bg-[#1d2730] text-slate-400 px-3 py-0.5 rounded-full">{isRTL ? 'اليوم' : 'Today'}</span>
+                </div>
 
-              {/* Side buttons */}
-              <div className="absolute right-[-8px] top-24 w-[3px] h-8 bg-slate-700 rounded-r" />
-              <div className="absolute right-[-8px] top-36 w-[3px] h-12 bg-slate-700 rounded-r" />
-              <div className="absolute left-[-8px] top-28 w-[3px] h-14 bg-slate-700 rounded-l" />
-            </motion.div>
+                {chatMessages.map((msg, idx) => {
+                  if (msg.type === 'quick_replies') return null;
+
+                  if (msg.type === 'bot') {
+                    return (
+                      <motion.div
+                        key={msg.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex gap-2 items-start"
+                      >
+                        <div className="w-7 h-7 bg-[#00a884] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5">
+                          <Bot className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div className="bg-[#1d2730] p-2 rounded-lg max-w-[75%]">
+                          <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line">{isRTL ? msg.textAr : msg.textEn}</p>
+                          <div className="text-[9px] text-slate-500 mt-0.5 text-right">9:41</div>
+                        </div>
+                      </motion.div>
+                    );
+                  }
+
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex justify-end gap-2 items-start"
+                    >
+                      <div className="bg-[#005c4b] p-2 rounded-lg max-w-[75%]">
+                        <p className="text-xs text-slate-100 leading-relaxed">{isRTL ? msg.textAr : msg.textEn}</p>
+                        <div className="flex items-center justify-end gap-1 mt-0.5">
+                          <span className="text-[9px] text-slate-400">9:41</span>
+                          <CheckCircle2 className="w-3 h-3 text-[#53bdeb]" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+
+                {/* Quick reply buttons */}
+                {pendingQuickReplies && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-wrap gap-1.5 max-w-[85%]"
+                  >
+                    {(isRTL ? pendingQuickReplies.optionsAr : pendingQuickReplies.optionsEn).map((opt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          const optsAr = pendingQuickReplies.optionsAr;
+                          const optsEn = pendingQuickReplies.optionsEn;
+                          handleQuickReply(optsAr[i], optsEn[i]);
+                        }}
+                        className="bg-[#005c4b] border border-[#00a884]/40 text-[#86efac] text-[10px] px-3 py-1.5 rounded-full hover:bg-[#00a884]/20 transition-colors cursor-pointer"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Typing indicator */}
+                {isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex gap-2 items-start"
+                  >
+                    <div className="w-7 h-7 bg-[#00a884] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5">
+                      <Bot className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div className="bg-[#1d2730] p-2 rounded-lg">
+                      <div className="flex items-center gap-1">
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0 }} className="w-1.5 h-1.5 rounded-full bg-[#00a884]" />
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-[#00a884]" />
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-[#00a884]" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input bar */}
+              <div className="bg-[#1d2730] px-3 py-2.5 flex items-center gap-2 border-t border-[#2a3942]">
+                <div className="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 text-[10px] text-slate-500">
+                  {isRTL ? 'اكتب رسالة...' : 'Type a message...'}
+                </div>
+                <div className="w-7 h-7 rounded-full bg-[#00a884] flex items-center justify-center flex-shrink-0">
+                  <Send className="w-3.5 h-3.5 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -789,13 +856,15 @@ export default function WADesign1Page() {
                     )}
                     <div className={`p-6 ${plan.popular ? 'pt-4' : ''}`}>
                       <h3 className="text-xl md:text-2xl font-extrabold text-white text-center mb-4">{isRTL ? plan.nameAr : plan.nameEn}</h3>
-                      <div className="flex gap-1.5 justify-center mb-4">
-                        {plan.tiers.map((t, ti) => (
-                          <button key={ti} onClick={() => setSelectedTier(prev => ({ ...prev, [plan.id]: ti }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tierIndex === ti ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
-                            {isRTL ? t.nameAr : t.nameEn}
-                          </button>
-                        ))}
-                      </div>
+                      {plan.tiers.length > 1 && (
+                        <div className="flex gap-1.5 justify-center mb-4">
+                          {plan.tiers.map((t, ti) => (
+                            <button key={ti} onClick={() => setSelectedTier(prev => ({ ...prev, [plan.id]: ti }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tierIndex === ti ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
+                              {isRTL ? t.nameAr : t.nameEn}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                       <div className="bg-blue-500/10 backdrop-blur-sm rounded-xl p-3 border border-blue-500/20 mb-4">
                         <div className="flex items-center justify-center gap-1.5 text-[10px] md:text-xs font-bold text-blue-300 mb-2">
                           <BarChart3 className="w-3.5 h-3.5" />
@@ -870,7 +939,8 @@ export default function WADesign1Page() {
                       <div className="text-2xl font-extrabold text-green-400">{isRTL ? 'مجانية' : 'Free'}</div>
                     ) : (
                       <div className="flex items-baseline justify-center gap-2">
-                        <span className="text-2xl font-extrabold text-white">${item.price}</span>
+                        <span className="text-2xl font-extrabold text-white">{isRTL ? item.priceAr : item.priceEn}</span>
+                        <span className="text-green-400 text-xs font-bold">{isRTL ? item.unitAr : item.unitEn}</span>
                         <span className="text-slate-400 text-xs">{isRTL ? item.durationAr : item.durationEn}</span>
                       </div>
                     )}
@@ -889,6 +959,7 @@ export default function WADesign1Page() {
                 <div>
                   <h4 className="font-bold text-white mb-1">💡 {isRTL ? 'نصيحة احترافية' : 'Pro Tip'}</h4>
                   <p className="text-slate-300 text-sm">{isRTL ? 'محادثات خدمة العملاء مجانية تماماً خلال 24 ساعة من آخر رسالة! استفد من هذه الميزة للرد على استفسارات عملائك دون أي تكلفة إضافية.' : 'Customer service conversations are completely free within 24 hours of the last message. Use this to answer customer questions with no extra cost.'}</p>
+                  <p className="text-slate-500 text-xs mt-2">{isRTL ? '* الأسعار قابلة للتغيير من Meta (واتساب) وقد تختلف حسب المنطقة والعملة.' : '* Prices are subject to change by Meta (WhatsApp) and may vary by region and currency.'}</p>
                 </div>
               </div>
             </div>
@@ -1154,38 +1225,7 @@ Authorization: Bearer YOUR_API_KEY
         </div>
       </section>
 
-      {/* ================================================================= */}
-      {/* 11. FOOTER                                                         */}
-      {/* ================================================================= */}
-      <footer className="bg-black py-10 md:py-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 md:px-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div className="flex items-center gap-4">
-              <Image
-                src={encodeImagePath('/logo/شعار المدار-01.svg')}
-                alt="Orbit"
-                width={120}
-                height={40}
-                className="h-8 w-auto invert"
-              />
-              <span className="text-slate-600 text-sm">
-                &copy; {new Date().getFullYear()} {isRTL ? 'المدار. جميع الحقوق محفوظة' : 'Orbit. All rights reserved'}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm text-slate-500">
-              <a href="https://ot.com.sa" className="hover:text-green-400 transition-colors">ot.com.sa</a>
-              <a href="mailto:info@ot.com.sa" className="hover:text-green-400 transition-colors flex items-center gap-1">
-                info@ot.com.sa
-              </a>
-              <a href="tel:920006900" className="hover:text-green-400 transition-colors flex items-center gap-1">
-                <Smartphone className="w-3.5 h-3.5" />
-                920006900
-              </a>
-              <span>{isRTL ? 'الرياض، طريق الملك فهد' : 'Riyadh, King Fahd Road'}</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <WAFooter isRTL={isRTL} variant="dark" />
     </div>
   );
 }
