@@ -147,7 +147,13 @@ const CAMPAIGNS = [
   { icon: TrendingUp, titleAr: 'تحليل الأداء', titleEn: 'Performance Analysis', descAr: 'تقارير شاملة عن معدلات الفتح والنقر والتحويل', descEn: 'Comprehensive reports on open rates, clicks, and conversions' },
 ];
 
-const INTEGRATIONS = ['سلة', 'دفترة', 'نور', 'إتقان', 'حضوري'];
+const INTEGRATIONS = [
+  { nameAr: 'سلة', nameEn: 'Salla', icon: '/integrations/salla.svg', link: 'https://salla.sa' },
+  { nameAr: 'دفترة', nameEn: 'Daftra', icon: '/integrations/daftra.svg', link: 'https://daftra.com' },
+  { nameAr: 'نظام نور', nameEn: 'Noor System', icon: '/integrations/noor.svg', link: 'https://noor.moe.gov.sa' },
+  { nameAr: 'إتقان', nameEn: 'Itqan', icon: '/integrations/itqan.svg', link: 'https://itqanapps.com' },
+  { nameAr: 'حضوري', nameEn: 'Haddari', icon: '/integrations/haddari.svg', link: 'https://haddari.com' },
+];
 
 const STATS_DATA = [
   { suffix: '%+', end: 98, labelAr: 'نسبة فتح الرسائل على واتساب', labelEn: 'WhatsApp message open rate' },
@@ -691,11 +697,25 @@ export default function WADesign3Page() {
             <h2 className="text-2xl md:text-4xl font-bold text-white">{isRTL ? 'نتكامل مع أدواتك المفضلة' : 'Seamless Integrations'}</h2>
           </ScrollReveal>
           <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-            {INTEGRATIONS.map((name, i) => (
+            {INTEGRATIONS.map((item, i) => (
               <ScrollReveal key={i}>
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-8 py-4 md:py-5 border border-white/10 hover:border-emerald-500/30 hover:bg-white/10 transition-all cursor-pointer">
-                  <span className="text-base md:text-lg font-bold text-white">{name}</span>
-                </div>
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 bg-white/5 backdrop-blur-sm rounded-2xl px-5 md:px-6 py-4 md:py-5 border border-white/10 hover:border-emerald-500/30 hover:bg-white/10 transition-all group"
+                >
+                  {item.icon && (
+                    <Image
+                      src={encodeImagePath(item.icon)}
+                      alt={isRTL ? item.nameAr : item.nameEn}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 object-contain brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
+                    />
+                  )}
+                  <span className="text-base md:text-lg font-bold text-white">{isRTL ? item.nameAr : item.nameEn}</span>
+                </a>
               </ScrollReveal>
             ))}
           </div>

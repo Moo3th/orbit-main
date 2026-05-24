@@ -905,7 +905,7 @@ const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value
 };
 
 const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string }) => {
-  let items: { nameAr: string; nameEn: string; icon: string }[] = [];
+  let items: { nameAr: string; nameEn: string; icon: string; link?: string }[] = [];
   try {
     items = value ? JSON.parse(value) : [];
   } catch (e) {
@@ -920,7 +920,7 @@ const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: stri
     commit(next);
   };
 
-  const addItem = () => commit([...items, { nameAr: "", nameEn: "", icon: "" }]);
+  const addItem = () => commit([...items, { nameAr: "", nameEn: "", icon: "", link: "" }]);
   const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
 
   return (
@@ -956,6 +956,10 @@ const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: stri
                 <label className="text-[10px] text-gray-400 block mb-1">Name (EN)</label>
                 <input type="text" value={item.nameEn} onChange={e => updateItem(idx, { nameEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
               </div>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "رابط التكامل" : "Link URL"}</label>
+              <input type="url" value={item.link || ""} onChange={e => updateItem(idx, { link: e.target.value })} placeholder="https://..." className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all" dir="ltr" />
             </div>
           </div>
         ))}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="12" fill="#4CAF50"/>
+  <path d="M14 24h20M24 14v20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <text x="24" y="38" text-anchor="middle" fill="white" font-size="8" font-weight="bold" font-family="sans-serif">سلة</text>
+</svg>

@@ -1195,6 +1195,17 @@ const waFooterCtaFields: SectionField[] = [
   { key: "subtitle", label: "وصف CTA النهائي", labelEn: "Final CTA Subtitle", type: "textarea", value: "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية", valueEn: "Our team is ready to help you get the Green Badge and integrate the API easily and professionally" },
 ];
 
+const waIntegrationsFields: SectionField[] = [
+  { key: "title", label: "عنوان قسم التكاملات", labelEn: "Integrations Section Title", type: "text", value: "نتكامل مع أدواتك المفضلة", valueEn: "Seamless Integrations" },
+  { key: "integrations_json", label: "قائمة التكاملات", labelEn: "Integrations List", type: "list", value: JSON.stringify([
+    { nameAr: "سلة", nameEn: "Salla", icon: "/integrations/salla.svg", link: "https://salla.sa" },
+    { nameAr: "دفترة", nameEn: "Daftra", icon: "/integrations/daftra.svg", link: "https://daftra.com" },
+    { nameAr: "نظام نور", nameEn: "Noor System", icon: "/integrations/noor.svg", link: "https://noor.moe.gov.sa" },
+    { nameAr: "إتقان", nameEn: "Itqan", icon: "/integrations/itqan.svg", link: "https://itqanapps.com" },
+    { nameAr: "حضوري", nameEn: "Haddari", icon: "/integrations/haddari.svg", link: "https://haddari.com" },
+  ]), valueEn: "" },
+];
+
 const ensureWhatsAppSection = (pages: PageData[], sectionId: string, sectionName: string, sectionNameEn: string, fields: SectionField[]): PageData[] => {
   return pages.map((page) => {
     if (page.id !== "whatsapp" && page.path !== "/products/whatsapp") return page;
@@ -1229,6 +1240,7 @@ const ensureWhatsAppFields = (pages: PageData[]): PageData[] => {
   result = ensureWhatsAppSection(result, "wa-marketing", "تسويق واتساب", "WhatsApp Marketing", waMarketingFields);
   result = ensureWhatsAppSection(result, "wa-green-tick", "الشارة الخضراء", "Green Tick", waGreenTickFields);
   result = ensureWhatsAppSection(result, "wa-footer-cta", "CTA نهائي واتساب", "WhatsApp Footer CTA", waFooterCtaFields);
+  result = ensureWhatsAppSection(result, "wa-integrations", "التكاملات", "Integrations", waIntegrationsFields);
   result = ensureWhatsAppPricingFields(result);
   result = ensureWhatsAppRequestFormFields(result);
   return result;
