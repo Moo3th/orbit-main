@@ -1,6 +1,4 @@
 import { WhatsAppPage } from '@/components/business/products/WhatsAppPage';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
 import { getCmsPageById, extractPageSeo } from '@/lib/cms/helpers';
 import { getCachedSeoSettings, generatePageMetadata } from '@/lib/seo';
@@ -44,11 +42,5 @@ export default async function WhatsAppProductPage() {
     notFound();
   }
 
-  return (
-    <>
-      <Navbar />
-      <WhatsAppPage cmsPage={cmsPage} />
-      <Footer />
-    </>
-  );
+  return <WhatsAppPage cmsPage={cmsPage} />;
 }

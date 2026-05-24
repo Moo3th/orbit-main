@@ -1206,6 +1206,60 @@ const waIntegrationsFields: SectionField[] = [
   ]), valueEn: "" },
 ];
 
+const waStatsFields: SectionField[] = [
+  { key: "stats_json", label: "قائمة الإحصائيات", labelEn: "Stats List", type: "list", value: JSON.stringify([
+    { suffix: "%+", end: 98, labelAr: "نسبة فتح الرسائل على واتساب", labelEn: "WhatsApp message open rate" },
+    { suffix: "x", end: 5, labelAr: "أعلى من البريد الإلكتروني", labelEn: "Higher than email" },
+    { suffix: "+", end: 2, labelAr: "مليار مستخدم واتساب عالمياً", labelEn: "Billion WhatsApp users globally" },
+    { suffix: "%+", end: 40, labelAr: "زيادة في المبيعات عبر واتساب", labelEn: "Increase in sales via WhatsApp" },
+  ]), valueEn: "" },
+];
+
+const waPartnersFields: SectionField[] = [
+  { key: "title", label: "عنوان شركاء النجاح", labelEn: "Partners Title", type: "text", value: "شركاء النجاح", valueEn: "Trusted Partners" },
+  { key: "subtitle", label: "وصف شركاء النجاح", labelEn: "Partners Subtitle", type: "text", value: "يثق بنا أكثر من 20,000 جهة حكومية وخاصة في المملكة", valueEn: "Trusted by over 20,000 government and private entities in the Kingdom" },
+  { key: "partners_json", label: "قائمة شركاء النجاح (صور)", labelEn: "Partners Logos (JSON)", type: "list", value: JSON.stringify([
+    { image: "/TrustedLogos/حرس الحدود.png" },
+    { image: "/TrustedLogos/إمارة منطقة الرياض.png" },
+    { image: "/TrustedLogos/مستشفى الملك فهد بجدة.png" },
+    { image: "/TrustedLogos/جامعة الملك سعود.png" },
+    { image: "/TrustedLogos/وزارة التعليم.png" },
+  ]), valueEn: "" },
+];
+
+const waPersonaFields: SectionField[] = [
+  { key: "title", label: "عنوان مسارات المستخدم", labelEn: "Persona Title", type: "text", value: "اختر مسارك", valueEn: "Choose Your Path" },
+  { key: "merchant_title_ar", label: "عنوان المسار التجاري (عربي)", labelEn: "Merchant Path Title (AR)", type: "text", value: "للمتاجر والمسوقين", valueEn: "For Merchants & Marketers" },
+  { key: "merchant_title_en", label: "عنوان المسار التجاري (إنجليزي)", labelEn: "Merchant Path Title (EN)", type: "text", value: "للمتاجر والمسوقين" },
+  { key: "merchant_steps_json", label: "خطوات المسار التجاري", labelEn: "Merchant Steps", type: "list", value: JSON.stringify([
+    { stepAr: "أنشئ قالب واتساب", stepEn: "Create WhatsApp Template", descAr: "صمّم قالب رسالتك المعتمدة من واتساب بنقرة واحدة", descEn: "Design your WhatsApp-approved message template with one click" },
+    { stepAr: "أدر محادثاتك", stepEn: "Manage Conversations", descAr: "رد على عملائك من لوحة تحكم مركزية مع ردود سريعة", descEn: "Reply to customers from a central dashboard with quick replies" },
+    { stepAr: "حلّل أداءك", stepEn: "Analyze Performance", descAr: "تتبع نسب الفتح والنقر والتحويل بتقارير واتساب التفصيلية", descEn: "Track open, click & conversion rates with detailed WhatsApp reports" },
+  ]), valueEn: "" },
+  { key: "developer_title_ar", label: "عنوان مسار المطورين (عربي)", labelEn: "Developer Path Title (AR)", type: "text", value: "للمطورين والتقنيين", valueEn: "For Developers & Engineers" },
+  { key: "developer_title_en", label: "عنوان مسار المطورين (إنجليزي)", labelEn: "Developer Path Title (EN)", type: "text", value: "للمطورين والتقنيين" },
+  { key: "developer_tools_json", label: "أدوات المطورين", labelEn: "Developer Tools", type: "list", value: JSON.stringify([
+    { icon: "🔗", titleAr: "REST API", titleEn: "REST API", descAr: "واجهة برمجة تطبيقات شاملة للتكامل مع أنظمتك", descEn: "Comprehensive API for integrating with your systems" },
+    { icon: "⚡", titleAr: "Webhooks", titleEn: "Webhooks", descAr: "إشعارات فورية للأحداث في الوقت الحقيقي", descEn: "Real-time event notifications via webhooks" },
+    { icon: "🧪", titleAr: "Sandbox", titleEn: "Sandbox", descAr: "بيئة اختبار كاملة قبل النشر على الإنتاج", descEn: "Full sandbox environment before production deployment" },
+  ]), valueEn: "" },
+];
+
+const waChatbotFields: SectionField[] = [
+  { key: "badge_ar", label: "شارة البوت (عربي)", labelEn: "Bot Badge (AR)", type: "text", value: "واتساب أعمال API المعتمد", valueEn: "Official WhatsApp Business API" },
+  { key: "badge_en", label: "شارة البوت (إنجليزي)", labelEn: "Bot Badge (EN)", type: "text", value: "واتساب أعمال API المعتمد" },
+  { key: "hero_title_ar", label: "عنوان الهيرو (عربي)", labelEn: "Hero Title (AR)", type: "text", value: "تواصل احترافي مع عملائك عبر واتساب أعمال", valueEn: "Professional Communication via WhatsApp Business" },
+  { key: "hero_title_en", label: "عنوان الهيرو (إنجليزي)", labelEn: "Hero Title (EN)", type: "text", value: "تواصل احترافي مع عملائك عبر واتساب أعمال" },
+  { key: "hero_subtitle_ar", label: "وصف الهيرو (عربي)", labelEn: "Hero Subtitle (AR)", type: "textarea", value: "كن أقرب لعملائك على واتساب — رسائل تسويقية معتمدة، ردود آلية ذكية، وإدارة محادثات مركزية من لوحة تحكم واحدة", valueEn: "Get closer to your customers on WhatsApp — approved marketing messages, smart auto-replies, and centralized conversation management" },
+  { key: "hero_subtitle_en", label: "وصف الهيرو (إنجليزي)", labelEn: "Hero Subtitle (EN)", type: "textarea", value: "كن أقرب لعملائك على واتساب — رسائل تسويقية معتمدة، ردود آلية ذكية، وإدارة محادثات مركزية من لوحة تحكم واحدة" },
+  { key: "cta_primary_text_ar", label: "نص الزر الرئيسي (عربي)", labelEn: "Primary CTA (AR)", type: "text", value: "ابدأ الآن — تجربة مجانية", valueEn: "Start Now — Free Trial" },
+  { key: "cta_primary_text_en", label: "نص الزر الرئيسي (إنجليزي)", labelEn: "Primary CTA (EN)", type: "text", value: "ابدأ الآن — تجربة مجانية" },
+  { key: "cta_secondary_text_ar", label: "نص الزر الثانوي (عربي)", labelEn: "Secondary CTA (AR)", type: "text", value: "تحدث مع المبيعات", valueEn: "Talk to Sales" },
+  { key: "cta_secondary_text_en", label: "نص الزر الثانوي (إنجليزي)", labelEn: "Secondary CTA (EN)", type: "text", value: "تحدث مع المبيعات" },
+  { key: "social_proof_ar", label: "نص الإثبات الاجتماعي (عربي)", labelEn: "Social Proof (AR)", type: "text", value: "+20,000 جهة تستخدم واتساب أعمال معنا", valueEn: "+20,000 entities use WhatsApp Business with us" },
+  { key: "social_proof_en", label: "نص الإثبات الاجتماعي (إنجليزي)", labelEn: "Social Proof (EN)", type: "text", value: "+20,000 جهة تستخدم واتساب أعمال معنا" },
+];
+
 const ensureWhatsAppSection = (pages: PageData[], sectionId: string, sectionName: string, sectionNameEn: string, fields: SectionField[]): PageData[] => {
   return pages.map((page) => {
     if (page.id !== "whatsapp" && page.path !== "/products/whatsapp") return page;
@@ -1241,6 +1295,10 @@ const ensureWhatsAppFields = (pages: PageData[]): PageData[] => {
   result = ensureWhatsAppSection(result, "wa-green-tick", "الشارة الخضراء", "Green Tick", waGreenTickFields);
   result = ensureWhatsAppSection(result, "wa-footer-cta", "CTA نهائي واتساب", "WhatsApp Footer CTA", waFooterCtaFields);
   result = ensureWhatsAppSection(result, "wa-integrations", "التكاملات", "Integrations", waIntegrationsFields);
+  result = ensureWhatsAppSection(result, "wa-stats", "الإحصائيات", "Stats", waStatsFields);
+  result = ensureWhatsAppSection(result, "wa-partners", "شركاء النجاح", "Partners", waPartnersFields);
+  result = ensureWhatsAppSection(result, "wa-persona", "مسارات المستخدم", "Persona Paths", waPersonaFields);
+  result = ensureWhatsAppSection(result, "wa-chatbot", "بوت المحادثة والهيرو", "Chatbot & Hero", waChatbotFields);
   result = ensureWhatsAppPricingFields(result);
   result = ensureWhatsAppRequestFormFields(result);
   return result;
