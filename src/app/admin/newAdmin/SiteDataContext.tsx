@@ -1158,11 +1158,23 @@ const waHeroFields: SectionField[] = [
 ];
 
 const waFeaturesFields: SectionField[] = [
-  { key: "title", label: "عنوان قسم المميزات", labelEn: "Features Section Title", type: "text", value: "أدوات احترافية لإدارة محادثاتك", valueEn: "Professional Tools to Manage Conversations" },
+  { key: "title", label: "عنوان قسم المميزات", labelEn: "Features Section Title", type: "text", value: "واتساب أعمال API", valueEn: "WhatsApp Business API" },
   { key: "subtitle", label: "وصف قسم المميزات", labelEn: "Features Section Subtitle", type: "textarea", value: "كل ما تحتاجه لتحويل واتساب إلى قناة تواصل احترافية مع عملائك", valueEn: "Everything you need to turn WhatsApp into a professional communication channel with your customers" },
-  { key: "solutions_json", label: "قائمة الحلول (JSON)", labelEn: "Solutions List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "solutions_json", label: "قائمة الحلول (JSON)", labelEn: "Solutions List (JSON)", type: "list", value: JSON.stringify([
+    { iconName: "Users", titleAr: "رقم موحد للفريق", titleEn: "Unified Team Number", descAr: "لا مزيد من تشتت المحادثات، رقم واحد يديره فريق كامل بكفاءة عالية", descEn: "No more scattered conversations, one number managed efficiently by the whole team" },
+    { iconName: "Shield", titleAr: "إدارة الصلاحيات", titleEn: "Permissions Management", descAr: "تحويل المحادثات بين المبيعات والدعم الفني بسلاسة واحترافية", descEn: "Seamlessly transfer conversations between sales and technical support" },
+    { iconName: "Bot", titleAr: "الردود الآلية (Chatbot)", titleEn: "Automated Replies (Chatbot)", descAr: "خدمة عملاء 24/7 دون تدخل بشري، أجب على الأسئلة الشائعة تلقائياً", descEn: "24/7 customer service without human intervention, automatically answer FAQs" },
+    { iconName: "MessageCirclePlus", titleAr: "صندوق وارد مشترك", titleEn: "Shared Inbox", descAr: "فلترة الرسائل (مقروءة، غير مقروءة، لم يتم الرد) في واجهة واحدة", descEn: "Filter messages (read, unread, unanswered) in a single interface" },
+    { iconName: "Clock", titleAr: "جدولة الرسائل", titleEn: "Message Scheduling", descAr: "حدد وقت إرسال رسائلك مسبقاً للوصول في الوقت المثالي", descEn: "Pre-schedule your messages to be sent at the optimal time" },
+    { iconName: "BarChart3", titleAr: "تقارير تفصيلية", titleEn: "Detailed Reports", descAr: "تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً", descEn: "Track campaign performance, read rates, and instant responses" },
+  ]), valueEn: "" },
   { key: "solutions_title", label: "عنوان الحلول المتقدمة", labelEn: "Solutions Title", type: "text", value: "أدوات احترافية لإدارة محادثاتك", valueEn: "Professional Tools to Manage Conversations" },
-  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: JSON.stringify([
+    { iconName: "Target", titleAr: "استهداف دقيق", titleEn: "Precise Targeting", descAr: "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك", descEn: "Target your audience based on location, interests, and behavior" },
+    { iconName: "Clock", titleAr: "جدولة ذكية", titleEn: "Smart Scheduling", descAr: "أرسل في الوقت الأمثل لزيادة معدلات التفاعل", descEn: "Send at the optimal time to increase interaction rates" },
+    { iconName: "Sparkles", titleAr: "قوالب جاهزة", titleEn: "Ready Templates", descAr: "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع", descEn: "Professional messages with interactive buttons, images, and videos" },
+    { iconName: "TrendingUp", titleAr: "تحليل الأداء", titleEn: "Performance Analysis", descAr: "تقارير شاملة عن معدلات الفتح والنقر والتحويل", descEn: "Comprehensive reports on open rates, clicks, and conversions" },
+  ]), valueEn: "" },
   { key: "campaigns_title", label: "عنوان حملات التسويق", labelEn: "Campaigns Title", type: "text", value: "أطلق حملاتك التسويقية بذكاء", valueEn: "Launch Your Campaigns Smartly" },
   { key: "api_pricing_title", label: "عنوان أسعار API", labelEn: "API Pricing Title", type: "text", value: "أسعار محادثات واتساب API", valueEn: "WhatsApp API Conversation Prices" },
 ];
@@ -1171,7 +1183,12 @@ const waWhyFields: SectionField[] = [
   { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "المميزات الرئيسية", valueEn: "Key Features" },
   { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا واتساب الأعمال؟", valueEn: "Why WhatsApp Business?" },
   { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", value: "المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة", valueEn: "The most trusted and widespread platform for communicating with your customers in the Kingdom" },
-  { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: JSON.stringify([
+    { iconName: "Globe", titleAr: "المنصة رقم 1 في المملكة", titleEn: "The #1 Platform in the Kingdom", descAr: "الأكثر انتشاراً واستخداماً في السعودية", descEn: "The most widespread and used in Saudi Arabia" },
+    { iconName: "CheckCircle2", titleAr: "معدل فتح 98%", titleEn: "98% Open Rate", descAr: "يتم فتح وقراءة معظم الرسائل فوراً", descEn: "Most messages are opened and read immediately" },
+    { iconName: "Shield", titleAr: "آمن وموثوق", titleEn: "Secure & Reliable", descAr: "تشفير كامل من طرف لطرف للبيانات", descEn: "End-to-end encryption for all data" },
+    { iconName: "Smartphone", titleAr: "سهل الاستخدام", titleEn: "Easy to Use", descAr: "تطبيق مألوف للجميع بدون تعقيد", descEn: "Familiar app for everyone without complexity" },
+  ]), valueEn: "" },
 ];
 
 const waSolutionsFields: SectionField[] = [
@@ -1182,17 +1199,36 @@ const waSolutionsFields: SectionField[] = [
 const waMarketingFields: SectionField[] = [
   { key: "badge", label: "شارة القسم", labelEn: "Section Badge", type: "text", value: "التسويق الذكي", valueEn: "Smart Marketing" },
   { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", value: "استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل.", valueEn: "Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates." },
-  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: "", valueEn: "" },
+  { key: "campaigns_json", label: "قائمة الحملات (JSON)", labelEn: "Campaigns List (JSON)", type: "list", value: JSON.stringify([
+    { iconName: "Target", titleAr: "استهداف دقيق", titleEn: "Precise Targeting", descAr: "حدد جمهورك بناءً على الموقع، الاهتمامات، والسلوك", descEn: "Target your audience based on location, interests, and behavior" },
+    { iconName: "Clock", titleAr: "جدولة ذكية", titleEn: "Smart Scheduling", descAr: "أرسل في الوقت الأمثل لزيادة معدلات التفاعل", descEn: "Send at the optimal time to increase interaction rates" },
+    { iconName: "Sparkles", titleAr: "قوالب جاهزة", titleEn: "Ready Templates", descAr: "رسائل احترافية مع أزرار تفاعلية وصور ومقاطع", descEn: "Professional messages with interactive buttons, images, and videos" },
+    { iconName: "TrendingUp", titleAr: "تحليل الأداء", titleEn: "Performance Analysis", descAr: "تقارير شاملة عن معدلات الفتح والنقر والتحويل", descEn: "Comprehensive reports on open rates, clicks, and conversions" },
+  ]), valueEn: "" },
 ];
 
 const waGreenTickFields: SectionField[] = [
   { key: "title", label: "عنوان الشارة الخضراء", labelEn: "Green Tick Title", type: "text", value: "احصل على الشارة الخضراء (Green Tick)", valueEn: "Get the Green Tick" },
   { key: "subtitle", label: "وصف الشارة الخضراء", labelEn: "Green Tick Subtitle", type: "text", value: "عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب", valueEn: "Boost your customers' trust and stand out from competitors with an officially verified WhatsApp account" },
+  { key: "comparison_json", label: "جدول مقارنة الشارة", labelEn: "Comparison Table (JSON)", type: "list", value: JSON.stringify([
+    { featureAr: "ظهور اسم الشركة", featureEn: "Company Name Visibility", unverified: false, business: true, verified: true },
+    { featureAr: "الشارة الخضراء الرسمية", featureEn: "Official Green Badge", unverified: false, business: false, verified: true },
+    { featureAr: "ثقة أعلى من العملاء", featureEn: "Higher Customer Trust", unverified: false, business: true, verified: true },
+    { featureAr: "رسائل غير محدودة", featureEn: "Unlimited Messages", unverified: false, business: false, verified: true },
+  ]), valueEn: "" },
+  { key: "competitive_json", label: "مميزات تنافسية", labelEn: "Competitive Edge (JSON)", type: "list", value: JSON.stringify([
+    { iconName: "BadgeCheck", titleAr: "ظهور اسم الشركة", titleEn: "Company Name Visibility", descAr: "يظهر اسم شركتك بجانب رقم الهاتف في واتساب", descEn: "Your company name appears next to the phone number in WhatsApp" },
+    { iconName: "BadgeCheck", titleAr: "الشارة الخضراء الرسمية", titleEn: "Official Green Badge", descAr: "احصل على الشارة الخضراء التي تمنح ثقة عملائك", descEn: "Get the official green badge that gives your customers confidence" },
+    { iconName: "CheckCircle2", titleAr: "ثقة أعلى من العملاء", titleEn: "Higher Customer Trust", descAr: "العملاء يثقون أكثر بالحسابات المعتمدة والموثقة", descEn: "Customers trust verified and authenticated accounts more" },
+    { iconName: "Send", titleAr: "رسائل غير محدودة", titleEn: "Unlimited Messages", descAr: "أرسل رسائل غير محدودة لعملائك بدون قيود", descEn: "Send unlimited messages to your customers without restrictions" },
+  ]), valueEn: "" },
 ];
 
 const waFooterCtaFields: SectionField[] = [
   { key: "title", label: "عنوان CTA النهائي", labelEn: "Final CTA Title", type: "text", value: "جاهز لنقل خدمة عملائك لمستوى آخر؟", valueEn: "Ready to take your customer service to the next level?" },
   { key: "subtitle", label: "وصف CTA النهائي", labelEn: "Final CTA Subtitle", type: "textarea", value: "فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية", valueEn: "Our team is ready to help you get the Green Badge and integrate the API easily and professionally" },
+  { key: "cta_primary", label: "نص الزر الرئيسي", labelEn: "Primary CTA Text", type: "text", value: "اطلب الخدمة الآن", valueEn: "Order Service Now" },
+  { key: "cta_secondary", label: "نص الزر الثانوي", labelEn: "Secondary CTA Text", type: "text", value: "تحدث مع المبيعات", valueEn: "Talk to Sales" },
 ];
 
 const waIntegrationsFields: SectionField[] = [

@@ -30,6 +30,15 @@ import {
   Star,
   Award,
 } from 'lucide-react';
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Users, Shield, Bot, MessageCirclePlus, Clock, BarChart3,
+  Globe, CheckCircle2, Smartphone, BadgeCheck, Send,
+  Target, Sparkles, TrendingUp, MessageCircle, Zap, Building2,
+  Headphones, CreditCard, FileText, Star, Award, ArrowLeft, ArrowRight, X, Check,
+};
+
+const getLucideIcon = (name: string) => ICON_MAP[name] || Shield;
 import Image from 'next/image';
 import Link from 'next/link';
 import { encodeImagePath } from '@/utils/imagePath';
@@ -94,7 +103,7 @@ function ScrollReveal({ children, className }: { children: React.ReactNode; clas
   );
 }
 
-const PARTNER_LOGOS = [
+const PARTNER_LOGOS_RAW = [
   '/TrustedLogos/حرس الحدود.png',
   '/TrustedLogos/إمارة منطقة الرياض.png',
   '/TrustedLogos/مستشفى الملك فهد بجدة.png',
@@ -121,9 +130,10 @@ const PARTNER_LOGOS = [
   '/TrustedLogos/logo_053.png',
   '/TrustedLogos/logo_057.png',
 ];
+const PARTNER_LOGOS = PARTNER_LOGOS_RAW.map(p => typeof p === 'string' ? { image: p } : p);
 
-const MARQUEE_ROW1 = PARTNER_LOGOS.slice(0, 12);
-const MARQUEE_ROW2 = PARTNER_LOGOS.slice(12);
+const MARQUEE_ROW1_BASE = PARTNER_LOGOS.slice(0, 12);
+const MARQUEE_ROW2_BASE = PARTNER_LOGOS.slice(12);
 
 type ChatMsg =
   | { id: number; type: 'bot'; textAr: string; textEn: string; delay: number }
@@ -235,6 +245,18 @@ const GREEN_TICK_COMPARISON = [
   { featureAr: 'رسائل غير محدودة', featureEn: 'Unlimited Messages', unverified: false, business: false, verified: true },
 ];
 
+const MERCHANT_STEPS = [
+  { stepAr: 'أنشئ قالب واتساب', stepEn: 'Create WhatsApp Template', descAr: 'صمّم قالب رسالتك المعتمدة من واتساب بنقرة واحدة', descEn: 'Design your WhatsApp-approved message template with one click' },
+  { stepAr: 'أدر محادثاتك', stepEn: 'Manage Conversations', descAr: 'رد على عملائك من لوحة تحكم مركزية مع ردود سريعة', descEn: 'Reply to customers from a central dashboard with quick replies' },
+  { stepAr: 'حلّل أداءك', stepEn: 'Analyze Performance', descAr: 'تتبع نسب الفتح والنقر والتحويل بتقارير واتساب التفصيلية', descEn: 'Track open, click & conversion rates with detailed WhatsApp reports' },
+];
+
+const DEVELOPER_TOOLS = [
+  { titleAr: 'SDK متعدد اللغات', titleEn: 'Multi-language SDK' },
+  { titleAr: 'Webhooks فورية', titleEn: 'Instant Webhooks' },
+  { titleAr: 'بيئة اختبار Sandbox', titleEn: 'Sandbox Environment' },
+];
+
 const PRICING_PLANS = [
   {
     id: 'basic',
@@ -316,6 +338,27 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const whySubtitle = getCmsField(cmsPage, 'wa-why', 'subtitle', isRTL, 'المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة');
 
   const featuresTitle = getCmsField(cmsPage, 'wa-features', 'solutions_title', isRTL, 'أدوات احترافية لإدارة محادثاتك');
+  const featuresBadge = getCmsField(cmsPage, 'wa-features', 'title', isRTL, 'واتساب أعمال API');
+  const featuresSubtitle = getCmsField(cmsPage, 'wa-features', 'subtitle', isRTL, 'كل ما تحتاجه لتحويل واتساب إلى قناة تواصل احترافية مع عملائك');
+
+  const featuresJson = getCmsField(cmsPage, 'wa-features', 'solutions_json', isRTL, '');
+  const waFeatures = useMemo(() => {
+    try { return featuresJson ? JSON.parse(featuresJson) : null; } catch { return null; }
+  }, [featuresJson]);
+
+  const whyFeaturesJson = getCmsField(cmsPage, 'wa-why', 'features_json', isRTL, '');
+  const waWhyFeatures = useMemo(() => {
+    try { return whyFeaturesJson ? JSON.parse(whyFeaturesJson) : null; } catch { return null; }
+  }, [whyFeaturesJson]);
+
+  const campaignsBadge = getCmsField(cmsPage, 'wa-marketing', 'badge', isRTL, 'التسويق الذكي');
+  const campaignsTitle = getCmsField(cmsPage, 'wa-features', 'campaigns_title', isRTL, 'أطلق حملاتك التسويقية بذكاء');
+  const campaignsSubtitle = getCmsField(cmsPage, 'wa-marketing', 'subtitle', isRTL, 'استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل.');
+
+  const campaignsJson = getCmsField(cmsPage, 'wa-marketing', 'campaigns_json', isRTL, '');
+  const waCampaigns = useMemo(() => {
+    try { return campaignsJson ? JSON.parse(campaignsJson) : null; } catch { return null; }
+  }, [campaignsJson]);
 
   const integrationsTitle = getCmsField(cmsPage, 'wa-integrations', 'title', isRTL, 'نتكامل مع أدواتك المفضلة');
   const integrationsJson = getCmsField(cmsPage, 'wa-integrations', 'integrations_json', isRTL, '');
@@ -330,10 +373,59 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const greenTickTitle = getCmsField(cmsPage, 'wa-green-tick', 'title', isRTL, 'احصل على الشارة الخضراء');
   const greenTickSubtitle = getCmsField(cmsPage, 'wa-green-tick', 'subtitle', isRTL, 'عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب');
 
+  const tickComparisonJson = getCmsField(cmsPage, 'wa-green-tick', 'comparison_json', isRTL, '');
+  const waTickComparison = useMemo(() => {
+    try { return tickComparisonJson ? JSON.parse(tickComparisonJson) : null; } catch { return null; }
+  }, [tickComparisonJson]);
+  const displayTickComparison = waTickComparison && waTickComparison.length > 0 ? waTickComparison : GREEN_TICK_COMPARISON;
+
+  const competitiveJson = getCmsField(cmsPage, 'wa-green-tick', 'competitive_json', isRTL, '');
+  const waCompetitiveEdge = useMemo(() => {
+    try { return competitiveJson ? JSON.parse(competitiveJson) : null; } catch { return null; }
+  }, [competitiveJson]);
+  const displayCompetitiveEdge = waCompetitiveEdge && waCompetitiveEdge.length > 0 ? waCompetitiveEdge : COMPETITIVE_EDGE;
+
   const ctaTitle = getCmsField(cmsPage, 'wa-footer-cta', 'title', isRTL, 'جاهز لنقل خدمة عملائك لمستوى آخر؟');
   const ctaSubtitle = getCmsField(cmsPage, 'wa-footer-cta', 'subtitle', isRTL, 'فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية');
+  const ctaPrimaryBtn = getCmsField(cmsPage, 'wa-footer-cta', 'cta_primary', isRTL, 'اطلب الخدمة الآن');
+  const ctaSecondaryBtn = getCmsField(cmsPage, 'wa-footer-cta', 'cta_secondary', isRTL, 'تحدث مع المبيعات');
+
+  const pricingTitle = getCmsField(cmsPage, 'wa-pricing', 'title', isRTL, 'اختر الباقة المناسبة لنمو أعمالك');
+  const pricingSubtitle = getCmsField(cmsPage, 'wa-pricing', 'subtitle', isRTL, 'باقات مرنة تناسب جميع أحجام الأعمال');
+  const pricingNoteTitle = getCmsField(cmsPage, 'wa-pricing', 'plans_note', isRTL, 'ملاحظة مهمة');
+  const pricingNoteText = getCmsField(cmsPage, 'wa-pricing', 'contact_note', isRTL, 'الأسعار الموضحة تشمل 3 شرائح لكل باقة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.');
+
+  const apiPricingTitle = getCmsField(cmsPage, 'wa-features', 'api_pricing_title', isRTL, 'أسعار محادثات واتساب API');
 
   const personaTitle = getCmsField(cmsPage, 'wa-persona', 'title', isRTL, 'اختر مسارك');
+  const merchantTitle = getCmsField(cmsPage, 'wa-persona', 'merchant_title_ar', isRTL, 'للمتاجر والمسوقين');
+  const developerTitle = getCmsField(cmsPage, 'wa-persona', 'developer_title_ar', isRTL, 'للمطورين والتقنيين');
+
+  const statsJson = getCmsField(cmsPage, 'wa-stats', 'stats_json', isRTL, '');
+  const waStats = useMemo(() => {
+    try { return statsJson ? JSON.parse(statsJson) : null; } catch { return null; }
+  }, [statsJson]);
+  const displayStats = waStats && waStats.length > 0 ? waStats : STATS_DATA;
+
+  const partnersJson = getCmsField(cmsPage, 'wa-partners', 'partners_json', isRTL, '');
+  const waPartnersLogos = useMemo(() => {
+    try { return partnersJson ? JSON.parse(partnersJson) : null; } catch { return null; }
+  }, [partnersJson]);
+  const displayPartnerLogos = waPartnersLogos && waPartnersLogos.length > 0 ? waPartnersLogos : PARTNER_LOGOS;
+  const partnerRow1 = displayPartnerLogos.slice(0, Math.ceil(displayPartnerLogos.length / 2));
+  const partnerRow2 = displayPartnerLogos.slice(Math.ceil(displayPartnerLogos.length / 2));
+
+  const merchantStepsJson = getCmsField(cmsPage, 'wa-persona', 'merchant_steps_json', isRTL, '');
+  const waMerchantSteps = useMemo(() => {
+    try { return merchantStepsJson ? JSON.parse(merchantStepsJson) : null; } catch { return null; }
+  }, [merchantStepsJson]);
+  const displayMerchantSteps = waMerchantSteps && waMerchantSteps.length > 0 ? waMerchantSteps : MERCHANT_STEPS;
+
+  const developerToolsJson = getCmsField(cmsPage, 'wa-persona', 'developer_tools_json', isRTL, '');
+  const waDeveloperTools = useMemo(() => {
+    try { return developerToolsJson ? JSON.parse(developerToolsJson) : null; } catch { return null; }
+  }, [developerToolsJson]);
+  const displayDeveloperTools = waDeveloperTools && waDeveloperTools.length > 0 ? waDeveloperTools : DEVELOPER_TOOLS;
 
   // Pricing from CMS
   const plansJson = getCmsField(cmsPage, 'wa-pricing', 'plans_list', isRTL, '');
@@ -455,7 +547,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
               <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 backdrop-blur-sm rounded-full px-4 py-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-green-400 text-sm font-semibold">
-                  {isRTL ? 'واتساب أعمال API المعتمد' : 'Official WhatsApp Business API'}
+                  {heroBadge}
                 </span>
               </div>
 
@@ -468,29 +560,11 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
               />
 
                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
-                {isRTL ? (
-                  <>
-                    تواصل احترافي مع عملائك{' '}
-                    <br />
-                    <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
-                      عبر واتساب أعمال
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Professional Communication{' '}
-                    <br />
-                    <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
-                      via WhatsApp Business
-                    </span>
-                  </>
-                )}
+                {heroTitle}
               </h1>
 
               <p className="text-base md:text-lg text-slate-400 leading-relaxed max-w-xl">
-                {isRTL
-                  ? 'كن أقرب لعملائك على واتساب — رسائل تسويقية معتمدة، ردود آلية ذكية، وإدارة محادثات مركزية من لوحة تحكم واحدة'
-                  : 'Get closer to your customers on WhatsApp — verified marketing messages, smart auto-replies, and centralized chat management from one dashboard'}
+                {heroSubtitle}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -498,13 +572,13 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                   href="https://app.mobile.net.sa/reg"
                   className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl font-bold text-lg text-center hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5"
                 >
-                  {isRTL ? 'ابدأ الآن — تجربة مجانية لواتساب أعمال' : 'Start Now — Free WhatsApp Business Trial'}
+                  {heroCtaPrimary}
                 </a>
                 <a
                   href="#contact"
                   className="border-2 border-white/20 text-white backdrop-blur-sm px-8 py-4 rounded-2xl font-bold text-lg text-center hover:bg-white/10 hover:border-green-500/50 transition-all"
                 >
-                  {isRTL ? 'تحدث مع المبيعات' : 'Talk to Sales'}
+                  {heroCtaSecondary}
                 </a>
               </div>
 
@@ -517,7 +591,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                   ))}
                 </div>
                 <p className="text-sm text-slate-500">
-                  {isRTL ? '+20,000 جهة تستخدم واتساب أعمال معنا' : '+20,000 entities using WhatsApp Business with us'}
+                  {socialProof}
                 </p>
               </div>
             </div>
@@ -668,7 +742,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {STATS_DATA.map((stat, i) => {
+            {displayStats.map((stat: any, i: number) => {
               const { ref, inView } = useInView();
               const count = useCountUp(stat.end, 2200, inView);
               return (
@@ -696,12 +770,10 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-10 text-center mb-10 md:mb-12">
           <ScrollReveal>
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              {isRTL ? 'شركاء النجاح' : 'Success Partners'}
+              {partnersTitle}
             </h2>
             <p className="mt-3 text-slate-500 text-sm md:text-lg max-w-xl mx-auto">
-              {isRTL
-                ? 'يثق بنا أكثر من 20,000 جهة حكومية وخاصة في المملكة'
-                : 'Trusted by over 20,000 government and private entities in the Kingdom'}
+              {partnersSubtitle}
             </p>
           </ScrollReveal>
         </div>
@@ -709,12 +781,12 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         {/* Row 1 */}
         <div className="relative overflow-hidden mb-6">
           <div className="marquee-row-glass flex gap-4 w-max">
-            {[...MARQUEE_ROW1, ...MARQUEE_ROW1].map((logo, i) => (
+            {[...partnerRow1, ...partnerRow1].map((logo: any, i: number) => (
               <div
                 key={i}
                 className="flex-shrink-0 bg-white/5 backdrop-blur-xl rounded-xl p-4 h-20 w-36 border border-white/10 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 hover:border-green-500/30 hover:bg-white/10"
               >
-                <Image src={logo} alt="" width={100} height={40} className="object-contain max-h-12 w-auto brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
+                <Image src={logo.image || logo} alt="" width={100} height={40} className="object-contain max-h-12 w-auto brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
               </div>
             ))}
           </div>
@@ -723,12 +795,12 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         {/* Row 2 */}
         <div className="relative overflow-hidden">
           <div className="marquee-row-reverse-glass flex gap-4 w-max">
-            {[...MARQUEE_ROW2, ...MARQUEE_ROW2].map((logo, i) => (
+            {[...partnerRow2, ...partnerRow2].map((logo: any, i: number) => (
               <div
                 key={i}
                 className="flex-shrink-0 bg-white/5 backdrop-blur-xl rounded-xl p-4 h-20 w-36 border border-white/10 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 hover:border-green-500/30 hover:bg-white/10"
               >
-                <Image src={logo} alt="" width={100} height={40} className="object-contain max-h-12 w-auto brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
+                <Image src={logo.image || logo} alt="" width={100} height={40} className="object-contain max-h-12 w-auto brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
               </div>
             ))}
           </div>
@@ -764,17 +836,17 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
               <MessageCircle className="w-4 h-4 text-green-400" />
               <span className="text-green-400 text-sm font-semibold">
-                {isRTL ? 'واتساب أعمال API' : 'WhatsApp Business API'}
+                {featuresBadge}
               </span>
             </div>
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              {isRTL ? 'أدوات احترافية لإدارة محادثاتك' : 'Professional Tools to Manage Conversations'}
+              {featuresTitle}
             </h2>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {WHATSAPP_FEATURES.map((feat, i) => {
-              const Icon = feat.icon;
+            {(waFeatures ?? WHATSAPP_FEATURES).map((feat: any, i: number) => {
+              const Icon = typeof feat.icon === 'function' ? feat.icon : getLucideIcon(feat.iconName || feat.icon || 'Shield');
               return (
                 <ScrollReveal key={i}>
                   <div className="group bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 hover:border-green-500/30 transition-all duration-300 hover:bg-white/10 h-full">
@@ -805,16 +877,16 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-10">
           <ScrollReveal className="text-center mb-10 md:mb-14">
               <h2 className="text-2xl md:text-4xl font-bold text-white">
-              {isRTL ? 'لماذا واتساب الأعمال؟' : 'Why WhatsApp Business?'}
+              {whyTitle}
             </h2>
             <p className="text-slate-400 mt-3 max-w-2xl mx-auto">
-              {isRTL ? 'المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة' : 'The most trusted and widespread platform for communicating with your customers in the Kingdom'}
+              {whySubtitle}
             </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {WHY_ORBIT.map((feat, i) => {
-              const Icon = feat.icon;
+            {(waWhyFeatures ?? WHY_ORBIT).map((feat: any, i: number) => {
+              const Icon = typeof feat.icon === 'function' ? feat.icon : getLucideIcon(feat.iconName || feat.icon || 'Shield');
               return (
                 <ScrollReveal key={i}>
                   <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-green-500/30 transition-all h-full">
@@ -846,17 +918,17 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
               <ScrollReveal>
                 <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
                   <Sparkles className="w-4 h-4 text-orange-400" />
-                  <span className="text-orange-400 text-sm font-bold">{isRTL ? 'التسويق الذكي' : 'Smart Marketing'}</span>
+                  <span className="text-orange-400 text-sm font-bold">{campaignsBadge}</span>
                 </div>
                 <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
-                  {isRTL ? 'أطلق حملاتك التسويقية بذكاء' : 'Launch Your Campaigns Smartly'}
+                  {campaignsTitle}
                 </h2>
                 <p className="text-slate-400 mb-8 leading-relaxed">
-                  {isRTL ? 'استهدف عملاءك بدقة، حدد جدولة زمنية للحملات، واستخدم قوالب رسائل جاهزة مع أزرار تفاعلية لزيادة معدلات التحويل.' : 'Target your customers accurately, schedule campaigns, and use ready-made message templates with interactive buttons to increase conversion rates.'}
+                  {campaignsSubtitle}
                 </p>
                 <div className="space-y-4">
-                  {CAMPAIGNS.map((campaign, i) => {
-                    const Icon = campaign.icon;
+                  {(waCampaigns ?? CAMPAIGNS).map((campaign: any, i: number) => {
+                    const Icon = typeof campaign.icon === 'function' ? campaign.icon : getLucideIcon(campaign.iconName || campaign.icon || 'Target');
                     return (
                       <motion.div key={i} initial={{ opacity: 0, x: isRTL ? 20 : -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className="flex gap-4 items-start bg-white/5 backdrop-blur-sm p-5 rounded-2xl border border-white/10 hover:border-orange-500/30 transition-all group">
                         <div className="bg-orange-500/10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -911,13 +983,13 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
           <ScrollReveal className="text-center mb-10 md:mb-14">
             <span className="text-purple-400 font-mono text-xs">{isRTL ? '>> الباقات والأسعار' : '>> Packages & Pricing'}</span>
             <h2 className="text-2xl md:text-4xl font-bold text-white mt-2 mb-3">
-              {isRTL ? 'اختر الباقة المناسبة لنمو أعمالك' : 'Choose the Right Package for Your Business Growth'}
+              {pricingTitle}
             </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">{isRTL ? 'باقات مرنة تناسب جميع أحجام الأعمال' : 'Flexible packages suitable for all business sizes'}</p>
+            <p className="text-slate-400 max-w-xl mx-auto">{pricingSubtitle}</p>
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {PRICING_PLANS.map((plan, planIndex) => {
+            {(waPlans ?? PRICING_PLANS).map((plan, planIndex) => {
               const tierIndex = selectedTier[plan.id] ?? 0;
               const tier = plan.tiers[tierIndex];
               return (
@@ -932,7 +1004,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                       <h3 className="text-xl md:text-2xl font-extrabold text-white text-center mb-4">{isRTL ? plan.nameAr : plan.nameEn}</h3>
                       {plan.tiers.length > 1 && (
                         <div className="flex gap-1.5 justify-center mb-4">
-                          {plan.tiers.map((t, ti) => (
+                          {(plan.tiers || []).map((t, ti) => (
                             <button key={ti} onClick={() => setSelectedTier(prev => ({ ...prev, [plan.id]: ti }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tierIndex === ti ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
                               {isRTL ? t.nameAr : t.nameEn}
                             </button>
@@ -967,7 +1039,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                           <Sparkles className="w-3 h-3 text-green-400" />
                           {isRTL ? 'المميزات الإضافية' : 'Additional Features'}
                         </h4>
-                        {(isRTL ? plan.featuresAr : plan.featuresEn).map((f, fi) => (
+                        {((isRTL ? plan.featuresAr : plan.featuresEn) || []).map((f, fi) => (
                           <div key={fi} className="flex items-start gap-2">
                             <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
                             <span className="text-xs text-slate-300">{f}</span>
@@ -984,9 +1056,9 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             <div className="text-center bg-blue-500/10 border-2 border-blue-500/20 rounded-xl p-6 max-w-4xl mx-auto mt-8 backdrop-blur-sm">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Star className="w-5 h-5 text-blue-400" />
-                <p className="font-bold text-white">{isRTL ? 'ملاحظة مهمة' : 'Important Note'}</p>
+                <p className="font-bold text-white">{pricingNoteTitle}</p>
               </div>
-              <p className="text-slate-400">{isRTL ? 'الأسعار الموضحة تشمل 3 شرائح لكل باقة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.' : 'The stated prices include 3 tiers for each package. Special discounts available for large companies and government entities.'}</p>
+              <p className="text-slate-400">{pricingNoteText}</p>
             </div>
           </ScrollReveal>
         </div>
@@ -1000,11 +1072,11 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8">
           <ScrollReveal className="text-center mb-10 md:mb-14">
             <span className="text-blue-400 font-mono text-xs">{isRTL ? '>> تكلفة المحادثات' : '>> Conversation Costs'}</span>
-            <h2 className="text-2xl md:text-4xl font-bold text-white mt-2 mb-3">{isRTL ? 'أسعار محادثات واتساب API' : 'WhatsApp API Conversation Prices'}</h2>
+            <h2 className="text-2xl md:text-4xl font-bold text-white mt-2 mb-3">{apiPricingTitle}</h2>
             <p className="text-slate-400">{isRTL ? 'الأسعار التالية محددة من واتساب (Meta) للسوق السعودي' : 'The following prices are standardized by WhatsApp (Meta) for the Saudi Market'}</p>
           </ScrollReveal>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {API_PRICING.map((item, i) => (
+            {(waConvPrices ?? API_PRICING).map((item, i) => (
               <ScrollReveal key={i}>
                 <div className={`border ${item.color} rounded-2xl p-6 hover:shadow-lg hover:shadow-green-500/5 transition-all backdrop-blur-sm`}>
                   <div className="text-center mb-4">
@@ -1051,8 +1123,8 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4 shadow-lg shadow-green-500/30">
               <BadgeCheck className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-3">{isRTL ? 'احصل على الشارة الخضراء' : 'Get the Green Tick'}</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">{isRTL ? 'عزز ثقة عملائك وتميز عن المنافسين بحساب موثوق رسمياً من واتساب' : 'Boost your customers\' trust and stand out from competitors with an officially verified WhatsApp account'}</p>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-3">{greenTickTitle}</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">{greenTickSubtitle}</p>
           </ScrollReveal>
           <ScrollReveal>
             <div className="border-2 border-green-500/30 rounded-2xl overflow-hidden backdrop-blur-xl bg-white/5">
@@ -1067,7 +1139,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {GREEN_TICK_COMPARISON.map((item, i) => (
+                    {displayTickComparison.map((item: any, i: number) => (
                       <tr key={i} className={`border-t border-white/10 ${i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-white/[0.05]'}`}>
                         <td className="p-4 text-white font-medium">{isRTL ? item.featureAr : item.featureEn}</td>
                         <td className="p-4 text-center"><X className="w-6 h-6 text-red-400 mx-auto" strokeWidth={3} /></td>
@@ -1097,7 +1169,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-10">
           <ScrollReveal className="text-center mb-10 md:mb-14">
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              {isRTL ? 'نتكامل مع أدواتك المفضلة' : 'Seamless Integrations'}
+              {integrationsTitle}
             </h2>
           </ScrollReveal>
 
@@ -1137,7 +1209,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
         <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-10">
           <ScrollReveal className="text-center mb-8 md:mb-10">
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              {isRTL ? 'اختر مسارك' : 'Choose Your Path'}
+              {personaTitle}
             </h2>
           </ScrollReveal>
 
@@ -1151,7 +1223,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {isRTL ? 'للمتاجر والمسوقين' : 'For Merchants & Marketers'}
+                {merchantTitle}
               </button>
               <button
                 onClick={() => setActiveTab('developer')}
@@ -1161,7 +1233,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {isRTL ? 'للمطورين والتقنيين' : 'For Developers & Engineers'}
+                {developerTitle}
               </button>
             </div>
           </div>
@@ -1177,17 +1249,13 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                 className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 md:p-12"
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                  {[
-                    {step: '01', titleAr: 'أنشئ قالب واتساب', titleEn: 'Create WhatsApp Template', descAr: 'صمّم قالب رسالتك المعتمدة من واتساب بنقرة واحدة', descEn: 'Design your WhatsApp-approved message template with one click' },
-                    { step: '02', titleAr: 'أدر محادثاتك', titleEn: 'Manage Conversations', descAr: 'رد على عملائك من لوحة تحكم مركزية مع ردود سريعة', descEn: 'Reply to customers from a central dashboard with quick replies' },
-                    { step: '03', titleAr: 'حلّل أداءك', titleEn: 'Analyze Performance', descAr: 'تتبع نسب الفتح والنقر والتحويل بتقارير واتساب التفصيلية', descEn: 'Track open, click & conversion rates with detailed WhatsApp reports' },
-                  ].map((item, i) => (
+                  {displayMerchantSteps.map((item: any, i: number) => (
                     <div key={i} className="text-center">
                       <div className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-4">
-                        <span className="text-2xl font-extrabold bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">{item.step}</span>
+                        <span className="text-2xl font-extrabold bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">{String(i + 1).padStart(2, '0')}</span>
                       </div>
                       <h3 className="text-lg font-bold text-white mb-2">
-                        {isRTL ? item.titleAr : item.titleEn}
+                        {isRTL ? item.stepAr : item.stepEn}
                       </h3>
                       <p className="text-slate-400 text-sm">{isRTL ? item.descAr : item.descEn}</p>
                     </div>
@@ -1246,14 +1314,10 @@ Authorization: Bearer YOUR_API_KEY
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-                    {[
-                      { ar: 'SDK متعدد اللغات', en: 'Multi-language SDK' },
-                      { ar: 'Webhooks فورية', en: 'Instant Webhooks' },
-                      { ar: 'بيئة اختبار Sandbox', en: 'Sandbox Environment' },
-                    ].map((tool, i) => (
+                    {displayDeveloperTools.map((tool: any, i: number) => (
                       <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl p-4 text-center border border-white/10">
                         <Check className="w-5 h-5 text-green-400 mx-auto mb-2" />
-                        <span className="text-sm font-semibold text-white">{isRTL ? tool.ar : tool.en}</span>
+                        <span className="text-sm font-semibold text-white">{isRTL ? tool.titleAr : tool.titleEn}</span>
                       </div>
                     ))}
                   </div>
@@ -1286,17 +1350,17 @@ Authorization: Bearer YOUR_API_KEY
           <ScrollReveal>
             <Sparkles className="w-16 h-16 text-green-300 mx-auto mb-6" />
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6">
-              {isRTL ? 'جاهز لنقل خدمة عملائك لمستوى آخر؟' : 'Ready to take your customer service to the next level?'}
+              {ctaTitle}
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              {isRTL ? 'فريقنا جاهز لمساعدتك في الحصول على الشارة الخضراء وربط الـ API بكل سهولة واحترافية' : 'Our team is ready to help you get the Green Badge and integrate the API easily and professionally'}
+              {ctaSubtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="https://app.mobile.net.sa/reg" className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-10 py-4 rounded-2xl text-lg shadow-2xl shadow-orange-500/50 transition-all hover:-translate-y-0.5">
-                {isRTL ? 'اطلب الخدمة الآن' : 'Order Service Now'} <ArrowRight className={`w-5 h-5 inline ${isRTL ? 'mr-2' : 'ml-2'}`} />
+                {ctaPrimaryBtn} <ArrowRight className={`w-5 h-5 inline ${isRTL ? 'mr-2' : 'ml-2'}`} />
               </a>
               <a href="https://wa.me/966920006900" target="_blank" rel="noopener noreferrer" className="bg-green-500 hover:bg-green-600 border-2 border-green-500 text-white font-bold px-10 py-4 rounded-2xl text-lg shadow-2xl shadow-green-500/50 transition-all hover:-translate-y-0.5">
-                {isRTL ? 'تحدث مع المبيعات' : 'Talk to Sales'} <Headphones className={`w-5 h-5 inline ${isRTL ? 'mr-2' : 'ml-2'}`} />
+                {ctaSecondaryBtn} <Headphones className={`w-5 h-5 inline ${isRTL ? 'mr-2' : 'ml-2'}`} />
               </a>
             </div>
 
