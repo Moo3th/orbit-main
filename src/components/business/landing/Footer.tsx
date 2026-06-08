@@ -60,7 +60,7 @@ export const Footer = () => {
             <ul className="space-y-4 text-sm text-[#E8DCCB]/80">
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4" />
-                <span>marketing@corbit.sa</span>
+                <span>info@corbit.sa</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4" />
@@ -78,7 +78,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-[#E8DCCB]/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#E8DCCB]/60">
-          <p>© 2025 مدار (Orbit). جميع الحقوق محفوظة.</p>
+          <p>© 2025 مدار (CORBIT). جميع الحقوق محفوظة.</p>
           <div className="flex items-center gap-6">
             <span>السجل التجاري: 7012398264</span>
             <span>التصريح: LGP0921-22</span>

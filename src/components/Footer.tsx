@@ -47,6 +47,12 @@ interface FooterCmsData {
     active: boolean;
     openInNewTab: boolean;
   }>;
+  paymentMethods?: Array<{
+    id: string;
+    name: string;
+    logo: string;
+    active: boolean;
+  }>;
   copyrightAr?: string;
   copyrightEn?: string;
   countryAr?: string;
@@ -83,23 +89,28 @@ const cmsFooterDefaults: Required<FooterCmsData> = {
   phoneNumber: "920006900",
   emailLabelAr: "البريد الإلكتروني",
   emailLabelEn: "Email",
-  emailAddress: "marketing@corbit.sa",
+  emailAddress: "info@corbit.sa",
   addressLabelAr: "العنوان",
   addressLabelEn: "Address",
-  addressDetailAr: "المملكة العربية السعودية",
-  addressDetailEn: "Saudi Arabia",
+  addressDetailAr: "المدينة المنورة، حي الراية، طريق الملك عبدالله بن عبدالعزيز، مبنى 8443، الرمز البريدي 42312",
+  addressDetailEn: "Madinah, Ar Rayah Dist., King Abdullah Bin Abdulaziz Rd., Bldg 8443, P.O. 42312",
   socialItems: [
     { id: "social-instagram", platform: "Instagram", icon: "instagram", url: "https://www.instagram.com/orbittec_sa?igsh=MXFqZmluMWhrbXk0dg==", active: true, openInNewTab: true },
     { id: "social-x", platform: "X", icon: "twitter", url: "https://x.com/orbittec_sa", active: true, openInNewTab: true },
   ],
+  paymentMethods: [
+    { id: "pay-mada", name: "Mada", logo: "/payment/mada.svg", active: true },
+    { id: "pay-visa", name: "Visa", logo: "/payment/visa.svg", active: true },
+    { id: "pay-mastercard", name: "Mastercard", logo: "/payment/mastercard.svg", active: true },
+  ],
   copyrightAr: "جميع الحقوق محفوظة لشركة المدار",
-  copyrightEn: "All rights reserved to Orbit",
+  copyrightEn: "All rights reserved to CORBIT",
   countryAr: "المملكة العربية السعودية",
   countryEn: "Saudi Arabia",
-  commercialRegistryAr: "السجل التجاري: 1010956877",
-  commercialRegistryEn: "CR: 1010956877",
-  licenseAr: "رقم الترخيص: 16-01-001098",
-  licenseEn: "License: 16-01-001098",
+  commercialRegistryAr: "السجل التجاري: 7012398264",
+  commercialRegistryEn: "CR: 7012398264",
+  licenseAr: "رقم الترخيص: LGP0921-22",
+  licenseEn: "License: LGP0921-22",
 };
 
 export default function Footer() {
@@ -141,6 +152,22 @@ export default function Footer() {
       revalidateOnReconnect: false,
       dedupingInterval: 60000,
     }
+  );
+
+  // الصفحات القانونية النشطة (ديناميكية — الروابط والأسماء يتحكّم بها الأدمن)
+  const { data: legalPages = [] } = useSWR<Array<{ slug: string; title: { ar: string; en: string } }>>(
+    'footer-legal-pages',
+    async () => {
+      try {
+        const r = await fetch('/api/legal');
+        if (!r.ok) return [];
+        const d = await r.json();
+        return Array.isArray(d.pages) ? d.pages : [];
+      } catch {
+        return [];
+      }
+    },
+    { revalidateOnFocus: false, revalidateOnReconnect: false, dedupingInterval: 60000 }
   );
 
   React.useEffect(() => {
@@ -190,7 +217,10 @@ export default function Footer() {
       ? mergeNavItems(footerData.solutions, cmsFooterDefaults.solutions)
       : cmsFooterDefaults.solutions,
     socialItems: Array.isArray(footerData?.socialItems) && footerData.socialItems.length ? footerData.socialItems : cmsFooterDefaults.socialItems,
+    paymentMethods: Array.isArray(footerData?.paymentMethods) ? footerData.paymentMethods : cmsFooterDefaults.paymentMethods,
   } as Required<FooterCmsData>;
+
+  const activePaymentMethods = (resolvedFooterData.paymentMethods || []).filter((p) => p.active && p.logo);
 
   const solutionMapping: Record<string, string> = {
     '/products/sms': 'sms',
@@ -277,7 +307,7 @@ export default function Footer() {
               {logoSrc ? (
                 <Image
                   src={encodeImagePath(logoSrc)}
-                  alt="ORBIT Logo"
+                  alt="CORBIT Logo"
                   fill
                   className="object-cover object-left scale-[1.25]"
                   priority
@@ -478,9 +508,38 @@ export default function Footer() {
           </div>
         </motion.div>
 
+        {/* Payment Methods */}
+        {activePaymentMethods.length > 0 && (
+          <motion.div
+            className="flex flex-col items-center gap-3 mt-4"
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            dir={isRTL ? 'rtl' : 'ltr'}
+          >
+            <span className="text-xs text-white/50">{isRTL ? 'وسائل الدفع' : 'Payment Methods'}</span>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {activePaymentMethods.map((pm) => (
+                <span
+                  key={pm.id}
+                  className="inline-flex items-center justify-center h-9 px-1 bg-white rounded-md shadow-sm"
+                  title={pm.name}
+                >
+                  <img
+                    src={pm.logo}
+                    alt={pm.name || 'payment method'}
+                    className="h-7 w-auto object-contain"
+                    loading="lazy"
+                  />
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Copyright */}
         <motion.div
-          className="text-center text-white/60  text-sm border-t border-white/10 pt-8"
+          className="text-center text-white/60  text-sm border-t border-white/10 pt-8 mt-8"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.9 }}
@@ -491,14 +550,11 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 text-white/40">
             <span>{commercialRegistry}</span>
             <span>{licenseText}</span>
-            <a 
-              href="https://app.mobile.net.sa/terms-of-use" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-white transition-colors"
-            >
-              {isRTL ? "شروط المستخدم" : "Terms of Use"}
-            </a>
+            {legalPages.map((p) => (
+              <Link key={p.slug} href={`/${p.slug}`} className="hover:text-white transition-colors">
+                {isRTL ? (p.title?.ar || p.slug) : (p.title?.en || p.slug)}
+              </Link>
+            ))}
           </div>
         </motion.div>
       </div>

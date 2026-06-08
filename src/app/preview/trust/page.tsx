@@ -20,7 +20,7 @@ const solutions = [
     descAr: "منصة رسائل ذكية للتواصل الفوري مع عملائك", descEn: "Smart messaging platform for instant communication",
     featuresAr: ["تنبيهات فورية", "حملات تسويقية", "رموز تحقق OTP"],
     featuresEn: ["Instant Alerts", "Marketing Campaigns", "OTP Verification"],
-    link: "/solutions/sms-platform",
+    link: "/products/sms",
   },
   {
     icon: ({ className }: { className?: string }) => (
@@ -30,7 +30,7 @@ const solutions = [
     descAr: "حل متكامل للتواصل الرسمي عبر واتساب", descEn: "Complete solution for official WhatsApp communication",
     featuresAr: ["ردود تلقائية", "إشعارات الطلبات", "حملات معتمدة"],
     featuresEn: ["Auto Replies", "Order Notifications", "Verified Campaigns"],
-    link: "/solutions/whatsapp-business-api",
+    link: "/products/whatsapp",
   },
   {
     icon: ({ className }: { className?: string }) => (
@@ -40,14 +40,14 @@ const solutions = [
     descAr: "نظام حضور وانصراف ذكي لإدارة الموارد البشرية", descEn: "Smart attendance system for HR management",
     featuresAr: ["تسجيل الحضور", "تقارير فورية", "حساب الرواتب"],
     featuresEn: ["Attendance Tracking", "Real-time Reports", "Payroll"],
-    link: "/solutions/otime",
+    link: "/products/o-time",
   },
   {
     icon: Building2, titleAr: "البوابة الحكومية Gov Gate", titleEn: "Gov Gate Portal",
     descAr: "بوابة مراسلات رسمية بأعلى مستويات الأمان", descEn: "Official messaging portal with highest security",
     featuresAr: ["رسائل معتمدة", "استضافة محلية", "تشفير عالي"],
     featuresEn: ["Certified Messages", "Local Hosting", "High Encryption"],
-    link: "/solutions/gov-gate",
+    link: "/products/gov-gate",
   },
 ];
 
@@ -363,7 +363,7 @@ export default function TrustPage() {
         </div>
       </section>
 
-      {/* ========== WHY ORBIT ========== */}
+      {/* ========== WHY CORBIT ========== */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
@@ -458,8 +458,8 @@ export default function TrustPage() {
             <Image src={encodeImagePath("/logo/شعار المدار1-01.png")} alt="Orbit" width={80} height={30} className="h-10 w-auto brightness-0 invert opacity-80" />
             <div className="flex flex-wrap gap-6 text-sm">
               <span>📞 920006900</span>
-              <span>✉️ info@ot.com.sa</span>
-              <span>📍 {t("الرياض، طريق الملك فهد", "Riyadh, King Fahd Road")}</span>
+              <span>✉️ info@corbit.sa</span>
+              <span>📍 {t("المدينة المنورة، حي الراية، طريق الملك عبدالله بن عبدالعزيز", "Madinah, Ar Rayah Dist., King Abdullah Bin Abdulaziz Rd.")}</span>
             </div>
             <p className="text-xs opacity-50">© {new Date().getFullYear()} Orbit. {t("جميع الحقوق محفوظة", "All rights reserved")}</p>
           </div>

@@ -351,7 +351,7 @@ export const FormsFormPage = ({ slug }: Props) => {
           <Phone className="w-4 h-4" /> {isRTL ? 'اتصل بنا' : 'Call Us'}
         </a>
         <a 
-          href="mailto:info@orbit.sa" 
+          href="mailto:info@corbit.sa" 
           className="inline-flex items-center gap-2 px-6 py-3 border-2 rounded-lg transition-all font-medium"
           style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
         >

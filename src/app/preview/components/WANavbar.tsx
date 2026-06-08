@@ -283,8 +283,8 @@ export default function WANavbar({ isRTL, setIsRTL, variant = 'dark' }: WANavbar
                     <a href="tel:920006900" className={`${isDark ? 'text-slate-400 hover:text-green-400' : 'text-gray-500 hover:text-[#128C7E]'} transition-colors flex items-center gap-2`}>
                       <Smartphone className="w-4 h-4" /> 920006900
                     </a>
-                    <a href="mailto:info@ot.com.sa" className={`${isDark ? 'text-slate-400 hover:text-green-400' : 'text-gray-500 hover:text-[#128C7E]'} transition-colors`}>
-                      info@ot.com.sa
+                    <a href="mailto:info@corbit.sa" className={`${isDark ? 'text-slate-400 hover:text-green-400' : 'text-gray-500 hover:text-[#128C7E]'} transition-colors`}>
+                      info@corbit.sa
                     </a>
                   </div>
                 </div>

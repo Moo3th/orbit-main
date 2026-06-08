@@ -45,7 +45,7 @@ const translations: { en: AdminTranslations; ar: AdminTranslations } = {
     logout: 'Logout',
     welcome: 'Welcome back,',
     adminDashboard: 'Admin Dashboard',
-    controlPanel: 'ORBIT Control Panel',
+    controlPanel: 'CORBIT Control Panel',
     backToDashboard: 'Back to Dashboard',
     saveChanges: 'Save Changes',
     saving: 'Saving...',

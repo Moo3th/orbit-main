@@ -151,8 +151,8 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           icon: Store,
           label: isRTL ? (s.badgeAr || s.titleAr) : (s.badgeEn || s.titleEn),
           messages: s.messages || [
-            { sender: isRTL ? "المدار" : "ORBIT", text: isRTL ? "مرحباً بك في عالم المراسلة!" : "Welcome to the world of messaging!" },
-            { sender: isRTL ? "أوربيت" : "ORBIT", text: isRTL ? "طلبك قيد المعالجة." : "Your order is being processed." }
+            { sender: isRTL ? "المدار" : "CORBIT", text: isRTL ? "مرحباً بك في عالم المراسلة!" : "Welcome to the world of messaging!" },
+            { sender: isRTL ? "أوربيت" : "CORBIT", text: isRTL ? "طلبك قيد المعالجة." : "Your order is being processed." }
           ],
           color: idx % 2 === 0 ? "bg-pink-50" : "bg-blue-50",
           imgColor: idx % 2 === 0 ? "bg-pink-100" : "bg-blue-100"

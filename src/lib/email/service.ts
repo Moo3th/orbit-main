@@ -49,8 +49,8 @@ async function sendViaEmailJS(
         template_params: {
           to_email: toEmails,
           to_name: toEmails,
-          from_name: options.from || 'ORBIT',
-          from_email: options.replyTo || 'noreply@orbit.sa',
+          from_name: options.from || 'CORBIT',
+          from_email: options.replyTo || 'info@corbit.sa',
           reply_to: options.replyTo || options.from,
           subject: options.subject,
           message: options.text || '',
@@ -99,7 +99,7 @@ async function sendViaSMTP(
     const toEmails = Array.isArray(options.to) ? options.to : [options.to];
     
     const mailOptions = {
-      from: `"${options.from || 'ORBIT'}" <${smtpUser}>`,
+      from: `"${options.from || 'CORBIT'}" <${smtpUser}>`,
       to: toEmails.join(', '),
       subject: options.subject,
       text: options.text,
@@ -178,7 +178,7 @@ export function buildContactEmailBody(data: {
   const { name, email, phone, company, product, subject, message, source } = data;
 
   const text = `
-تم استلام طلب اتصال جديد من موقع المدار (ORBIT)
+تم استلام طلب اتصال جديد من موقع المدار (CORBIT)
 
 ═══════════════════════════════════════
 معلومات المرسل:
@@ -220,7 +220,7 @@ ${message}
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">🚀 المدار (ORBIT)</div>
+      <div class="logo">🚀 المدار (CORBIT)</div>
       <p>طلب اتصال جديد</p>
     </div>
     
@@ -249,7 +249,7 @@ ${message}
     </div>
     
     <div class="footer">
-      تم الإرسال من موقع المدار (ORBIT)<br>
+      تم الإرسال من موقع المدار (CORBIT)<br>
       ${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })}
     </div>
   </div>
@@ -275,7 +275,7 @@ export function buildWhatsAppRequestEmailBody(data: {
   const { name, email, phone, companyName, planId, tierId, industry, goal, employeeCount, notes } = data;
 
   const text = `
-تم استلام طلب خدمة واتساب جديد من موقع المدار (ORBIT)
+تم استلام طلب خدمة واتساب جديد من موقع المدار (CORBIT)
 
 ═══════════════════════════════════════
 معلومات العميل:
@@ -322,7 +322,7 @@ ${notes ? `ملاحظات: ${notes}` : ''}
   <div class="container">
     <div class="header">
       <div class="logo">📱 طلب خدمة واتساب</div>
-      <p>المدار (ORBIT)</p>
+      <p>المدار (CORBIT)</p>
     </div>
     
     <div class="section">
@@ -350,7 +350,7 @@ ${notes ? `ملاحظات: ${notes}` : ''}
     </div>
     
     <div class="footer">
-      تم الإرسال من موقع المدار (ORBIT)<br>
+      تم الإرسال من موقع المدار (CORBIT)<br>
       ${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })}
     </div>
   </div>

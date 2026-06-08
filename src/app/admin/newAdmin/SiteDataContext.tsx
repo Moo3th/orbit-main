@@ -44,6 +44,13 @@ export interface FooterSocialItem {
   openInNewTab: boolean;
 }
 
+export interface FooterPaymentItem {
+  id: string;
+  name: string;
+  logo: string;
+  active: boolean;
+}
+
 export interface FooterData {
   logoDefault: string;
   logoDark: string;
@@ -65,6 +72,7 @@ export interface FooterData {
   addressDetailAr: string;
   addressDetailEn: string;
   socialItems: FooterSocialItem[];
+  paymentMethods: FooterPaymentItem[];
   copyrightAr: string;
   copyrightEn: string;
   countryAr: string;
@@ -496,7 +504,7 @@ const homeTrustFields: SectionField[] = [
 ];
 
 const homeWhyUsFields: SectionField[] = [
-  { key: "section_title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا المدار؟", valueEn: "Why ORBIT?" },
+  { key: "section_title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا المدار؟", valueEn: "Why CORBIT?" },
   { key: "section_subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "text", value: "نقدم لك مزايا فريدة تجعل تجربتك أفضل", valueEn: "We offer unique advantages that make your experience better" },
   { key: "support_title", label: "عنوان الدعم المحلي", labelEn: "Local Support Title", type: "text", value: "دعم فني محلي", valueEn: "Local Support" },
   { key: "support_desc", label: "وصف الدعم المحلي", labelEn: "Local Support Description", type: "text", value: "فريق سعودي يرد عليك واتساب/هاتف على مدار الساعة لخدمتك.", valueEn: "A Saudi team answering you via WhatsApp/phone 24/7." },
@@ -614,7 +622,7 @@ const smsHeroFields: SectionField[] = [
 ];
 
 const smsValueFields: SectionField[] = [
-  { key: "title", label: "عنوان قسم المميزات", labelEn: "Value Props Title", type: "text", value: "لماذا الرسائل النصية مع المدار؟", valueEn: "Why SMS with ORBIT?" },
+  { key: "title", label: "عنوان قسم المميزات", labelEn: "Value Props Title", type: "text", value: "لماذا الرسائل النصية مع المدار؟", valueEn: "Why SMS with CORBIT?" },
   { key: "features_json", label: "قائمة المميزات (JSON)", labelEn: "Features List (JSON)", type: "list", value: "", valueEn: "" },
   { key: "feature1_title", label: "عنوان الميزة 1 (قديم)", labelEn: "Feature 1 Title", type: "text", value: "سرعة فورية", valueEn: "Zero Latency" },
   { key: "feature1_desc", label: "وصف الميزة 1 (قديم)", labelEn: "Feature 1 Description", type: "textarea", value: "رسائلك تصل في ثوانٍ معدودة، حتى في أوقات الذروة.", valueEn: "Your messages arrive in seconds, even during peak times." },
@@ -1090,8 +1098,8 @@ const defaultWhatsAppRequestFormFields: SectionField[] = [
     label: "بريد الإشعارات",
     labelEn: "Notification Email",
     type: "text",
-    value: "marketing@corbit.sa",
-    valueEn: "marketing@corbit.sa",
+    value: "info@corbit.sa",
+    valueEn: "info@corbit.sa",
   },
 ];
 
@@ -1489,8 +1497,8 @@ const defaultContactSections: PageSection[] = [
         label: "البريد الإلكتروني",
         labelEn: "Email Address",
         type: "text",
-        value: "sales@orbit.sa",
-        valueEn: "sales@orbit.sa",
+        value: "info@corbit.sa",
+        valueEn: "info@corbit.sa",
       },
       {
         key: "email_note",
@@ -1513,8 +1521,8 @@ const defaultContactSections: PageSection[] = [
         label: "تفاصيل العنوان",
         labelEn: "Address Details",
         type: "text",
-        value: "طريق الملك فهد",
-        valueEn: "King Fahd Road",
+        value: "طريق الملك عبدالله بن عبدالعزيز",
+        valueEn: "King Abdullah Bin Abdulaziz Rd.",
       },
       {
         key: "whatsapp_title",
@@ -1590,60 +1598,60 @@ const MIN_EXPECTED_PAGES = 4;
 
 const DEFAULT_SEO: Record<string, { title: string; titleEn: string; description: string; descriptionEn: string; keywords: string; keywordsEn: string }> = {
   home: {
-    title: 'ORBIT | المدار - حلول تقنية رائدة',
-    titleEn: 'ORBIT - Leading Technical Solutions',
-    description: 'ORBIT المدار - مزود حلول تقنية رائد في المملكة العربية السعودية. خدمات الرسائل النصية SMS وواتساب أعمال API وبرامج الموارد البشرية وبوابات المراسلة الحكومية.',
-    descriptionEn: 'ORBIT - Leading technical solutions provider in Saudi Arabia. SMS messaging, WhatsApp Business API, HR software, and government messaging gateways.',
-    keywords: 'ORBIT, المدار, حلول تقنية, SMS, واتساب, السعودية, رسائل نصية',
-    keywordsEn: 'ORBIT, technical solutions, SMS, WhatsApp, Saudi Arabia, messaging, API',
+    title: 'CORBIT | المدار - حلول تقنية رائدة',
+    titleEn: 'CORBIT - Leading Technical Solutions',
+    description: 'CORBIT المدار - مزود حلول تقنية رائد في المملكة العربية السعودية. خدمات الرسائل النصية SMS وواتساب أعمال API وبرامج الموارد البشرية وبوابات المراسلة الحكومية.',
+    descriptionEn: 'CORBIT - Leading technical solutions provider in Saudi Arabia. SMS messaging, WhatsApp Business API, HR software, and government messaging gateways.',
+    keywords: 'CORBIT, المدار, حلول تقنية, SMS, واتساب, السعودية, رسائل نصية',
+    keywordsEn: 'CORBIT, technical solutions, SMS, WhatsApp, Saudi Arabia, messaging, API',
   },
   sms: {
     title: 'خدمة الرسائل النصية SMS | المدار',
-    titleEn: 'SMS Messaging Service | ORBIT',
+    titleEn: 'SMS Messaging Service | CORBIT',
     description: 'خدمة الرسائل النصية SMS من المدار - حلول مراسلة موثوقة وفعالة للشركات والمؤسسات في السعودية.',
-    descriptionEn: 'SMS Messaging Service by ORBIT - Reliable and efficient messaging solutions for businesses in Saudi Arabia.',
+    descriptionEn: 'SMS Messaging Service by CORBIT - Reliable and efficient messaging solutions for businesses in Saudi Arabia.',
     keywords: 'SMS, رسائل نصية, خدمة رسائل, المدار, السعودية, أطفال رسائل',
-    keywordsEn: 'SMS, messaging, text messages, ORBIT, Saudi Arabia, bulk SMS',
+    keywordsEn: 'SMS, messaging, text messages, CORBIT, Saudi Arabia, bulk SMS',
   },
   whatsapp: {
     title: 'واتساب أعمال API | المدار',
-    titleEn: 'WhatsApp Business API | ORBIT',
+    titleEn: 'WhatsApp Business API | CORBIT',
     description: 'واتساب أعمال API من المدار - تواصل مع عملائك عبر واتساب بشكل احترافي وآمن.',
-    descriptionEn: 'WhatsApp Business API by ORBIT - Connect with your customers professionally and securely via WhatsApp.',
+    descriptionEn: 'WhatsApp Business API by CORBIT - Connect with your customers professionally and securely via WhatsApp.',
     keywords: 'واتساب, WhatsApp, واتساب أعمال, API, المدار, تسويق',
-    keywordsEn: 'WhatsApp, WhatsApp Business, API, ORBIT, marketing, messaging',
+    keywordsEn: 'WhatsApp, WhatsApp Business, API, CORBIT, marketing, messaging',
   },
   otime: {
     title: 'O-Time برنامج الموارد البشرية | المدار',
-    titleEn: 'O-Time HR Software | ORBIT',
+    titleEn: 'O-Time HR Software | CORBIT',
     description: 'برنامج O-Time لإدارة الموارد البشرية - منصة متكاملة للحضور والرواتب ودورة حياة الموظف.',
     descriptionEn: 'O-Time HR Software - Complete platform for attendance, payroll, and employee lifecycle management.',
     keywords: 'O-Time, موارد بشرية, إدارة حضور, رواتب, المدار',
-    keywordsEn: 'O-Time, HR, attendance, payroll, ORBIT, employee management',
+    keywordsEn: 'O-Time, HR, attendance, payroll, CORBIT, employee management',
   },
   govgate: {
     title: 'Gov Gate بوابة حكومية | المدار',
-    titleEn: 'Gov Gate | ORBIT',
+    titleEn: 'Gov Gate | CORBIT',
     description: 'بوابة Gov Gate للحوسبة المؤسسية - منصة مراسلة آمنة ومتخصصة للجهات الحكومية.',
     descriptionEn: 'Gov Gate - Secure enterprise messaging gateway for government entities.',
     keywords: 'Gov Gate, بوابة حكومية, مراسلة, حكومة, المدار',
-    keywordsEn: 'Gov Gate, government gateway, messaging, ORBIT, secure',
+    keywordsEn: 'Gov Gate, government gateway, messaging, CORBIT, secure',
   },
   contact: {
     title: 'تواصل معنا | المدار',
-    titleEn: 'Contact Us | ORBIT',
+    titleEn: 'Contact Us | CORBIT',
     description: 'تواصل معنا - المدار لحلول التقنية. نحن هنا لمساعدتك في جميع استفساراتك.',
-    descriptionEn: 'Contact ORBIT - We are here to help with all your inquiries.',
+    descriptionEn: 'Contact CORBIT - We are here to help with all your inquiries.',
     keywords: 'تواصل معنا, المدار, اتصل بنا, دعم فني',
-    keywordsEn: 'contact us, ORBIT, support, inquiry',
+    keywordsEn: 'contact us, CORBIT, support, inquiry',
   },
   blog: {
     title: 'المدونة | المدار',
-    titleEn: 'Blog | ORBIT',
+    titleEn: 'Blog | CORBIT',
     description: 'مدونة المدار - أحدث الأخبار والمقالات عن الحلول التقنية والاتصالات.',
-    descriptionEn: 'ORBIT Blog - Latest news and articles about technology solutions and communications.',
+    descriptionEn: 'CORBIT Blog - Latest news and articles about technology solutions and communications.',
     keywords: 'مدونة, المدار, أخبار تقنية, مقالات',
-    keywordsEn: 'blog, ORBIT, tech news, articles',
+    keywordsEn: 'blog, CORBIT, tech news, articles',
   },
 };
 
@@ -1679,7 +1687,7 @@ const ensureMissingPages = (pages: PageData[]): PageData[] => {
       descriptionEn: DEFAULT_SEO[bp.id].descriptionEn,
       keywords: DEFAULT_SEO[bp.id].keywords,
       keywordsEn: DEFAULT_SEO[bp.id].keywordsEn,
-      canonical: `https://orbit.sa${bp.path}`,
+      canonical: `https://corbit.sa${bp.path}`,
       noIndex: false,
       ogImage: '',
     } : undefined,
@@ -1793,11 +1801,11 @@ const defaultFooterData: FooterData = {
   phoneNumber: "920006900",
   emailLabelAr: "البريد الإلكتروني",
   emailLabelEn: "Email",
-  emailAddress: "marketing@corbit.sa",
+  emailAddress: "info@corbit.sa",
   addressLabelAr: "العنوان",
   addressLabelEn: "Address",
-  addressDetailAr: "المملكة العربية السعودية",
-  addressDetailEn: "Saudi Arabia",
+  addressDetailAr: "المدينة المنورة، حي الراية، طريق الملك عبدالله بن عبدالعزيز، مبنى 8443، الرمز البريدي 42312",
+  addressDetailEn: "Madinah, Ar Rayah Dist., King Abdullah Bin Abdulaziz Rd., Bldg 8443, P.O. 42312",
   socialItems: [
     {
       id: "social-instagram",
@@ -1816,14 +1824,19 @@ const defaultFooterData: FooterData = {
       openInNewTab: true,
     },
   ],
+  paymentMethods: [
+    { id: "pay-mada", name: "Mada", logo: "/payment/mada.svg", active: true },
+    { id: "pay-visa", name: "Visa", logo: "/payment/visa.svg", active: true },
+    { id: "pay-mastercard", name: "Mastercard", logo: "/payment/mastercard.svg", active: true },
+  ],
   copyrightAr: "جميع الحقوق محفوظة لشركة المدار",
-  copyrightEn: "All rights reserved to Orbit",
+  copyrightEn: "All rights reserved to CORBIT",
   countryAr: "المملكة العربية السعودية",
   countryEn: "Saudi Arabia",
-  commercialRegistryAr: "السجل التجاري: 1010956877",
-  commercialRegistryEn: "CR: 1010956877",
-  licenseAr: "رقم الترخيص: 16-01-001098",
-  licenseEn: "License: 16-01-001098",
+  commercialRegistryAr: "السجل التجاري: 7012398264",
+  commercialRegistryEn: "CR: 7012398264",
+  licenseAr: "رقم الترخيص: LGP0921-22",
+  licenseEn: "License: LGP0921-22",
 };
 
 const mergeFooterData = (value: unknown): FooterData => {
@@ -1864,6 +1877,9 @@ const mergeFooterData = (value: unknown): FooterData => {
     socialItems: Array.isArray(raw.socialItems) && raw.socialItems.length
       ? (raw.socialItems as FooterSocialItem[])
       : (migratedSocials.length ? migratedSocials : defaultFooterData.socialItems),
+    paymentMethods: Array.isArray(raw.paymentMethods)
+      ? (raw.paymentMethods as FooterPaymentItem[])
+      : defaultFooterData.paymentMethods,
   };
 };
 

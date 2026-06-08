@@ -1330,7 +1330,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
   const [saving, setSaving] = useState(false);
   
   const getDefaultSeo = (pageData: any): PageSeo => {
-    const pageTitle = pageData?.title || pageData?.titleEn || 'ORBIT';
+    const pageTitle = pageData?.title || pageData?.titleEn || 'CORBIT';
     const pagePath = pageData?.path || '';
     return {
       title: pageData?.seo?.title || `${pageTitle} | حلول تقنية رائدة`,
@@ -1339,7 +1339,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
       descriptionEn: pageData?.seo?.descriptionEn || 'Leading technical solutions provider in Saudi Arabia',
       keywords: pageData?.seo?.keywords || 'SMS, WhatsApp, واتساب, رسائل,API',
       keywordsEn: pageData?.seo?.keywordsEn || 'SMS, WhatsApp, messaging, API',
-      canonical: pageData?.seo?.canonical || `https://orbit.sa${pagePath}`,
+      canonical: pageData?.seo?.canonical || `https://corbit.sa${pagePath}`,
       noIndex: pageData?.seo?.noIndex || false,
       ogImage: pageData?.seo?.ogImage || '',
     };
@@ -1864,7 +1864,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
                   onChange={(e) => setSeo({ ...seo, canonical: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm"
                   dir="ltr"
-                  placeholder="https://orbit.sa/page"
+                  placeholder="https://corbit.sa/page"
                 />
               </div>
               <div className="flex items-center pt-6">

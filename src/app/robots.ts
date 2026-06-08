@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getCachedSeoSettings } from '@/lib/seo';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa';
   
   let robotsRules: MetadataRoute.Robots['rules'] = {
     userAgent: '*',

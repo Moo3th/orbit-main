@@ -284,7 +284,7 @@ export function CmsSeoView({ isAr }: Props) {
               onChange={(e) => setSettings({ ...settings, notificationEmail: e.target.value })} 
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
               dir="ltr" 
-              placeholder="sales@orbit.sa, marketing@corbit.sa"
+              placeholder="info@corbit.sa, info@corbit.sa"
             />
             <p className="text-xs text-gray-500 mt-2">
               {isAr 

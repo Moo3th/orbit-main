@@ -129,7 +129,7 @@ export default function WAFooter({ isRTL, variant = 'dark' }: WAFooterProps) {
                 </div>
                 <div>
                   <p className={`text-xs ${mutedColor}`}>{isRTL ? 'البريد الإلكتروني' : 'Email'}</p>
-                  <a href="mailto:info@ot.com.sa" className={`text-sm ${textColor} ${hoverColor} transition-colors`}>info@ot.com.sa</a>
+                  <a href="mailto:info@corbit.sa" className={`text-sm ${textColor} ${hoverColor} transition-colors`}>info@corbit.sa</a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -138,7 +138,7 @@ export default function WAFooter({ isRTL, variant = 'dark' }: WAFooterProps) {
                 </div>
                 <div>
                   <p className={`text-xs ${mutedColor}`}>{isRTL ? 'العنوان' : 'Address'}</p>
-                  <p className={`text-sm ${textColor}`}>{isRTL ? 'الرياض، طريق الملك فهد' : 'Riyadh, King Fahd Road'}</p>
+                  <p className={`text-sm ${textColor}`}>{isRTL ? 'المدينة المنورة، حي الراية، طريق الملك عبدالله بن عبدالعزيز' : 'Madinah, Ar Rayah Dist., King Abdullah Bin Abdulaziz Rd.'}</p>
                 </div>
               </li>
             </ul>
@@ -164,11 +164,14 @@ export default function WAFooter({ isRTL, variant = 'dark' }: WAFooterProps) {
             />
           </div>
           <div className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs ${mutedColor}`}>
-            <span>&copy; {new Date().getFullYear()} {isRTL ? 'المدار. جميع الحقوق محفوظة' : 'Orbit. All rights reserved'}</span>
-            <span>{isRTL ? 'السجل التجاري: 1010956877' : 'CR: 1010956877'}</span>
-            <span>{isRTL ? 'رقم الترخيص: 16-01-001098' : 'License: 16-01-001098'}</span>
-            <a href="https://app.mobile.net.sa/terms-of-use" target="_blank" rel="noopener noreferrer" className={`${hoverColor} transition-colors`}>
-              {isRTL ? 'شروط الاستخدام' : 'Terms of Use'}
+            <span>&copy; {new Date().getFullYear()} {isRTL ? 'المدار. جميع الحقوق محفوظة' : 'CORBIT. All rights reserved'}</span>
+            <span>{isRTL ? 'السجل التجاري: 7012398264' : 'CR: 7012398264'}</span>
+            <span>{isRTL ? 'رقم الترخيص: LGP0921-22' : 'License: LGP0921-22'}</span>
+            <a href="/terms" className={`${hoverColor} transition-colors`}>
+              {isRTL ? 'الشروط والأحكام' : 'Terms & Conditions'}
+            </a>
+            <a href="/privacy" className={`${hoverColor} transition-colors`}>
+              {isRTL ? 'سياسة الخصوصية' : 'Privacy Policy'}
             </a>
           </div>
         </div>

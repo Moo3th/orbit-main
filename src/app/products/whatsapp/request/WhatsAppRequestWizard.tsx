@@ -264,7 +264,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
     'wa-request-form',
     'notification_email',
     isRTL,
-    'marketing@corbit.sa'
+    'info@corbit.sa'
   );
 
   const validateStep = (step: number): boolean => {
@@ -1005,7 +1005,7 @@ export const WhatsAppRequestWizard = ({ cmsPage = null }: WhatsAppRequestWizardP
               <a href="tel:+966500000000" className="inline-flex items-center gap-2 px-6 py-3 bg-[#128C7E] text-white rounded-lg hover:bg-[#0d6b5f] transition-colors font-bold">
                 <Phone className="w-5 h-5" /> {isRTL ? 'اتصل بنا' : 'Call Us'}
               </a>
-              <a href="mailto:info@orbit.sa" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#128C7E] text-[#128C7E] rounded-lg hover:bg-[#128C7E]/5 transition-colors font-bold">
+              <a href="mailto:info@corbit.sa" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#128C7E] text-[#128C7E] rounded-lg hover:bg-[#128C7E]/5 transition-colors font-bold">
                 <Mail className="w-5 h-5" /> {isRTL ? 'راسلنا' : 'Email Us'}
               </a>
             </div>

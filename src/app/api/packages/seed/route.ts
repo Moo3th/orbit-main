@@ -11,7 +11,7 @@ export async function POST() {
     await requireAdmin();
     await connectDB();
 
-    // Delete existing packages and recreate with actual ORBIT packages
+    // Delete existing packages and recreate with actual CORBIT packages
     await Package.deleteMany({});
 
     // SMS Packages (from TechnicalPackages.tsx)

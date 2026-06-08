@@ -38,11 +38,11 @@ const normalizeSeoSettings = (doc: unknown): ISeoSettings | null => {
   return {
     key: String(settings.key),
     siteName: {
-      en: String(siteNameData.en || 'ORBIT'),
+      en: String(siteNameData.en || 'CORBIT'),
       ar: String(siteNameData.ar || 'المدار'),
     },
-    siteUrl: String(settings.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa'),
-    notificationEmail: String((settings.notificationEmail as string) || 'sales@orbit.sa'),
+    siteUrl: String(settings.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'),
+    notificationEmail: String((settings.notificationEmail as string) || 'info@corbit.sa'),
     emailConfig: {
       provider: (emailConfigData.provider as 'emailjs' | 'smtp' | 'none') || 'none',
       emailjsServiceId: String(emailConfigData.emailjsServiceId || ''),
@@ -68,7 +68,7 @@ const normalizeSeoSettings = (doc: unknown): ISeoSettings | null => {
       },
     },
     organization: {
-      name: String(orgData.name || 'ORBIT'),
+      name: String(orgData.name || 'CORBIT'),
       logo: String(orgData.logo || '/logo/شعار المدار-03.svg'),
       description: {
         en: String((orgData.description as Record<string, string>)?.en || ''),
@@ -80,7 +80,7 @@ const normalizeSeoSettings = (doc: unknown): ISeoSettings | null => {
         country: String((orgData.address as Record<string, string>)?.country || 'SA'),
       },
       phone: String(orgData.phone || ''),
-      email: String(orgData.email || 'info@orbit.sa'),
+      email: String(orgData.email || 'info@corbit.sa'),
       socialLinks: {
         twitter: String((orgData.socialLinks as Record<string, string>)?.twitter || ''),
         linkedin: String((orgData.socialLinks as Record<string, string>)?.linkedin || ''),
@@ -123,7 +123,7 @@ export const getCachedSeoSettings = unstable_cache(
 );
 
 export function generatePageMetadata(page: PageMetadataInput | null, settings: ISeoSettings | null) {
-  const baseUrl = settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa';
+  const baseUrl = settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa';
   
   const firstNonEmpty = (...values: (string | undefined | null)[]): string => {
     for (const v of values) {
@@ -139,7 +139,7 @@ export function generatePageMetadata(page: PageMetadataInput | null, settings: I
     settings?.defaultSeo?.title?.en,
     settings?.siteName?.ar,
     settings?.siteName?.en,
-    'ORBIT'
+    'CORBIT'
   );
   const description = firstNonEmpty(
     page?.seo?.description?.ar,
@@ -191,7 +191,7 @@ export function generatePageMetadata(page: PageMetadataInput | null, settings: I
       title: ogTitle,
       description: ogDescription,
       url: canonical,
-      siteName: settings?.siteName?.ar || settings?.siteName?.en || 'ORBIT',
+      siteName: settings?.siteName?.ar || settings?.siteName?.en || 'CORBIT',
       locale: 'ar_SA',
       alternateLocale: 'en_US',
       type: 'website',
@@ -254,7 +254,7 @@ export function generateWebsiteJsonLd(settings: ISeoSettings | null) {
   if (!settings) return null;
 
   const baseUrl = settings.siteUrl;
-  const name = settings.siteName.ar || settings.siteName.en || 'ORBIT';
+  const name = settings.siteName.ar || settings.siteName.en || 'CORBIT';
 
   return {
     '@context': 'https://schema.org',

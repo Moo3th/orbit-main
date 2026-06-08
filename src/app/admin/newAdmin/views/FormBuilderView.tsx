@@ -1034,7 +1034,7 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
             </div>
             <div>
               <label className="text-xs text-gray-500">{t('إيميلات الإشعار (مفصولة بفاصلة)', 'Notification Emails (comma separated)')}</label>
-              <input type="text" value={notificationEmails} onChange={(e) => setNotificationEmails(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="marketing@corbit.sa, sales@corbit.sa" dir="ltr" />
+              <input type="text" value={notificationEmails} onChange={(e) => setNotificationEmails(e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="info@corbit.sa, info@corbit.sa" dir="ltr" />
             </div>
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium">{t('تفعيل النموذج', 'Active')}</label>

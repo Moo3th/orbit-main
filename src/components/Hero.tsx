@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { shouldReduceAnimations, getPerformanceLevel } from '@/utils/deviceDetection';
+import { productHref } from '@/lib/productLinks';
 import Orb from './Orb';
 import OrbitSectionBackground from './OrbitSectionBackground';
 import Partners from './Partners';
@@ -420,7 +421,7 @@ export default function Hero() {
             {/* Navigation Arrows - Inside content on mobile, outside on desktop */}
             <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between pointer-events-none z-20 px-2 sm:px-0">
               <motion.button
-                className={`pointer-events-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full ${reduceAnimations ? 'bg-white dark:bg-gray-800' : 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm'} border border-neutral/20 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary active:bg-primary active:text-white transition-all shadow-lg sm:-translate-x-4 lg:-translate-x-6`}
+                className={`pointer-events-auto w-11 h-11 sm:w-12 sm:h-12 rounded-full ${reduceAnimations ? 'bg-white dark:bg-gray-800' : 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm'} border border-neutral/20 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary active:bg-primary active:text-white transition-all shadow-lg sm:-translate-x-4 lg:-translate-x-6`}
                 onClick={() =>
                   goToSolution(
                     (currentSolutionIndex - 1 + solutions.length) % solutions.length
@@ -445,7 +446,7 @@ export default function Hero() {
                 </svg>
               </motion.button>
               <motion.button
-                className={`pointer-events-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full ${reduceAnimations ? 'bg-white dark:bg-gray-800' : 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm'} border border-neutral/20 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary active:bg-primary active:text-white transition-all shadow-lg sm:translate-x-4 lg:translate-x-6`}
+                className={`pointer-events-auto w-11 h-11 sm:w-12 sm:h-12 rounded-full ${reduceAnimations ? 'bg-white dark:bg-gray-800' : 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm'} border border-neutral/20 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary active:bg-primary active:text-white transition-all shadow-lg sm:translate-x-4 lg:translate-x-6`}
                 onClick={() => goToSolution((currentSolutionIndex + 1) % solutions.length)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -545,7 +546,7 @@ export default function Hero() {
                           ? solutions[currentSolutionIndex].descriptionAr
                           : solutions[currentSolutionIndex].descriptionEn}
                       </motion.p>
-                      <Link href={`/solutions/${solutions[currentSolutionIndex].slug}`}>
+                      <Link href={productHref(solutions[currentSolutionIndex].slug)}>
                         <motion.div
                           whileHover={{ x: isRTL ? -5 : 5 }}
                           className="flex items-center gap-2 text-primary font-heading font-medium cursor-pointer text-sm sm:text-base md:text-lg lg:text-xl mt-2 sm:mt-4"
@@ -579,7 +580,7 @@ export default function Hero() {
                   {solutions.map((_, index) => (
                     <motion.button
                       key={index}
-                      className={`relative w-3.5 h-3.5 sm:w-3 sm:h-3 rounded-full transition-all touch-manipulation ${
+                      className={`relative w-3.5 h-3.5 sm:w-3 sm:h-3 rounded-full transition-all touch-manipulation before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-11 before:h-11 ${
                         index === currentSolutionIndex
                           ? 'bg-primary'
                           : 'bg-white/40 dark:bg-white/20 active:bg-white/60'

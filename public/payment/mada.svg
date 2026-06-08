@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" role="img" aria-label="Mada">
+  <rect width="120" height="40" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="60" y="26" text-anchor="middle" font-family="'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif" font-size="20" font-weight="700" fill="#0E4C92">مدى</text>
+  <rect x="42" y="30" width="22" height="3" rx="1.5" fill="#84BD00"/>
+  <rect x="66" y="30" width="12" height="3" rx="1.5" fill="#0E4C92"/>
+</svg>

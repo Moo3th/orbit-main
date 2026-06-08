@@ -45,7 +45,7 @@ export const ContactPage = () => {
       if (EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") {
         // Fallback: Open mailto link to send notification
         const productLabel = productOptions.find(p => p.value === formData.product)?.label || "غير محدد";
-        const subject = encodeURIComponent(`طلب تواصل جديد من ${formData.name} - المدار (Orbit)`);
+        const subject = encodeURIComponent(`طلب تواصل جديد من ${formData.name} - المدار (CORBIT)`);
         const body = encodeURIComponent(
           `طلب تواصل جديد:\n\n` +
           `الاسم: ${formData.name}\n` +
@@ -54,7 +54,7 @@ export const ContactPage = () => {
           `الشركة: ${formData.company || "غير محدد"}\n` +
           `الخدمة: ${productLabel}\n` +
           `الرسالة: ${formData.message}\n\n` +
-          `---\nتم الإرسال تلقائياً من موقع المدار (Orbit)`
+          `---\nتم الإرسال تلقائياً من موقع المدار (CORBIT)`
         );
 
         // Create a hidden iframe to trigger mailto without leaving the page
@@ -222,7 +222,7 @@ export const ContactPage = () => {
                 </div>
                 <div>
                   <h4 className="text-slate-900 mb-1">البريد الإلكتروني</h4>
-                  <p className="text-sm text-slate-500" dir="ltr">support@orbit.sa</p>
+                  <p className="text-sm text-slate-500" dir="ltr">info@corbit.sa</p>
                   <p className="text-xs text-slate-400 mt-1">نرد خلال 24 ساعة كحد أقصى</p>
                 </div>
               </CardContent>
@@ -236,7 +236,7 @@ export const ContactPage = () => {
                 <div>
                   <h4 className="text-slate-900 mb-1">العنوان</h4>
                   <p className="text-sm text-slate-500">المملكة العربية السعودية، الرياض</p>
-                  <p className="text-xs text-slate-400 mt-1">طريق الملك فهد، مبنى رقم 12</p>
+                  <p className="text-xs text-slate-400 mt-1">طريق الملك عبدالله بن عبدالعزيز، مبنى 8443</p>
                 </div>
               </CardContent>
             </Card>

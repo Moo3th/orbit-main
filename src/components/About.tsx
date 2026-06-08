@@ -246,7 +246,7 @@ export default function About({ data }: AboutProps) {
                     transition: { duration: 0.2 },
                   }}
                 >
-                  {isRTL ? 'المدار' : 'ORBIT'}
+                  {isRTL ? 'المدار' : 'CORBIT'}
                   {/* Glow effect on hover */}
                   <motion.span
                     className="absolute inset-0 blur-xl bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"

@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     });
 
     const seoSettings = await SeoSettings.findOne({ key: 'primary' }).lean();
-    const rawNotificationEmail = (seoSettings as any)?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'sales@orbit.sa';
+    const rawNotificationEmail = (seoSettings as any)?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'info@corbit.sa';
     const notificationEmails = parseEmailRecipients(rawNotificationEmail);
     const emailConfig = (seoSettings as any)?.emailConfig;
 

@@ -12,7 +12,7 @@ interface WhyUsProps {
 
 export const WhyUs = ({ pageData = null }: WhyUsProps) => {
   const { isRTL } = useLanguage();
-  const sectionTitle = getCmsField(pageData, 'home-whyus', 'section_title', isRTL, isRTL ? 'لماذا المدار؟' : 'Why ORBIT?');
+  const sectionTitle = getCmsField(pageData, 'home-whyus', 'section_title', isRTL, isRTL ? 'لماذا المدار؟' : 'Why CORBIT?');
   const sectionSubtitle = getCmsField(pageData, 'home-whyus', 'section_subtitle', isRTL, isRTL ? 'نقدم لك مزايا فريدة تجعل تجربتك أفضل' : 'We offer unique advantages that make your experience better');
   const features = [
     {

@@ -119,7 +119,7 @@ export default function Orb({
       return vec4(colorIn.rgb / (a + 1e-5), a);
     }
 
-    // ORBIT Brand Colors - Burgundy (Primary), Beige (Secondary), Cool Gray (Neutral)
+    // CORBIT Brand Colors - Burgundy (Primary), Beige (Secondary), Cool Gray (Neutral)
     // Burgundy #7A1E2E = rgb(122, 30, 46) = vec3(0.478, 0.118, 0.180)
     // Beige #E8DCCB = rgb(232, 220, 203) = vec3(0.910, 0.863, 0.796)
     // Cool Gray #A7A9AC = rgb(167, 169, 172) = vec3(0.655, 0.663, 0.675)

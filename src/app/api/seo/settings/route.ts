@@ -15,11 +15,11 @@ export async function GET() {
       settings = await SeoSettings.create({
         key: 'primary',
         siteName: {
-          en: 'ORBIT | المدار',
-          ar: 'ORBIT | المدار',
+          en: 'CORBIT | المدار',
+          ar: 'CORBIT | المدار',
         },
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa',
-        notificationEmail: 'sales@orbit.sa',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa',
+        notificationEmail: 'info@corbit.sa',
         emailConfig: {
           provider: 'none',
           emailjsServiceId: '',
@@ -36,7 +36,7 @@ export async function GET() {
           keywords: { en: '', ar: '' },
         },
         organization: {
-          name: 'ORBIT',
+          name: 'CORBIT',
           logo: '/logo/شعار المدار-03.svg',
           description: {
             en: 'Leading technical solutions provider in Saudi Arabia',
@@ -48,7 +48,7 @@ export async function GET() {
             country: 'SA',
           },
           phone: '',
-          email: 'info@orbit.sa',
+          email: 'info@corbit.sa',
           socialLinks: {},
         },
         analytics: {
@@ -65,7 +65,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /_next/
 
-Sitemap: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa'}/sitemap.xml`,
+Sitemap: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'}/sitemap.xml`,
         isActive: true,
       });
     }
@@ -77,7 +77,7 @@ Sitemap: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa'}/sitemap.xml`,
         key: settings.key,
         siteName: settings.siteName,
         siteUrl: settings.siteUrl,
-        notificationEmail: (settings as any).notificationEmail || 'sales@orbit.sa',
+        notificationEmail: (settings as any).notificationEmail || 'info@corbit.sa',
         emailConfig: (settings as any).emailConfig || {
           provider: 'none',
           emailjsServiceId: '',
@@ -160,7 +160,7 @@ export async function PUT(request: NextRequest) {
         key: settings!.key,
         siteName: settings!.siteName,
         siteUrl: settings!.siteUrl,
-        notificationEmail: (settings as any).notificationEmail || 'sales@orbit.sa',
+        notificationEmail: (settings as any).notificationEmail || 'info@corbit.sa',
         emailConfig: (settings as any).emailConfig || {
           provider: 'none',
           emailjsServiceId: '',

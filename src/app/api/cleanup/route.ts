@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
           partners: [],
           socialLinks: [],
           contactSubmissions: [],
-          notificationEmail: 'sales@orbit.sa',
+          notificationEmail: 'info@corbit.sa',
           footerData: {},
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }

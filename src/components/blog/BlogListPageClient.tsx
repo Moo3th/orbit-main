@@ -92,7 +92,7 @@ export default function BlogListPageClient({ posts }: BlogListPageClientProps) {
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
               {isRTL
                 ? 'تابع آخر مقالات وتحديثات أوربيت'
-                : 'Stay updated with the latest blog articles and product updates from ORBIT'}
+                : 'Stay updated with the latest blog articles and product updates from CORBIT'}
             </p>
           </div>
 

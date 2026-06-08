@@ -27,24 +27,24 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   variable: '--font-ibm-plex-arabic',
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getCachedSeoSettings();
   
   return {
-    title: settings?.siteName?.ar || settings?.siteName?.en || "ORBIT | المدار",
-    applicationName: settings?.siteName?.ar || "ORBIT | المدار",
+    title: settings?.siteName?.ar || settings?.siteName?.en || "CORBIT | المدار",
+    applicationName: settings?.siteName?.ar || "CORBIT | المدار",
     description: settings?.defaultSeo?.description?.ar || "حلول تقنية رائدة في المملكة العربية السعودية",
-    keywords: settings?.defaultSeo?.keywords?.ar || "ORBIT, المدار, حلول تقنية, SMS, واتساب, السعودية",
+    keywords: settings?.defaultSeo?.keywords?.ar || "CORBIT, المدار, حلول تقنية, SMS, واتساب, السعودية",
     icons: {
       icon: '/logo/شعار المدار-03.svg',
       apple: '/logo/شعار المدار-03.svg',
     },
     openGraph: {
-      title: settings?.siteName?.ar || "ORBIT | المدار",
+      title: settings?.siteName?.ar || "CORBIT | المدار",
       description: settings?.defaultSeo?.description?.ar || "حلول تقنية رائدة في المملكة العربية السعودية",
-      siteName: settings?.siteName?.ar || "ORBIT | المدار",
+      siteName: settings?.siteName?.ar || "CORBIT | المدار",
       type: "website",
       locale: "ar_SA",
       alternateLocale: "en_US",

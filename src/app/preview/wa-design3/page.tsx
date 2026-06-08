@@ -126,7 +126,7 @@ const WHATSAPP_FEATURES = [
   { icon: BarChart3, titleAr: 'تقارير تفصيلية', titleEn: 'Detailed Reports', descAr: 'تتبع أداء الحملات ومعدلات القراءة والاستجابة لحظياً', descEn: 'Track campaign performance, read rates, and instant responses' },
 ];
 
-const WHY_ORBIT = [
+const WHY_CORBIT = [
   { icon: Globe, titleAr: 'المنصة رقم 1 في المملكة', titleEn: 'The #1 Platform in the Kingdom', descAr: 'الأكثر انتشاراً واستخداماً في السعودية', descEn: 'The most widespread and used in Saudi Arabia' },
   { icon: CheckCircle2, titleAr: 'معدل فتح 98%', titleEn: '98% Open Rate', descAr: 'يتم فتح وقراءة معظم الرسائل فوراً', descEn: 'Most messages are opened and read immediately' },
   { icon: Shield, titleAr: 'آمن وموثوق', titleEn: 'Secure & Reliable', descAr: 'تشفير كامل من طرف لطرف للبيانات', descEn: 'End-to-end encryption for all data' },
@@ -394,7 +394,7 @@ export default function WADesign3Page() {
             </p>
           </ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {WHY_ORBIT.map((feat, i) => {
+            {WHY_CORBIT.map((feat, i) => {
               const Icon = feat.icon;
               return (
                 <ScrollReveal key={i}>
@@ -683,7 +683,7 @@ export default function WADesign3Page() {
           <ScrollReveal>
             <div className="mt-8 text-center bg-emerald-500/10 border-2 border-emerald-500/20 rounded-xl p-6 backdrop-blur-sm">
               <Award className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <p className="text-lg font-bold text-white mb-2">{isRTL ? 'فريق المدار يساعدك في تجهيز المتطلبات' : 'ORBIT Team helps you prepare the requirements'}</p>
+              <p className="text-lg font-bold text-white mb-2">{isRTL ? 'فريق المدار يساعدك في تجهيز المتطلبات' : 'CORBIT Team helps you prepare the requirements'}</p>
               <p className="text-slate-300">{isRTL ? 'نوفر لك الدعم الكامل للحصول على التوثيق الرسمي من واتساب' : 'We provide you with full support to get official WhatsApp verification'}</p>
             </div>
           </ScrollReveal>

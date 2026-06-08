@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       const admin = await User.create({
         email: 'admin@corbit',
         password: 'AAaa12341234',
-        name: 'ORBIT Admin',
+        name: 'CORBIT Admin',
         role: 'admin',
       });
 

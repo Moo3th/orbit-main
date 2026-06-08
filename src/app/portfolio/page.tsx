@@ -139,7 +139,7 @@ export default function PortfolioPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden" dir="ltr" style={{ width: '100%', maxWidth: '100vw' }}>
+    <div className="min-h-screen bg-black overflow-x-hidden w-full" dir="ltr">
       <Navbar />
 
       {/* Header */}
@@ -268,7 +268,6 @@ export default function PortfolioPage() {
             minHeight: 'calc(100vh - 150px)',
             paddingBottom: '300px',
             width: '100%',
-            maxWidth: '100vw',
           }}
         >
           {/* 6 Rows of Infinite Scrolling Cards */}

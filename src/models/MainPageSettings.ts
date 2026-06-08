@@ -20,7 +20,7 @@ const aboutSectionSchema = new mongoose.Schema({
   }]
 });
 
-// Why ORBIT Section Settings
+// Why CORBIT Section Settings
 const whyOrbitSectionSchema = new mongoose.Schema({
   stats: [{
     number: String,

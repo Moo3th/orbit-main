@@ -29,22 +29,22 @@ const solutions = [
   {
     icon: Send, accent: "bg-orange-100 text-orange-600", titleAr: "الرسائل النصية SMS", titleEn: "SMS Messaging",
     descAr: "أسرع طريقة للوصول لكل الجوالات. مثالية للإشعارات ورموز التحقق", descEn: "Fastest way to reach all phones. Perfect for alerts & OTP",
-    cta: "📱 جرب 50 رسالة مجانية", link: "/solutions/sms-platform",
+    cta: "📱 جرب 50 رسالة مجانية", link: "/products/sms",
   },
   {
     icon: MessageCircle, accent: "bg-emerald-100 text-emerald-600", titleAr: "واتساب للأعمال", titleEn: "WhatsApp Business",
     descAr: "تواصل مع عملائك على تطبيقهم المفضل. ردود آلية، وسائط، والمزيد", descEn: "Connect on their favorite app. Auto-replies, media & more",
-    cta: "💚 تفعيل فوري", link: "/solutions/whatsapp-business-api",
+    cta: "💚 تفعيل فوري", link: "/products/whatsapp",
   },
   {
     icon: Clock, accent: "bg-violet-100 text-violet-600", titleAr: "نظام OTime", titleEn: "OTime System",
     descAr: "خلّص نفسك من تعقيد الحضور والانصراف. نظام سهل وذكي لإدارة موظفينك", descEn: "Say goodbye to complex attendance. Smart & easy HR management",
-    cta: "⏰ جرّبه مجاناً", link: "/solutions/otime",
+    cta: "⏰ جرّبه مجاناً", link: "/products/o-time",
   },
   {
     icon: Shield, accent: "bg-primary/10 text-primary", titleAr: "البوابة الحكومية", titleEn: "Gov Gate",
     descAr: "للجهات الحكومية والكبيرة. بوابة مراسلات خاصة بأعلى معايير الأمان", descEn: "For government & enterprises. Private portal with top security",
-    cta: "🏛️ تحدث معنا", link: "/solutions/gov-gate",
+    cta: "🏛️ تحدث معنا", link: "/products/gov-gate",
   },
 ];
 
@@ -68,7 +68,7 @@ const partnerLogos = [
 ];
 
 const chatMessages = [
-  { from: "bot", ar: "أهلاً بك في المدار! كيف نقدر نساعدك؟ 😊", en: "Welcome to Orbit! How can we help? 😊", delay: 0.5 },
+  { from: "bot", ar: "أهلاً بك في المدار! كيف نقدر نساعدك؟ 😊", en: "Welcome to CORBIT! How can we help? 😊", delay: 0.5 },
   { from: "user", ar: "أبغى أرسل رسائل لعملائي", en: "I want to send messages to my customers", delay: 1.5 },
   { from: "bot", ar: "طيب! حمّل جهات اتصالك وابدأ الإرسال فوراً ✅", en: "Great! Upload your contacts and start sending now ✅", delay: 2.5 },
   { from: "bot", ar: "عندك 50 رسالة مجانية كهدية ترحيبية 🎁", en: "You have 50 free welcome messages 🎁", delay: 3.5 },
@@ -115,7 +115,7 @@ export default function WarmPage() {
         <div className="container mx-auto flex items-center justify-between text-sm text-slate-500">
           <div className="flex items-center gap-2">
             <Smile className="h-4 w-4 text-primary" />
-            <span>{t("أهلاً بك في المدار 💫", "Welcome to Orbit 💫")}</span>
+            <span>{t("أهلاً بك في المدار 💫", "Welcome to CORBIT 💫")}</span>
           </div>
           <div className="flex items-center gap-4">
             <span>📞 920006900</span>
@@ -264,7 +264,7 @@ export default function WarmPage() {
         </div>
       </section>
 
-      {/* ========== WHY PEOPLE LOVE ORBIT ========== */}
+      {/* ========== WHY PEOPLE LOVE CORBIT ========== */}
       <section className="py-20">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
@@ -395,8 +395,8 @@ export default function WarmPage() {
             </div>
             <div className="flex flex-wrap gap-4 text-sm">
               <span>📞 920006900</span>
-              <span>✉️ info@ot.com.sa</span>
-              <span>📍 {t("الرياض، طريق الملك فهد", "Riyadh, King Fahd Road")}</span>
+              <span>✉️ info@corbit.sa</span>
+              <span>📍 {t("المدينة المنورة، حي الراية، طريق الملك عبدالله بن عبدالعزيز", "Madinah, Ar Rayah Dist., King Abdullah Bin Abdulaziz Rd.")}</span>
             </div>
             <div className="flex gap-3 text-sm">
               <span>Instagram</span><span>·</span><span>X</span>

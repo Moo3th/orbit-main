@@ -1,13 +1,15 @@
 import { MetadataRoute } from 'next';
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
 import { getCachedSeoSettings } from '@/lib/seo';
+import { getActiveLegalPages } from '@/lib/cms/legal';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbit.sa';
-  
-  const [snapshot, settings] = await Promise.all([
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa';
+
+  const [snapshot, settings, legalPages] = await Promise.all([
     getSiteCmsSnapshot(),
     getCachedSeoSettings(),
+    getActiveLegalPages(),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -30,30 +32,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/solutions/whatsapp-business-api`,
+      url: `${baseUrl}/products/whatsapp`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/solutions/sms-platform`,
+      url: `${baseUrl}/products/sms`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/solutions/otime`,
+      url: `${baseUrl}/products/o-time`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/solutions/gov-gate`,
+      url: `${baseUrl}/products/gov-gate`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
   ];
+
+  // الصفحات القانونية (ديناميكية من قاعدة البيانات)
+  const legalEntries: MetadataRoute.Sitemap = legalPages.map((p) => ({
+    url: `${baseUrl}/${p.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'yearly' as const,
+    priority: 0.3,
+  }));
+  staticPages.push(...legalEntries);
 
   const pages = snapshot?.pages || [];
   const dynamicPages: MetadataRoute.Sitemap = pages.map((page) => ({

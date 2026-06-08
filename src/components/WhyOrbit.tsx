@@ -151,7 +151,7 @@ export default function WhyOrbit({ data }: WhyOrbitProps) {
               className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading mb-6 uppercase tracking-tight leading-tight"
               style={{ fontFamily: isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif' }}
             >
-              {t.about.stats?.title || (isRTL ? 'لماذا المدار التقني؟' : 'Why ORBIT Technical?')}
+              {t.about.stats?.title || (isRTL ? 'لماذا المدار التقني؟' : 'Why CORBIT Technical?')}
             </motion.h2>
             <motion.div
               className="h-1 bg-white/80 mx-auto rounded-full"

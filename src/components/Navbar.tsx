@@ -160,7 +160,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
               <img
                 src={navbarIsDark ? encodeImagePath("/logo/شعار المدار1-0٥.png") : encodeImagePath("/logo/شعار المدار1-0٢.png")}
-                alt="ORBIT Logo"
+                alt="CORBIT Logo"
                 className="h-16 sm:h-20 md:h-24 lg:h-48 w-auto object-contain lg:-my-10"
                 style={{
                   minWidth: 'auto',
@@ -276,9 +276,6 @@ export default function Navbar() {
                 onClick={(e) => {
                   e.preventDefault();
                   const config = (() => {
-                    if (pathname?.startsWith('/solutions')) {
-                      return { href: '/request-quote' };
-                    }
                     if (pathname === '/request-quote') {
                       return { href: '/contact' };
                     }
@@ -298,7 +295,6 @@ export default function Navbar() {
               >
                 <span className="relative z-10">
                   {(() => {
-                    if (pathname?.startsWith('/solutions')) return t.clientInquiryPage.title;
                     if (pathname === '/request-quote') return t.nav.contact;
                     return t.nav.contact;
                   })()}
@@ -589,9 +585,6 @@ function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorCl
               setIsOpen(false);
 
               const config = (() => {
-                if (pathname?.startsWith('/solutions')) {
-                  return { href: '/request-quote' };
-                }
                 if (pathname === '/request-quote') {
                   return { href: '/contact' };
                 }
@@ -607,7 +600,6 @@ function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorCl
             dir={isRTL ? 'rtl' : 'ltr'}
           >
             {(() => {
-              if (pathname?.startsWith('/solutions')) return t.clientInquiryPage.title;
               if (pathname === '/request-quote') return t.nav.contact;
               return t.nav.contact;
             })()}

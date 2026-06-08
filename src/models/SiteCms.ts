@@ -28,7 +28,7 @@ const siteCmsSchema = new Schema(
     contactSubmissions: { type: [Schema.Types.Mixed], default: [] },
     notificationEmail: {
       type: String,
-      default: 'sales@orbit.sa',
+      default: 'info@corbit.sa',
     },
     footerData: {
       type: Schema.Types.Mixed,

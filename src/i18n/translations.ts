@@ -1,4 +1,4 @@
-// ORBIT Brand Translations
+// CORBIT Brand Translations
 
 export const translations = {
   en: {
@@ -48,7 +48,7 @@ export const translations = {
       whyChooseUs: 'Why Choose Us?',
     },
     hero: {
-      title: 'ORBIT Your Success',
+      title: 'CORBIT Your Success',
       subtitle1: 'INNOVATION',
       subtitle2: 'EXCELLENCE',
       subtitle3: 'IMPACT',
@@ -57,7 +57,7 @@ export const translations = {
       cta2: 'Explore Services',
     },
     about: {
-      title: 'About ORBIT',
+      title: 'About CORBIT',
       description: 'A leading Saudi company providing smart technical solutions, enabling organizations to evolve through modern technologies that ensure higher efficiency, faster communication, and an integrated digital experience',
       vision: 'VISION',
       visionText: 'To be the first and most trusted technical partner in the Kingdom and beyond',
@@ -82,7 +82,7 @@ export const translations = {
         { title: 'Fast Deployment', desc: 'Quick deployment and seamless system integration' },
       ],
       stats: {
-        title: 'Why ORBIT Technical?',
+        title: 'Why CORBIT Technical?',
         items: [
           { number: '20+', label: 'Years of Experience' },
           { number: '20,000+', label: 'Government and Private Entities' },
@@ -115,17 +115,17 @@ export const translations = {
     },
     testimonials: {
       title: 'Client Testimonials',
-      description: 'Hear from partners who have successfully launched with ORBIT',
+      description: 'Hear from partners who have successfully launched with CORBIT',
     },
     faq: {
       title: 'Questions and Answers',
     },
     contact: {
       title: 'Ready To Launch Your Brand?',
-      description: 'Join the ORBIT network and let us propel your business to new heights with integrated solutions that deliver measurable impact',
+      description: 'Join the CORBIT network and let us propel your business to new heights with integrated solutions that deliver measurable impact',
       email: 'Email Us',
       quote: 'Request Consultation',
-      copyright: 'Copyright © 2025 ORBIT. All rights reserved.',
+      copyright: 'Copyright © 2025 CORBIT. All rights reserved.',
       country: 'Kingdom of Saudi Arabia',
     },
     joinTeamPage: {

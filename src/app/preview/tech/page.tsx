@@ -431,10 +431,10 @@ export default function TechPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono">
             <div className="flex items-center gap-3">
               <Image src={encodeImagePath("/logo/شعار المدار1-01.png")} alt="Orbit" width={32} height={12} className="h-6 w-auto brightness-0 invert opacity-50" />
-              <span>orbit.sa</span>
+              <span>corbit.sa</span>
             </div>
             <div className="flex gap-4">
-              <span>📡 920006900</span><span>📧 info@ot.com.sa</span><span>📍 {t("الرياض", "Riyadh")}</span>
+              <span>📡 920006900</span><span>📧 info@corbit.sa</span><span>📍 {t("الرياض", "Riyadh")}</span>
             </div>
             <span>© {new Date().getFullYear()} — v3.2.0</span>
           </div>

@@ -8,7 +8,7 @@ import {
   Handshake, Save, ChevronDown, ChevronUp, ExternalLink,
   Upload, CheckCircle, XCircle, X,
   Mail, MessageSquare, Phone, Inbox, PanelBottom, Newspaper,
-  ListChecks, Sparkles
+  ListChecks, Sparkles, ScrollText
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -18,7 +18,8 @@ import { Button } from "@/components/business/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/business/ui/card";
 import { Badge } from "@/components/business/ui/badge";
 import { encodeImagePath } from "@/utils/imagePath";
-import { useSiteData, type FooterData, type FooterNavItem, type FooterSocialItem, type SectionField } from "./SiteDataContext";
+import { useSiteData, type FooterData, type FooterNavItem, type FooterSocialItem, type FooterPaymentItem, type SectionField } from "./SiteDataContext";
+import { ImageUploader } from "@/components/business/ImageUploader";
 import {
   parseWhatsAppConversationPrices,
   parseWhatsAppPlans,
@@ -32,9 +33,10 @@ import { CmsPagesView } from './views/CmsPagesView';
 import { CmsPageEditorView } from './views/CmsPageEditorView';
 import { FormBuilderView } from './views/FormBuilderView';
 import { CmsSeoView } from './views/CmsSeoView';
+import { LegalPagesView } from './views/LegalPagesView';
 import { RichTextEditor } from "@/components/business/RichTextEditor";
 
-type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder";
+type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder" | "legal-pages";
 
 const adminLogoSrc = encodeImagePath("/logo/شعار المدار-01.svg");
 const ADMIN_EMAIL = "admin@corbit";
@@ -83,6 +85,7 @@ export const AdminDashboard = () => {
     { id: "wa-requests" as AdminView, icon: MessageSquare, label: isAr ? "طلبات واتساب" : "WhatsApp Requests" },
     { id: "submissions" as AdminView, icon: Inbox, label: isAr ? "طلبات تواصل" : "Contact Submissions" },
     { id: "footer" as AdminView, icon: PanelBottom, label: isAr ? "الفوتر" : "Footer CMS" },
+    { id: "legal-pages" as AdminView, icon: ScrollText, label: isAr ? "الصفحات القانونية" : "Legal Pages" },
     { id: "cms-seo" as AdminView, icon: Globe, label: isAr ? "إعدادات الموقع" : "Site Settings" },
   ];
 
@@ -100,6 +103,7 @@ export const AdminDashboard = () => {
     "cms-page-editor": "/admin/cms/pages/edit",
     "cms-seo": "/admin/cms/seo",
     "form-builder": "/admin/form-builder",
+    "legal-pages": "/admin/legal-pages",
   };
 
   const resolveViewFromPath = (path: string): AdminView => {
@@ -112,6 +116,7 @@ export const AdminDashboard = () => {
     if (path === "/admin/cms/pages") return "cms-pages";
     if (path === "/admin/cms/seo") return "cms-seo";
     if (path === "/admin/form-builder") return "form-builder";
+    if (path === "/admin/legal-pages") return "legal-pages";
     return "dashboard";
   };
 
@@ -206,6 +211,8 @@ export const AdminDashboard = () => {
         return <CmsPageEditorView isAr={isAr} pageId={editingPage} onBack={() => navigateToView("cms-pages")} />;
       case "cms-seo":
         return <CmsSeoView isAr={isAr} />;
+      case "legal-pages":
+        return <LegalPagesView isAr={isAr} />;
       default:
         return null;
     }
@@ -297,7 +304,7 @@ export const AdminDashboard = () => {
                 <img src={adminLogoSrc} alt="Orbit" className="h-7 w-auto brightness-0 invert" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[14px] font-black tracking-tighter leading-none text-white">ORBIT</span>
+                <span className="text-[14px] font-black tracking-tighter leading-none text-white">CORBIT</span>
                 <span className="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mt-0.5">CMS PRO</span>
               </div>
             </motion.div>
@@ -2281,6 +2288,30 @@ const FooterView = ({ isAr }: { isAr: boolean }) => {
     }));
   };
 
+  const addPaymentItem = () => {
+    setFooterData((prev) => ({
+      ...prev,
+      paymentMethods: [
+        ...(prev.paymentMethods || []),
+        { id: `pay-${Date.now()}`, name: "", logo: "", active: true },
+      ],
+    }));
+  };
+
+  const updatePaymentItem = (id: string, updates: Partial<FooterPaymentItem>) => {
+    setFooterData((prev) => ({
+      ...prev,
+      paymentMethods: (prev.paymentMethods || []).map((item) => (item.id === id ? { ...item, ...updates } : item)),
+    }));
+  };
+
+  const removePaymentItem = (id: string) => {
+    setFooterData((prev) => ({
+      ...prev,
+      paymentMethods: (prev.paymentMethods || []).filter((item) => item.id !== id),
+    }));
+  };
+
   const uploadLogo = async (key: "logoDefault" | "logoDark" | "logoWhatsApp", file: File) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -2467,6 +2498,62 @@ const FooterView = ({ isAr }: { isAr: boolean }) => {
 
       <Card className="border-0 shadow-sm">
         <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <CardTitle className="text-lg text-[#104E8B]">{isAr ? "وسائل الدفع" : "Payment Methods"}</CardTitle>
+              <p className="text-xs text-gray-500 mt-1">{isAr ? "شعارات وسائل الدفع المعروضة في التذييل (مدى، فيزا، ماستركارد...)" : "Payment logos shown in the footer (Mada, Visa, Mastercard...)"}</p>
+            </div>
+            <Button size="sm" className="bg-[#104E8B] hover:bg-[#0A2647] text-white w-full sm:w-auto" onClick={addPaymentItem}>
+              <Plus className="w-3.5 h-3.5" />
+              {isAr ? "إضافة وسيلة" : "Add Method"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(footerData.paymentMethods || []).map((item) => (
+            <div key={item.id} className={`grid lg:grid-cols-[1fr_2fr_auto_auto] gap-3 items-start p-3 rounded-lg border ${item.active ? "bg-gray-50 border-gray-200" : "bg-gray-100 border-gray-200 opacity-70"}`}>
+              <input
+                type="text"
+                value={item.name}
+                onChange={(e) => updatePaymentItem(item.id, { name: e.target.value })}
+                placeholder={isAr ? "الاسم (مثال: مدى)" : "Name (e.g. Mada)"}
+                className="border border-gray-200 rounded-md px-2 py-1.5 text-sm"
+              />
+              <div>
+                <ImageUploader
+                  value={item.logo}
+                  onChange={(url) => updatePaymentItem(item.id, { logo: url })}
+                  folder="payment"
+                  isAr={isAr}
+                  aspectRatio="auto"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => updatePaymentItem(item.id, { active: !item.active })}
+                className={`px-2 py-1 rounded-md text-xs h-fit ${item.active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+              >
+                {item.active ? (isAr ? "نشط" : "Active") : (isAr ? "مخفي" : "Hidden")}
+              </button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-200 text-red-600 hover:bg-red-50 h-fit"
+                onClick={() => removePaymentItem(item.id)}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {isAr ? "حذف" : "Delete"}
+              </Button>
+            </div>
+          ))}
+          {(!footerData.paymentMethods || footerData.paymentMethods.length === 0) && (
+            <p className="text-sm text-gray-500">{isAr ? "لا توجد وسائل دفع مضافة." : "No payment methods added yet."}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
           <div className="flex flex-col gap-3">
             <CardTitle className="text-lg text-[#104E8B]">{isAr ? "روابط سريعة" : "Quick Links"}</CardTitle>
             <div className="flex flex-wrap items-center gap-2">
@@ -2560,7 +2647,7 @@ const SettingsView = ({ isAr }: { isAr: boolean }) => {
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-3">
               <p className="text-xs text-gray-500">{isAr ? "إشعارات الطلبات" : "Submission Notifications"}</p>
-              <p className="text-sm text-gray-900 mt-1" dir="ltr">{notificationEmail || "sales@orbit.sa"}</p>
+              <p className="text-sm text-gray-900 mt-1" dir="ltr">{notificationEmail || "info@corbit.sa"}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">

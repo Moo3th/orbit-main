@@ -17,7 +17,7 @@ export default function PackagesPage() {
       title: isRTL ? 'باقات الرسائل النصية' : 'SMS Packages',
       titleAr: 'باقات الرسائل النصية',
       description: isRTL ? 'باقات متنوعة من 1,000 إلى 100,000 رسالة' : 'Various packages from 1,000 to 100,000 messages',
-      href: '/solutions/sms-platform#packages',
+      href: '/products/sms#packages',
       icon: '📱',
       color: 'from-blue-500 to-blue-600'
     },
@@ -25,7 +25,7 @@ export default function PackagesPage() {
       title: isRTL ? 'باقات OTime' : 'OTime Packages',
       titleAr: 'باقات OTime',
       description: isRTL ? 'باقات اشتراك نظام الحضور والانصراف' : 'Attendance & HR system subscription packages',
-      href: '/solutions/otime#packages',
+      href: '/products/o-time#packages',
       icon: '⏰',
       color: 'from-primary to-primary/80'
     },
@@ -33,7 +33,7 @@ export default function PackagesPage() {
       title: isRTL ? 'باقات واتساب الأعمال' : 'WhatsApp Business Packages',
       titleAr: 'باقات واتساب الأعمال',
       description: isRTL ? 'باقات API واتساب للأعمال' : 'WhatsApp Business API packages',
-      href: '/solutions/whatsapp-business-api',
+      href: '/products/whatsapp',
       icon: '💬',
       color: 'from-green-500 to-green-600'
     }

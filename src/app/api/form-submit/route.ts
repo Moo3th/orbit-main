@@ -26,7 +26,7 @@ const buildDynamicFormEmailBody = (
       <h2 style="color:#7A1E2E;">${isAr ? 'طلب خدمة جديد' : 'New Service Request'}</h2>
       <p>${isAr ? `تم استلام طلب جديد من <strong>${formName}</strong>` : `A new request has been received from <strong>${formNameEn}</strong>`}</p>
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">${rows}</table>
-      <p style="color:#9ca3af;font-size:12px;margin-top:24px;">${isAr ? 'أرسل تلقائياً من نظام المدار' : 'Sent automatically from ORBIT system'}</p>
+      <p style="color:#9ca3af;font-size:12px;margin-top:24px;">${isAr ? 'أرسل تلقائياً من نظام المدار' : 'Sent automatically from CORBIT system'}</p>
     </div>`;
 
   const text = fields
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     const notificationEmails: string = formConfig.notificationEmails || '';
     const seoSettings = await SeoSettings.findOne({ key: 'primary' }).lean() as any;
-    const fallbackEmail: string = seoSettings?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'sales@orbit.sa';
+    const fallbackEmail: string = seoSettings?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'info@corbit.sa';
     
     // Combine form emails and general emails
     const combinedEmails = notificationEmails 

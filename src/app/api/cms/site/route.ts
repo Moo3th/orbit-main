@@ -38,7 +38,7 @@ export async function GET() {
           partners,
           socialLinks: [],
           contactSubmissions: [],
-          notificationEmail: 'sales@orbit.sa',
+          notificationEmail: 'info@corbit.sa',
           footerData: {},
         };
     return NextResponse.json(
@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest) {
         contactSubmissions: Array.isArray(contactSubmissions) ? contactSubmissions : (Array.isArray(existing?.contactSubmissions) ? existing.contactSubmissions : []),
         notificationEmail: typeof notificationEmail === 'string'
           ? notificationEmail
-          : (typeof existing?.notificationEmail === 'string' ? existing.notificationEmail : 'sales@orbit.sa'),
+          : (typeof existing?.notificationEmail === 'string' ? existing.notificationEmail : 'info@corbit.sa'),
         footerData: footerData && typeof footerData === 'object'
           ? footerData
           : (existing?.footerData && typeof existing.footerData === 'object' ? existing.footerData : {}),
@@ -118,10 +118,6 @@ export async function PUT(request: NextRequest) {
       '/products/o-time',
       '/products/gov-gate',
       '/products/schoolbit',
-      '/solutions/sms-platform',
-      '/solutions/whatsapp-business-api',
-      '/solutions/otime',
-      '/solutions/gov-gate',
     ];
     
     try {

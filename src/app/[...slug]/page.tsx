@@ -8,6 +8,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
 import { getCmsPageById } from '@/lib/cms/helpers';
+import { LegalPage, type ILegalPage } from '@/models/LegalPage';
+import LegalPageClient from '@/components/LegalPageClient';
 
 interface Props {
   params: Promise<{ slug: string[] }>;
@@ -20,21 +22,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const host = headersList.get('host');
 
   await connectDB();
-  
-  // Try to find form by custom domain + slug or just slug
-  const config = await FormConfig.findOne({ 
+
+  // 1) نموذج (form) بالـ slug + النطاق المخصّص
+  const config = await FormConfig.findOne({
     $or: [
       { slug: path, customDomain: host },
       { slug: path, customDomain: { $in: [null, ''] } }
     ]
   }).lean() as any;
 
-  if (!config) return {};
+  if (config) {
+    return {
+      title: config.titleAr || config.productName,
+      description: config.productNameEn,
+    };
+  }
 
-  return {
-    title: config.titleAr || config.productName,
-    description: config.productNameEn,
-  };
+  // 2) صفحة قانونية بالـ slug (قراءة مباشرة من القاعدة — تظهر التعديلات فوراً)
+  const legal = await LegalPage.findOne({ slug: path, isActive: true }).lean<ILegalPage>();
+  if (legal) {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa';
+    const url = `${baseUrl}/${legal.slug}`;
+    return {
+      title: legal.seo?.title?.ar || legal.title?.ar,
+      description: legal.seo?.description?.ar,
+      alternates: {
+        canonical: url,
+        languages: { ar: url, en: `${baseUrl}/en/${legal.slug}` },
+      },
+      openGraph: {
+        title: legal.seo?.title?.ar || legal.title?.ar,
+        description: legal.seo?.description?.ar,
+        url,
+        type: 'article',
+      },
+    };
+  }
+
+  return {};
 }
 
 export default async function CatchAllPage({ params }: Props) {
@@ -45,29 +70,37 @@ export default async function CatchAllPage({ params }: Props) {
 
   await connectDB();
 
-  // 1. Try to find by exact slug + custom domain
-  // 2. Try to find by exact slug + no custom domain
-  const config = await FormConfig.findOne({ 
+  // 1) نموذج (form)
+  const config = await FormConfig.findOne({
     $or: [
       { slug: path, customDomain: host },
       { slug: path, customDomain: { $in: [null, ''] } }
     ]
   }).lean() as any;
 
-  if (!config) {
-    notFound();
+  if (config) {
+    const snapshot = await getSiteCmsSnapshot();
+    const cmsPage = getCmsPageById(snapshot, 'home');
+    return (
+      <>
+        <Navbar />
+        <div className="pt-20">
+          <DynamicFormPage productId={config.productId} cmsPage={cmsPage} />
+        </div>
+        <Footer />
+      </>
+    );
   }
 
-  const snapshot = await getSiteCmsSnapshot();
-  const cmsPage = getCmsPageById(snapshot, 'home');
+  // 2) صفحة قانونية (قراءة مباشرة من القاعدة)
+  const legal = await LegalPage.findOne({ slug: path, isActive: true }).lean<ILegalPage>();
+  if (legal) {
+    return (
+      <LegalPageClient
+        page={{ title: legal.title, content: legal.content, updatedAt: String(legal.updatedAt) }}
+      />
+    );
+  }
 
-  return (
-    <>
-      <Navbar />
-      <div className="pt-20">
-        <DynamicFormPage productId={config.productId} cmsPage={cmsPage} />
-      </div>
-      <Footer />
-    </>
-  );
+  notFound();
 }

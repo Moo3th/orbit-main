@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Link from 'next/link';
+import { productHref } from '@/lib/productLinks';
 import OrbitSectionBackground from './OrbitSectionBackground';
 
 const solutions = [
@@ -145,7 +146,7 @@ export default function ProductsShowcase() {
                   className="group relative"
                 >
                   <Link
-                    href={`/solutions/${solution.slug}`}
+                    href={productHref(solution.slug)}
                     className="block h-full"
                     prefetch={true}
                   >

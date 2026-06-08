@@ -110,7 +110,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
     isRTL,
     isRTL ? 'من الأحد للخميس، 8ص - 6م' : 'Sunday to Thursday, 8 AM - 6 PM'
   );
-  const emailAddress = footerEmail || getCmsField(cmsPage, 'contact-info', 'email', isRTL, 'sales@orbit.sa');
+  const emailAddress = footerEmail || getCmsField(cmsPage, 'contact-info', 'email', isRTL, 'info@corbit.sa');
   const emailNote = getCmsField(
     cmsPage,
     'contact-info',
@@ -130,7 +130,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
     'contact-info',
     'address_note',
     isRTL,
-    isRTL ? 'طريق الملك فهد' : 'King Fahd Road'
+    isRTL ? 'طريق الملك عبدالله بن عبدالعزيز' : 'King Abdullah Bin Abdulaziz Rd.'
   );
   const whatsappTitle = getCmsField(
     cmsPage,
@@ -552,16 +552,24 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                   {isRTL ? (
                     <>
                       بإرسال النموذج، أنت توافق على{' '}
-                      <a href="https://app.mobile.net.sa/terms-of-use" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">
-                        شروط المستخدم
+                      <a href="/terms" className="underline hover:text-primary transition-colors">
+                        الشروط والأحكام
+                      </a>
+                      {' '}و{' '}
+                      <a href="/privacy" className="underline hover:text-primary transition-colors">
+                        سياسة الخصوصية
                       </a>
                       .
                     </>
                   ) : (
                     <>
                       By sending this form, you agree to the{' '}
-                      <a href="https://app.mobile.net.sa/terms-of-use" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">
-                        Terms of Use
+                      <a href="/terms" className="underline hover:text-primary transition-colors">
+                        Terms &amp; Conditions
+                      </a>
+                      {' '}and{' '}
+                      <a href="/privacy" className="underline hover:text-primary transition-colors">
+                        Privacy Policy
                       </a>
                       .
                     </>

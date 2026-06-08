@@ -59,7 +59,7 @@ const DEFAULT_ABOUT: AboutSectionData = {
   ],
 };
 
-const DEFAULT_WHY_ORBIT: WhyOrbitSectionData = {
+const DEFAULT_WHY_CORBIT: WhyOrbitSectionData = {
   stats: [
     { number: '20+', labelEn: 'Years of Experience', labelAr: 'عامًا خبرة' },
     { number: '20,000+', labelEn: 'Government and Private Entities', labelAr: 'جهة حكومية وخاصة' },
@@ -129,8 +129,8 @@ const cloneDefaultAbout = (): AboutSectionData => ({
 });
 
 const cloneDefaultWhyOrbit = (): WhyOrbitSectionData => ({
-  stats: DEFAULT_WHY_ORBIT.stats.map((stat) => ({ ...stat })),
-  features: DEFAULT_WHY_ORBIT.features.map((feature) => ({ ...feature })),
+  stats: DEFAULT_WHY_CORBIT.stats.map((stat) => ({ ...stat })),
+  features: DEFAULT_WHY_CORBIT.features.map((feature) => ({ ...feature })),
 });
 
 export const createMainPageSettingsDefaults = (): MainPageSettingsSnapshot => ({
