@@ -449,10 +449,20 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
     }
     return null;
   }, [convJson, isRTL]);
+  const chatTree: ChatNode = useMemo(() => {
+    const raw = getCmsField(cmsPage, 'wa-chatbot', 'chat_tree', isRTL, '');
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.messages)) return parsed as ChatNode;
+      } catch { /* fallback to default tree */ }
+    }
+    return CHAT_TREE;
+  }, [cmsPage, isRTL]);
   const [selectedTier, setSelectedTier] = useState<Record<string, number>>({});
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [currentNode, setCurrentNode] = useState<ChatNode>(CHAT_TREE);
+  const [currentNode, setCurrentNode] = useState<ChatNode>(chatTree);
   const [pendingQuickReplies, setPendingQuickReplies] = useState<{ optionsAr: string[]; optionsEn: string[] } | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -489,7 +499,8 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   }, []);
 
   useEffect(() => {
-    appendMessages(CHAT_TREE);
+    appendMessages(chatTree);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -584,7 +595,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
 
               <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-3 rtl:space-x-reverse">
-                  {['/logo/شعار المدار1-01.png', '/TrustedLogos/حرس الحدود.png', '/TrustedLogos/إمارة منطقة الرياض.png', '/TrustedLogos/جامعة الملك سعود.png'].map((src, i) => (
+                  {['/logo/شعار المدار-01.svg', '/TrustedLogos/حرس الحدود.png', '/TrustedLogos/إمارة منطقة الرياض.png', '/TrustedLogos/جامعة الملك سعود.png'].map((src, i) => (
                     <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-700 bg-slate-800 overflow-hidden shadow-sm">
                       <Image src={src} alt="" width={40} height={40} className="object-contain p-0.5" />
                     </div>
@@ -805,23 +816,6 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             ))}
           </div>
         </div>
-
-        <style jsx>{`
-          .marquee-row-glass {
-            animation: marquee-g1 35s linear infinite;
-          }
-          .marquee-row-reverse-glass {
-            animation: marquee-g2 35s linear infinite;
-          }
-          @keyframes marquee-g1 {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          @keyframes marquee-g2 {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-          }
-        `}</style>
       </section>
 
       {/* ================================================================= */}

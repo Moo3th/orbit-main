@@ -254,7 +254,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
                     <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                     <div className="w-3 h-3 rounded-full bg-green-400"></div>
                   </div>
-                  <div className="text-xs text-slate-400 font-mono">Secure Login</div>
+                  <div className="text-xs text-slate-400 font-mono">{getCmsField(cmsPage, 'gg-hero', 'portal_secure_login', isRTL, 'Secure Login')}</div>
                 </div>
                 <div className="p-8">
                   <div className="text-center mb-8">
@@ -262,7 +262,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
                       <Lock className="text-white w-8 h-8" />
                     </div>
                     <h3 className="text-xl font-bold text-[#104E8B]">{g.portal.login.title}</h3>
-                    <p className="text-sm text-slate-500 mt-1">Gove Gate Portal</p>
+                    <p className="text-sm text-slate-500 mt-1">{getCmsField(cmsPage, 'gg-hero', 'portal_name', isRTL, 'Gov Gate Portal')}</p>
                   </div>
                   
                   <div className="space-y-4">

@@ -46,3 +46,9 @@ next-env.d.ts
 # Uploaded videos (keep originals in repo)
 /public/video/*
 !/public/video/video1.mp4
+
+# local dev / QA artifacts (not for repo)
+/.dev-server.log
+/.playwright-mcp/
+/*.jpeg
+/*.png

@@ -529,7 +529,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 ) : <div className="mb-6 text-center"><p className="text-lg text-slate-600 font-semibold">{t.products.sms.packages.items.custom.feature}</p></div>}
                 <div className={`mt-auto bg-slate-50 rounded-xl p-3 mb-6 text-center border ${pkg.featured ? "bg-[#7A1E2E]/5 border-[#7A1E2E]/10" : "border-transparent"}`}><p className="text-sm text-slate-700 font-medium">{pkg.feature}</p></div>
                 <Button className={`w-full font-bold ${pkg.featured ? "bg-[#7A1E2E] hover:bg-[#601824] text-white" : "bg-transparent border border-[#7A1E2E] text-[#7A1E2E] hover:bg-[#7A1E2E]/5"}`} asChild>
-                  {pkg.isCustom ? <Link href="/contact">{t.products.sms.packages.buttons.contact}</Link> : <a href="https://app.mobile.net.sa/reg" target="_blank" rel="noopener noreferrer">{pkg.featured ? (isRTL ? "اشحن الآن" : "Top Up Now") : (isRTL ? "اختر الباقة" : "Choose Package")}</a>}
+                  {pkg.isCustom ? <Link href="/contact">{t.products.sms.packages.buttons.contact}</Link> : <a href="https://app.mobile.net.sa/reg" target="_blank" rel="noopener noreferrer">{pkg.featured ? getCmsField(cmsPage, 'sms-pricing', 'btn_topup', isRTL, isRTL ? "اشحن الآن" : "Top Up Now") : getCmsField(cmsPage, 'sms-pricing', 'btn_choose', isRTL, isRTL ? "اختر الباقة" : "Choose Package")}</a>}
                 </Button>
               </div>
             ))}

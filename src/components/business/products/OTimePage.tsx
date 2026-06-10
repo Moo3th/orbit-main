@@ -306,40 +306,71 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
 
 
 
-  const technicalSpecs = [
-    {
-      category: isRTL ? "المنصات المدعومة" : "Supported Platforms",
-      items: ["Windows", "macOS", "Android", "iOS", "Web Browsers"]
-    },
-    {
-      category: isRTL ? "المتصفحات" : "Browsers",
-      items: ["Chrome", "Safari", "Firefox", "Edge", "Opera"]
-    },
-    {
-      category: isRTL ? "الأمان" : "Security",
-      items: isRTL ? ["تشفير SSL/TLS", "مصادقة ثنائية (2FA)", "صلاحيات دقيقة", "نسخ احتياطي يومي"] : ["SSL/TLS Encryption", "Two-Factor Auth (2FA)", "Granular Permissions", "Daily Backups"]
-    },
-    {
-      category: isRTL ? "التكامل" : "Integration",
-      items: isRTL ? ["Zoom", "Microsoft Teams", "البنوك السعودية", "أجهزة البصمة"] : ["Zoom", "Microsoft Teams", "Saudi Banks", "Biometric Devices"]
-    }
-  ];
+  const technicalSpecs = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'tech_specs_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        if (Array.isArray(items) && items.length) {
+          return items.map((item: any) => ({
+            category: isRTL ? item.titleAr : item.titleEn,
+            items: String((isRTL ? item.listAr : item.listEn) || '').split(',').map((s: string) => s.trim()).filter(Boolean),
+          }));
+        }
+      }
+    } catch (e) {}
+    return [
+      { category: isRTL ? "المنصات المدعومة" : "Supported Platforms", items: ["Windows", "macOS", "Android", "iOS", "Web Browsers"] },
+      { category: isRTL ? "المتصفحات" : "Browsers", items: ["Chrome", "Safari", "Firefox", "Edge", "Opera"] },
+      { category: isRTL ? "الأمان" : "Security", items: isRTL ? ["تشفير SSL/TLS", "مصادقة ثنائية (2FA)", "صلاحيات دقيقة", "نسخ احتياطي يومي"] : ["SSL/TLS Encryption", "Two-Factor Auth (2FA)", "Granular Permissions", "Daily Backups"] },
+      { category: isRTL ? "التكامل" : "Integration", items: isRTL ? ["Zoom", "Microsoft Teams", "البنوك السعودية", "أجهزة البصمة"] : ["Zoom", "Microsoft Teams", "Saudi Banks", "Biometric Devices"] },
+    ];
+  }, [cmsPage, isRTL]);
 
-  const localFeatures = [
-    isRTL ? "دعم التقويم الهجري والميلادي" : "Gregorian and Hijri Calendar Support",
-    isRTL ? "العطلات الرسمية السعودية" : "Saudi Public Holidays",
-    isRTL ? "نظام حماية الأجور (WPS)" : "Wage Protection System (WPS)",
-    isRTL ? "تكامل مع منصة قوى" : "Integration with Qiwa Platform",
-    isRTL ? "دعم الهويات الوطنية والإقامات" : "National ID and Iqama Support",
-    isRTL ? "إدارة التأشيرات والجوازات" : "Visas and Passports Management"
-  ];
+  const localFeatures = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'local_features_json', isRTL, '');
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        if (Array.isArray(items) && items.length) {
+          return items.map((item: any) => (isRTL ? item.titleAr : item.titleEn)).filter(Boolean);
+        }
+      }
+    } catch (e) {}
+    return [
+      isRTL ? "دعم التقويم الهجري والميلادي" : "Gregorian and Hijri Calendar Support",
+      isRTL ? "العطلات الرسمية السعودية" : "Saudi Public Holidays",
+      isRTL ? "نظام حماية الأجور (WPS)" : "Wage Protection System (WPS)",
+      isRTL ? "تكامل مع منصة قوى" : "Integration with Qiwa Platform",
+      isRTL ? "دعم الهويات الوطنية والإقامات" : "National ID and Iqama Support",
+      isRTL ? "إدارة التأشيرات والجوازات" : "Visas and Passports Management",
+    ];
+  }, [cmsPage, isRTL]);
 
-  const stats = [
-    { value: "10,000+", label: isRTL ? "موظف يستخدم النظام" : "Employees Use the System" },
-    { value: "500+", label: isRTL ? "شركة تثق في O-Time" : "Companies Trust O-Time" },
-    { value: "99.9%", label: isRTL ? "وقت التشغيل" : "Uptime" },
-    { value: "24/7", label: isRTL ? "دعم فني متواصل" : "Continuous Technical Support" }
-  ];
+  const rolesTitle = getCmsField(cmsPage, 'ot-features', 'roles_title', isRTL, isRTL ? "نظام صلاحيات متقدم" : "Advanced Permission System");
+  const roles = useMemo(() => {
+    const json = getCmsField(cmsPage, 'ot-features', 'roles_json', isRTL, '');
+    const iconArr = [Settings, Users, Smartphone];
+    const colorArr = ['red', 'blue', 'green'];
+    try {
+      if (json) {
+        const items = JSON.parse(json);
+        if (Array.isArray(items) && items.length) {
+          return items.map((item: any, i: number) => ({
+            role: isRTL ? item.titleAr : item.titleEn,
+            desc: isRTL ? item.descAr : item.descEn,
+            icon: iconArr[i % 3],
+            color: colorArr[i % 3],
+          }));
+        }
+      }
+    } catch (e) {}
+    return [
+      { role: "Admin", desc: isRTL ? "صلاحيات كاملة" : "Full Access", icon: Settings, color: "red" },
+      { role: "HR Manager", desc: isRTL ? "إدارة الموارد البشرية" : "HR Management", icon: Users, color: "blue" },
+      { role: "Employee", desc: isRTL ? "الخدمة الذاتية" : "Self Service", icon: Smartphone, color: "green" },
+    ];
+  }, [cmsPage, isRTL]);
 
   return (
     <div
@@ -830,13 +861,9 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
           <div className="max-w-4xl mx-auto">
             <Card className="bg-white/5 backdrop-blur-sm border-white/10">
               <CardContent className="p-6 md:p-8">
-                <h3 className="text-xl font-bold text-white mb-6 text-center">{isRTL ? "نظام صلاحيات متقدم" : "Advanced Permission System"}</h3>
+                <h3 className="text-xl font-bold text-white mb-6 text-center">{rolesTitle}</h3>
                 <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { role: "Admin", desc: isRTL ? "صلاحيات كاملة" : "Full Access", icon: Settings, color: "red" },
-                    { role: "HR Manager", desc: isRTL ? "إدارة الموارد البشرية" : "HR Management", icon: Users, color: "blue" },
-                    { role: "Employee", desc: isRTL ? "الخدمة الذاتية" : "Self Service", icon: Smartphone, color: "green" }
-                  ].map((role, i) => (
+                  {roles.map((role, i) => (
                     <div key={i} className="bg-white/10 rounded-lg p-4 text-center">
                       <div className={`bg-${role.color}-500/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3`}>
                         <role.icon className={`w-6 h-6 text-${role.color}-400`} />

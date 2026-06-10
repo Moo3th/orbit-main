@@ -6,6 +6,9 @@ export interface CmsField {
 
 export interface CmsSection {
   id: string;
+  name?: string;
+  nameEn?: string;
+  visible?: boolean;
   fields: CmsField[];
 }
 

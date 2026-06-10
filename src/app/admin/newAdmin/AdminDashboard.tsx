@@ -8,7 +8,7 @@ import {
   Handshake, Save, ChevronDown, ChevronUp, ExternalLink,
   Upload, CheckCircle, XCircle, X,
   Mail, MessageSquare, Phone, Inbox, PanelBottom, Newspaper,
-  ListChecks, Sparkles, ScrollText
+  ListChecks, Sparkles, ScrollText, BadgeDollarSign
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -36,7 +36,7 @@ import { CmsSeoView } from './views/CmsSeoView';
 import { LegalPagesView } from './views/LegalPagesView';
 import { RichTextEditor } from "@/components/business/RichTextEditor";
 
-type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder" | "legal-pages";
+type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "quote-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder" | "legal-pages";
 
 const adminLogoSrc = encodeImagePath("/logo/شعار المدار-01.svg");
 const ADMIN_EMAIL = "admin@corbit";
@@ -83,6 +83,7 @@ export const AdminDashboard = () => {
     { id: "blog" as AdminView, icon: Newspaper, label: isAr ? "المدونة" : "Blog" },
     { id: "partners" as AdminView, icon: Handshake, label: isAr ? "شركاء النجاح" : "Success Partners" },
     { id: "wa-requests" as AdminView, icon: MessageSquare, label: isAr ? "طلبات واتساب" : "WhatsApp Requests" },
+    { id: "quote-requests" as AdminView, icon: BadgeDollarSign, label: isAr ? "طلبات الأسعار" : "Quote Requests" },
     { id: "submissions" as AdminView, icon: Inbox, label: isAr ? "طلبات تواصل" : "Contact Submissions" },
     { id: "footer" as AdminView, icon: PanelBottom, label: isAr ? "الفوتر" : "Footer CMS" },
     { id: "legal-pages" as AdminView, icon: ScrollText, label: isAr ? "الصفحات القانونية" : "Legal Pages" },
@@ -99,6 +100,7 @@ export const AdminDashboard = () => {
     submissions: "/admin/submissions",
     footer: "/admin/footer",
     "wa-requests": "/admin/wa-requests",
+    "quote-requests": "/admin/quote-requests",
     "cms-pages": "/admin/cms/pages",
     "cms-page-editor": "/admin/cms/pages/edit",
     "cms-seo": "/admin/cms/seo",
@@ -112,6 +114,7 @@ export const AdminDashboard = () => {
     if (path === "/admin/submissions") return "submissions";
     if (path === "/admin/footer") return "footer";
     if (path === "/admin/wa-requests") return "wa-requests";
+    if (path === "/admin/quote-requests") return "quote-requests";
     if (path === "/admin/cms/pages/edit") return "cms-page-editor";
     if (path === "/admin/cms/pages") return "cms-pages";
     if (path === "/admin/cms/seo") return "cms-seo";
@@ -199,6 +202,8 @@ export const AdminDashboard = () => {
         return <PartnersView isAr={isAr} />;
       case "wa-requests":
         return <WhatsAppRequestsView isAr={isAr} />;
+      case "quote-requests":
+        return <QuoteRequestsView isAr={isAr} />;
       case "form-builder":
         return <FormBuilderView isAr={isAr} />;
       case "submissions":
@@ -2050,6 +2055,174 @@ const PartnersView = ({ isAr }: { isAr: boolean }) => {
 };
 
 // ──────────────────── WhatsApp Requests View ────────────────────
+// ──────────────────── Quote Requests View ────────────────────
+interface QuoteInquiry {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string;
+  serviceType?: string;
+  message?: string;
+  budget?: string;
+  packageName?: string;
+  packagePrice?: string;
+  source?: string;
+  status: string;
+  createdAt: string;
+}
+
+const QuoteRequestsView = ({ isAr }: { isAr: boolean }) => {
+  const [items, setItems] = useState<QuoteInquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/client-inquiries?type=quote', { cache: 'no-store' });
+      const data = await res.json();
+      setItems(Array.isArray(data?.inquiries) ? data.inquiries : []);
+    } catch (e) {
+      console.error(e);
+      toast.error(isAr ? 'تعذر تحميل الطلبات' : 'Failed to load requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { void load(); }, []);
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/client-inquiries/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('failed');
+      setItems((prev) => prev.map((it) => (it._id === id ? { ...it, status } : it)));
+      toast.success(isAr ? 'تم تحديث الحالة' : 'Status updated');
+    } catch {
+      toast.error(isAr ? 'تعذر تحديث الحالة' : 'Failed to update');
+    }
+  };
+
+  const remove = async (id: string) => {
+    if (!window.confirm(isAr ? 'حذف هذا الطلب؟' : 'Delete this request?')) return;
+    try {
+      const res = await fetch(`/api/client-inquiries/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('failed');
+      setItems((prev) => prev.filter((it) => it._id !== id));
+      if (selectedId === id) setSelectedId(null);
+      toast.success(isAr ? 'تم الحذف' : 'Deleted');
+    } catch {
+      toast.error(isAr ? 'تعذر الحذف' : 'Failed to delete');
+    }
+  };
+
+  const selected = items.find((it) => it._id === selectedId);
+  const newCount = items.filter((it) => it.status === 'new').length;
+  const formatDate = (d: string) => { try { return new Date(d).toLocaleString('ar-SA', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return d; } };
+
+  const statusLabels: Record<string, string> = {
+    new: isAr ? 'جديد' : 'New',
+    contacted: isAr ? 'تم التواصل' : 'Contacted',
+    quoted: isAr ? 'تم التسعير' : 'Quoted',
+    converted: isAr ? 'تم التحويل' : 'Converted',
+    closed: isAr ? 'مغلق' : 'Closed',
+  };
+  const serviceLabels: Record<string, string> = {
+    'sms-platform': 'SMS',
+    'whatsapp-business-api': isAr ? 'واتساب' : 'WhatsApp',
+    otime: 'O-Time',
+    'gov-gate': 'Gov Gate',
+    other: isAr ? 'أخرى' : 'Other',
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Badge className="bg-[#104E8B]/10 text-[#104E8B]">{items.length} {isAr ? 'إجمالي' : 'total'}</Badge>
+        {newCount > 0 && <Badge className="bg-[#104E8B] text-white">{newCount} {isAr ? 'جديد' : 'new'}</Badge>}
+        <Button size="sm" variant="outline" className="h-8 text-xs ml-auto" onClick={() => void load()}>
+          {isAr ? 'تحديث' : 'Refresh'}
+        </Button>
+      </div>
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card className="border-0 shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="p-12 text-center text-gray-400 text-sm">{isAr ? 'جارِ التحميل...' : 'Loading...'}</div>
+              ) : items.length === 0 ? (
+                <div className="p-12 text-center text-gray-400"><BadgeDollarSign className="w-12 h-12 mx-auto mb-3 opacity-30" /><p>{isAr ? 'لا توجد طلبات أسعار' : 'No quote requests'}</p></div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {items.map((req) => (
+                    <div key={req._id} onClick={() => setSelectedId(req._id)}
+                      className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${selectedId === req._id ? `bg-[#104E8B]/5 ${isAr ? 'border-r-4' : 'border-l-4'} border-[#104E8B]` : ''}`}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {req.status === 'new' && <span className="w-2 h-2 bg-[#104E8B] rounded-full flex-shrink-0"></span>}
+                            <span className="text-sm text-gray-900">{req.name}</span>
+                            <Badge className="bg-gray-100 text-gray-500 text-[10px]">{statusLabels[req.status] || req.status}</Badge>
+                            {req.serviceType && <Badge className="bg-[#104E8B]/10 text-[#104E8B] text-[10px]">{serviceLabels[req.serviceType] || req.serviceType}</Badge>}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1 truncate" dir="ltr">{req.phone} • {req.email}</p>
+                          <p className="text-xs text-gray-400 mt-1">{(req.company || '-')}{req.budget ? ` • ${req.budget}` : ''}</p>
+                          <p className="text-xs text-gray-400 mt-1">{formatDate(req.createdAt)}</p>
+                        </div>
+                        <button onClick={(e) => { e.stopPropagation(); void remove(req._id); }}
+                          className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          {selected ? (
+            <Card className="border-0 shadow-sm lg:sticky lg:top-20">
+              <CardHeader><CardTitle className="text-sm text-[#104E8B]">{isAr ? 'تفاصيل الطلب' : 'Details'}</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div><label className="text-xs text-gray-400">{isAr ? 'الاسم' : 'Name'}</label><p className="text-sm text-gray-800">{selected.name}</p></div>
+                <div><label className="text-xs text-gray-400">{isAr ? 'البريد' : 'Email'}</label><p className="text-sm text-gray-800" dir="ltr">{selected.email}</p></div>
+                <div><label className="text-xs text-gray-400">{isAr ? 'الجوال' : 'Phone'}</label><p className="text-sm text-gray-800" dir="ltr">{selected.phone}</p></div>
+                {selected.company && <div><label className="text-xs text-gray-400">{isAr ? 'الشركة' : 'Company'}</label><p className="text-sm text-gray-800">{selected.company}</p></div>}
+                {selected.serviceType && <div><label className="text-xs text-gray-400">{isAr ? 'نوع الحل' : 'Solution'}</label><Badge className="bg-[#104E8B]/10 text-[#104E8B] text-xs">{serviceLabels[selected.serviceType] || selected.serviceType}</Badge></div>}
+                {selected.budget && <div><label className="text-xs text-gray-400">{isAr ? 'الميزانية' : 'Budget'}</label><p className="text-sm text-gray-800">{selected.budget}</p></div>}
+                {selected.packageName && <div><label className="text-xs text-gray-400">{isAr ? 'الباقة' : 'Package'}</label><p className="text-sm text-gray-800">{selected.packageName}{selected.packagePrice ? ` — ${selected.packagePrice}` : ''}</p></div>}
+                {selected.source && <div><label className="text-xs text-gray-400">{isAr ? 'المصدر' : 'Source'}</label><p className="text-sm text-gray-800">{selected.source}</p></div>}
+                {selected.message && <div><label className="text-xs text-gray-400">{isAr ? 'الرسالة' : 'Message'}</label><p className="text-sm text-gray-800 bg-gray-50 rounded-lg p-3 mt-1 whitespace-pre-wrap">{selected.message}</p></div>}
+                <div><label className="text-xs text-gray-400">{isAr ? 'التاريخ' : 'Date'}</label><p className="text-sm text-gray-800">{formatDate(selected.createdAt)}</p></div>
+                <div><label className="text-xs text-gray-400">{isAr ? 'الحالة' : 'Status'}</label>
+                  <select value={selected.status} onChange={(e) => void updateStatus(selected._id, e.target.value)}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button size="sm" className="flex-1 bg-[#104E8B] hover:bg-[#0A2647] text-white" asChild><a href={`mailto:${selected.email}`}><Mail className="w-3.5 h-3.5" />{isAr ? 'رد' : 'Reply'}</a></Button>
+                  <Button size="sm" className="flex-1 bg-[#25D366] hover:bg-[#1da954] text-white" asChild><a href={`https://wa.me/${(selected.phone || '').replace(/[^\d]/g, '').replace(/^0/, '966')}`} target="_blank" rel="noreferrer"><Phone className="w-3.5 h-3.5" />{isAr ? 'واتساب' : 'WA'}</a></Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-0 shadow-sm"><CardContent className="p-12 text-center text-gray-400"><BadgeDollarSign className="w-10 h-10 mx-auto mb-3 opacity-30" /><p className="text-sm">{isAr ? 'اختر طلباً لعرض التفاصيل' : 'Select to view'}</p></CardContent></Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const WhatsAppRequestsView = ({ isAr }: { isAr: boolean }) => {
   const { whatsAppRequests, fetchWhatsAppRequests, updateWhatsAppRequestStatus, deleteWhatsAppRequest } = useSiteData();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -2628,7 +2801,7 @@ const FooterView = ({ isAr }: { isAr: boolean }) => {
 // ──────────────────── Settings View ────────────────────
 const SettingsView = ({ isAr }: { isAr: boolean }) => {
   const { notificationEmail, setNotificationEmail, saveSiteData, isSyncing } = useSiteData();
-  const brandName = "CorBit | شركة المدار";
+  const brandName = "CORBIT | شركة المدار";
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -2680,8 +2853,8 @@ const SettingsView = ({ isAr }: { isAr: boolean }) => {
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
             <p className="text-sm text-amber-900">
               {isAr
-                ? "تم تحديث اسم الموقع في الكود إلى CorBit | شركة المدار. إذا ظل اسم Google SSO مختلفاً في نافذة جوجل، فذلك يُدار من Google Cloud Console (OAuth consent screen > App name)."
-                : "Site/app name was updated in code to CorBit | شركة المدار. If Google SSO still shows an old name in Google's popup, it must be changed in Google Cloud Console (OAuth consent screen > App name)."}
+                ? "تم تحديث اسم الموقع في الكود إلى CORBIT | شركة المدار. إذا ظل اسم Google SSO مختلفاً في نافذة جوجل، فذلك يُدار من Google Cloud Console (OAuth consent screen > App name)."
+                : "Site/app name was updated in code to CORBIT | شركة المدار. If Google SSO still shows an old name in Google's popup, it must be changed in Google Cloud Console (OAuth consent screen > App name)."}
             </p>
           </div>
         </CardContent>

@@ -294,3 +294,19 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-transform: translateZ(0) !important;
   }
 }
+
+/* WhatsApp partners marquee (moved from styled-jsx to avoid hydration mismatch with React Compiler) */
+.marquee-row-glass {
+  animation: marquee-g1 35s linear infinite;
+}
+.marquee-row-reverse-glass {
+  animation: marquee-g2 35s linear infinite;
+}
+@keyframes marquee-g1 {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-g2 {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}

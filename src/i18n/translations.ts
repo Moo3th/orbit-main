@@ -378,14 +378,14 @@ export const translations = {
         },
       },
       govgate: {
-        title: 'Gove Gate',
+        title: 'Gov Gate',
         subtitle: 'Your secure gateway for trusted communication',
-        heroTitle: 'Gove Gate: SMS Gateway',
+        heroTitle: 'Gov Gate: SMS Gateway',
         heroSubtitle: 'Dedicated for Large Enterprises',
         heroDescription: 'An independent, secure platform specifically designed to meet government and institutional communication needs with complete privacy.',
         cta: 'Contact Us for Details',
         aboutTitle: 'Your Fully Private Communication System',
-        aboutDescription: 'Gove Gate differs from traditional messaging platforms by providing an independent Private Portal isolated from the public domain, giving your organization full control, faster transmission, and data confidentiality guaranteed according to the highest cybersecurity standards in the Kingdom.',
+        aboutDescription: 'Gov Gate differs from traditional messaging platforms by providing an independent Private Portal isolated from the public domain, giving your organization full control, faster transmission, and data confidentiality guaranteed according to the highest cybersecurity standards in the Kingdom.',
         features: {
           independence: {
             title: 'Full Independence',
@@ -417,7 +417,7 @@ export const translations = {
           }
         },
         whyUs: {
-          title: 'Why Gove Gate?',
+          title: 'Why Gov Gate?',
           subtitle: 'We provide advanced technical solutions that meet the expectations of the government and private sectors',
           compliance: {
             title: 'Legislation Compliant',
@@ -1070,14 +1070,14 @@ export const translations = {
         },
       },
       govgate: {
-        title: 'Gove Gate',
+        title: 'Gov Gate',
         subtitle: 'بوابتك الآمنة للتواصل الموثوق',
-        heroTitle: 'Gove Gate: بوابة الرسائل النصية',
+        heroTitle: 'Gov Gate: بوابة الرسائل النصية',
         heroSubtitle: 'المخصصة للمنشآت الكبرى',
         heroDescription: 'منصة مستقلة، آمنة، ومصممة خصيصاً لتلبية احتياجات التواصل الحكومي والمؤسسي بخصوصية تامة.',
         cta: 'تواصل معنا للتفاصيل',
         aboutTitle: 'نظام اتصالات خاص بك بالكامل',
-        aboutDescription: 'تختلف Gove Gate عن منصات الرسائل التقليدية بأنها توفر لك بوابة دخول مستقلة (Private Portal) معزولة عن النطاق العام، مما يمنح مؤسستكم تحكماً كاملاً، سرعة أعلى في الإرسال، وضماناً لسرية البيانات وفق أعلى معايير الأمن السيبراني في المملكة.',
+        aboutDescription: 'تختلف Gov Gate عن منصات الرسائل التقليدية بأنها توفر لك بوابة دخول مستقلة (Private Portal) معزولة عن النطاق العام، مما يمنح مؤسستكم تحكماً كاملاً، سرعة أعلى في الإرسال، وضماناً لسرية البيانات وفق أعلى معايير الأمن السيبراني في المملكة.',
         features: {
           independence: {
             title: 'استقلالية تامة',
@@ -1109,7 +1109,7 @@ export const translations = {
           }
         },
         whyUs: {
-          title: 'لماذا Gove Gate؟',
+          title: 'لماذا Gov Gate؟',
           subtitle: 'نقدم حلولاً تقنية متقدمة تلبي تطلعات القطاع الحكومي والخاص',
           compliance: {
             title: 'متوافق مع التشريعات',

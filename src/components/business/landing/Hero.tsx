@@ -167,7 +167,7 @@ export const Hero = ({ pageData = null, partners = [] }: HeroProps) => {
                     >
                       <Image
                         src={encodeImagePath(logo)}
-                        alt={`Trusted partner ${idx + 1}`}
+                        alt={`${getCmsField(pageData, 'home-hero', 'partners_alt', isRTL, isRTL ? 'شريك موثوق' : 'Trusted partner')} ${idx + 1}`}
                         width={48}
                         height={48}
                         quality={100}
@@ -220,7 +220,7 @@ export const Hero = ({ pageData = null, partners = [] }: HeroProps) => {
                         <p className="text-xs text-slate-500 font-medium leading-relaxed">{notificationDesc}</p>
                       </div>
                       <div className="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        {isRTL ? 'الآن' : 'Now'}
+                        {getCmsField(pageData, 'home-hero', 'notification_time', isRTL, isRTL ? 'الآن' : 'Now')}
                       </div>
                     </div>
                   </motion.div>

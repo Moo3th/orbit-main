@@ -73,6 +73,15 @@ export function CmsSeoView({ isAr }: Props) {
         if (!settings.organization.socialLinks) {
           settings.organization.socialLinks = {};
         }
+        // Ensure all nested bilingual / address fields exist so inputs stay controlled
+        settings.organization.description = { en: '', ar: '', ...(settings.organization.description || {}) };
+        settings.organization.address = { street: '', city: '', country: '', ...(settings.organization.address || {}) };
+        settings.defaultSeo = settings.defaultSeo || {};
+        settings.defaultSeo.title = { en: '', ar: '', ...(settings.defaultSeo.title || {}) };
+        settings.defaultSeo.description = { en: '', ar: '', ...(settings.defaultSeo.description || {}) };
+        settings.defaultSeo.keywords = { en: '', ar: '', ...(settings.defaultSeo.keywords || {}) };
+        settings.siteName = { en: '', ar: '', ...(settings.siteName || {}) };
+        settings.analytics = { gtmId: '', gscVerification: '', facebookPixelId: '', facebookAccessToken: '', clarityProjectId: '', ...(settings.analytics || {}) };
         if (!settings.emailConfig) {
           settings.emailConfig = {
             provider: 'none',
@@ -256,14 +265,23 @@ export function CmsSeoView({ isAr }: Props) {
                 dir="ltr" 
               />
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الكلمات المفتاحية (مفصولة بفواصل)' : 'Keywords (comma separated)'}</label>
-              <input 
-                type="text" 
-                value={settings.defaultSeo.keywords.ar} 
-                onChange={(e) => setSettings({ ...settings, defaultSeo: { ...settings.defaultSeo, keywords: { ...settings.defaultSeo.keywords, ar: e.target.value } } })} 
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                dir="ltr" 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الكلمات المفتاحية (عربي)' : 'Keywords (AR)'}</label>
+              <input
+                type="text"
+                value={settings.defaultSeo.keywords.ar}
+                onChange={(e) => setSettings({ ...settings, defaultSeo: { ...settings.defaultSeo, keywords: { ...settings.defaultSeo.keywords, ar: e.target.value } } })}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Keywords (EN)</label>
+              <input
+                type="text"
+                value={settings.defaultSeo.keywords.en}
+                onChange={(e) => setSettings({ ...settings, defaultSeo: { ...settings.defaultSeo, keywords: { ...settings.defaultSeo.keywords, en: e.target.value } } })}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+                dir="ltr"
               />
             </div>
           </div>
@@ -530,11 +548,20 @@ export function CmsSeoView({ isAr }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الدولة' : 'Country'}</label>
-              <input 
-                type="text" 
-                value={settings.organization.address.country} 
-                onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, address: { ...settings.organization.address, country: e.target.value } } })} 
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
+              <input
+                type="text"
+                value={settings.organization.address.country}
+                onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, address: { ...settings.organization.address, country: e.target.value } } })}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الشارع / العنوان التفصيلي' : 'Street / Address'}</label>
+              <input
+                type="text"
+                value={settings.organization.address.street}
+                onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, address: { ...settings.organization.address, street: e.target.value } } })}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
               />
             </div>
           </div>
@@ -554,14 +581,26 @@ export function CmsSeoView({ isAr }: Props) {
             </div>
           </div>
 
-          <div className="md:col-span-2 border-t pt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الوصف (عربي)' : 'Description (AR)'}</label>
-            <textarea 
-              value={settings.organization.description.ar} 
-              onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, description: { ...settings.organization.description, ar: e.target.value } } })} 
-              rows={3} 
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-            />
+          <div className="border-t pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'الوصف (عربي)' : 'Description (AR)'}</label>
+              <textarea
+                value={settings.organization.description.ar}
+                onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, description: { ...settings.organization.description, ar: e.target.value } } })}
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description (EN)</label>
+              <textarea
+                value={settings.organization.description.en}
+                onChange={(e) => setSettings({ ...settings, organization: { ...settings.organization, description: { ...settings.organization.description, en: e.target.value } } })}
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+                dir="ltr"
+              />
+            </div>
           </div>
 
           <h3 className="font-bold text-gray-700 pt-4 border-t flex items-center gap-2">

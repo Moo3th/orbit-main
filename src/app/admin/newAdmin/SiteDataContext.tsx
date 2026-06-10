@@ -182,6 +182,8 @@ interface SiteDataContextType {
   setPages: React.Dispatch<React.SetStateAction<PageData[]>>;
   updateSectionField: (pageId: string, sectionId: string, fieldKey: string, value: string, lang: "ar" | "en") => void;
   toggleSectionVisibility: (pageId: string, sectionId: string) => void;
+  moveSection: (pageId: string, sectionId: string, dir: "up" | "down") => void;
+  reorderSections: (pageId: string, orderedMovableIds: string[]) => void;
   getField: (pageId: string, sectionId: string, fieldKey: string) => string;
   isSectionVisible: (pageId: string, sectionId: string) => boolean;
   updatePageSeo: (pageId: string, seo: any) => void;
@@ -286,6 +288,8 @@ const homeHeroExtraFields: SectionField[] = [
   { key: "hero_image_url", label: "رابط صورة البطل", labelEn: "Hero Image URL", type: "image", value: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", valueEn: "https://images.unsplash.com/photo-1669023414162-5bb06bbff0ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" },
   { key: "notification_title", label: "عنوان الإشعار", labelEn: "Notification Title", type: "text", value: "رسالة جديدة", valueEn: "New Message" },
   { key: "notification_desc", label: "وصف الإشعار", labelEn: "Notification Description", type: "text", value: "تم تأكيد طلبك بنجاح", valueEn: "Your order has been confirmed" },
+  { key: "notification_time", label: "وقت الإشعار", labelEn: "Notification Time", type: "text", value: "الآن", valueEn: "Now" },
+  { key: "partners_alt", label: "النص البديل لشعارات الشركاء", labelEn: "Partners Logo Alt Text", type: "text", value: "شريك موثوق", valueEn: "Trusted partner" },
 ];
 
 const ensureHomeHeroFields = (pages: PageData[]): PageData[] => {
@@ -572,6 +576,121 @@ const ensureHomeWhyUsFields = (pages: PageData[]): PageData[] => {
   });
 };
 
+const homeNavbarFields: SectionField[] = [
+  { key: "blog_label", label: "تسمية المدونة في القائمة", labelEn: "Blog Nav Label", type: "text", value: "المدونة", valueEn: "Blog" },
+  { key: "sms_name", label: "اسم منتج: الرسائل النصية", labelEn: "Product Name: SMS", type: "text", value: "الرسائل النصية SMS", valueEn: "SMS Messaging" },
+  { key: "sms_href", label: "رابط منتج: الرسائل النصية", labelEn: "Product Link: SMS", type: "url", value: "/products/sms", valueEn: "/products/sms" },
+  { key: "whatsapp_name", label: "اسم منتج: واتساب", labelEn: "Product Name: WhatsApp", type: "text", value: "واتساب أعمال API", valueEn: "WhatsApp Business API" },
+  { key: "whatsapp_href", label: "رابط منتج: واتساب", labelEn: "Product Link: WhatsApp", type: "url", value: "/products/whatsapp", valueEn: "/products/whatsapp" },
+  { key: "schoolbit_name", label: "اسم منتج: سكول بت", labelEn: "Product Name: SchoolBit", type: "text", value: "سكول بت", valueEn: "SchoolBit" },
+  { key: "schoolbit_href", label: "رابط منتج: سكول بت", labelEn: "Product Link: SchoolBit", type: "url", value: "/products/schoolbit", valueEn: "/products/schoolbit" },
+  { key: "otime_name", label: "اسم منتج: O-Time", labelEn: "Product Name: O-Time", type: "text", value: "O-Time برنامج الموارد البشرية", valueEn: "O-Time HR Software" },
+  { key: "otime_href", label: "رابط منتج: O-Time", labelEn: "Product Link: O-Time", type: "url", value: "/products/o-time", valueEn: "/products/o-time" },
+  { key: "govgate_name", label: "اسم منتج: Gov Gate", labelEn: "Product Name: Gov Gate", type: "text", value: "Gov Gate", valueEn: "Gov Gate" },
+  { key: "govgate_href", label: "رابط منتج: Gov Gate", labelEn: "Product Link: Gov Gate", type: "url", value: "/products/gov-gate", valueEn: "/products/gov-gate" },
+];
+
+const ensureHomeNavbarFields = (pages: PageData[]): PageData[] => {
+  return pages.map((page) => {
+    if (page.id !== "home" && page.path !== "/") return page;
+    if (!Array.isArray(page.sections)) return page;
+
+    const idx = page.sections.findIndex((s) => s.id === "home-navbar");
+    if (idx === -1) {
+      return {
+        ...page,
+        sections: [
+          ...page.sections,
+          { id: "home-navbar", name: "قائمة التنقّل (المنتجات)", nameEn: "Navbar (Products)", visible: true, fields: homeNavbarFields.map((f) => ({ ...f })) },
+        ],
+      };
+    }
+
+    const section = page.sections[idx];
+    const safeFields = Array.isArray(section.fields) ? section.fields : [];
+    const existingKeys = new Set(safeFields.map((f) => f.key));
+    const missing = homeNavbarFields.filter((f) => !existingKeys.has(f.key)).map((f) => ({ ...f }));
+    if (!missing.length) return page;
+
+    return {
+      ...page,
+      sections: page.sections.map((s, i) => (i === idx ? { ...s, fields: [...safeFields, ...missing] } : s)),
+    };
+  });
+};
+
+// ===== الصفحة الرئيسية: أقسام جديدة (أرقام، آراء العملاء، الأسئلة الشائعة، CTA ختامي) =====
+
+const homeStatsFields: SectionField[] = [
+  { key: "stat1_value", label: "القيمة 1", labelEn: "Stat 1 Value", type: "text", value: "+100", valueEn: "100+" },
+  { key: "stat1_label", label: "وصف القيمة 1", labelEn: "Stat 1 Label", type: "text", value: "شركة تثق بنا", valueEn: "Companies Trust Us" },
+  { key: "stat2_value", label: "القيمة 2", labelEn: "Stat 2 Value", type: "text", value: "ملايين", valueEn: "Millions" },
+  { key: "stat2_label", label: "وصف القيمة 2", labelEn: "Stat 2 Label", type: "text", value: "رسالة شهرياً", valueEn: "Messages / Month" },
+  { key: "stat3_value", label: "القيمة 3", labelEn: "Stat 3 Value", type: "text", value: "99.99%", valueEn: "99.99%" },
+  { key: "stat3_label", label: "وصف القيمة 3", labelEn: "Stat 3 Label", type: "text", value: "نسبة التشغيل", valueEn: "Uptime" },
+  { key: "stat4_value", label: "القيمة 4", labelEn: "Stat 4 Value", type: "text", value: "24/7", valueEn: "24/7" },
+  { key: "stat4_label", label: "وصف القيمة 4", labelEn: "Stat 4 Label", type: "text", value: "دعم فني محلي", valueEn: "Local Support" },
+];
+
+const homeTestimonialsFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "ماذا يقول عملاؤنا", valueEn: "What Our Clients Say" },
+  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "text", value: "قصص نجاح حقيقية من شركاء يثقون بمنصات المدار", valueEn: "Real success stories from partners who trust CORBIT platforms" },
+  { key: "testimonials_json", label: "قائمة آراء العملاء (JSON)", labelEn: "Testimonials List (JSON)", type: "list", value: "", valueEn: "" },
+];
+
+const homeFaqFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "الأسئلة الشائعة", valueEn: "Frequently Asked Questions" },
+  { key: "subtitle", label: "وصف القسم", labelEn: "Section Subtitle", type: "text", value: "إجابات عن أكثر ما يسأل عنه عملاؤنا", valueEn: "Answers to what our clients ask most" },
+  { key: "faq_json", label: "قائمة الأسئلة (JSON)", labelEn: "FAQ List (JSON)", type: "list", value: "", valueEn: "" },
+];
+
+const homeCtaFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "جاهز لتطوير تواصلك مع عملائك؟", valueEn: "Ready to elevate how you reach your customers?" },
+  { key: "subtitle", label: "الوصف", labelEn: "Subtitle", type: "textarea", value: "ابدأ اليوم مع المدار، أو تحدّث مع فريق المبيعات لاختيار الحل الأنسب لأعمالك.", valueEn: "Start today with CORBIT, or talk to our sales team to find the right solution for your business." },
+  { key: "primary_text", label: "نص الزر الرئيسي", labelEn: "Primary Button Text", type: "text", value: "ابدأ مجاناً", valueEn: "Start Free" },
+  { key: "primary_url", label: "رابط الزر الرئيسي", labelEn: "Primary Button URL", type: "url", value: "https://app.mobile.net.sa/reg", valueEn: "https://app.mobile.net.sa/reg" },
+  { key: "secondary_text", label: "نص الزر الثانوي", labelEn: "Secondary Button Text", type: "text", value: "تواصل مع المبيعات", valueEn: "Talk to Sales" },
+  { key: "secondary_url", label: "رابط الزر الثانوي", labelEn: "Secondary Button URL", type: "url", value: "/contact", valueEn: "/contact" },
+];
+
+const ensureHomeSectionFields = (pages: PageData[], sectionId: string, name: string, nameEn: string, fields: SectionField[]): PageData[] => {
+  return pages.map((page) => {
+    if (page.id !== "home" && page.path !== "/") return page;
+    if (!Array.isArray(page.sections)) return page;
+
+    const idx = page.sections.findIndex((s) => s.id === sectionId);
+    if (idx === -1) {
+      return {
+        ...page,
+        sections: [
+          ...page.sections,
+          { id: sectionId, name, nameEn, visible: true, fields: fields.map((f) => ({ ...f })) },
+        ],
+      };
+    }
+
+    const section = page.sections[idx];
+    const safeFields = Array.isArray(section.fields) ? section.fields : [];
+    const existingKeys = new Set(safeFields.map((f) => f.key));
+    const missing = fields.filter((f) => !existingKeys.has(f.key)).map((f) => ({ ...f }));
+    if (!missing.length) return page;
+
+    return {
+      ...page,
+      sections: page.sections.map((s, i) => (i === idx ? { ...s, fields: [...safeFields, ...missing] } : s)),
+    };
+  });
+};
+
+const ensureHomeStatsFields = (pages: PageData[]): PageData[] =>
+  ensureHomeSectionFields(pages, "home-stats", "شريط الأرقام", "Stats Band", homeStatsFields);
+const ensureHomeTestimonialsFields = (pages: PageData[]): PageData[] =>
+  ensureHomeSectionFields(pages, "home-testimonials", "آراء العملاء", "Testimonials", homeTestimonialsFields);
+const ensureHomeFaqFields = (pages: PageData[]): PageData[] =>
+  ensureHomeSectionFields(pages, "home-faq", "الأسئلة الشائعة", "FAQ", homeFaqFields);
+const ensureHomeCtaFields = (pages: PageData[]): PageData[] =>
+  ensureHomeSectionFields(pages, "home-cta", "دعوة ختامية (CTA)", "Final CTA", homeCtaFields);
+
 const smsHeroFields: SectionField[] = [
   { key: "slides_json", label: "قائمة السلايدر (JSON)", labelEn: "Slider Slides (JSON)", type: "list", value: "", valueEn: "" },
   { key: "retail_title", label: "عنوان تبويب التجزئة", labelEn: "Retail Tab Title", type: "text", value: "التجزئة والتجارة", valueEn: "Retail & Commerce" },
@@ -708,6 +827,8 @@ const smsPricingFields: SectionField[] = [
   { key: "benefit3_label", label: "ميزة 3 - العنوان", labelEn: "Benefit 3 Label", type: "text", value: "تفعيل فوري", valueEn: "Instant activation" },
   { key: "benefit3_desc", label: "ميزة 3 - الوصف", labelEn: "Benefit 3 Desc", type: "text", value: "اشحن وابدأ الإرسال مباشرة", valueEn: "Top up and start sending directly" },
   { key: "plans_list", label: "قائمة الباقات", labelEn: "Plans List", type: "list", value: "", valueEn: "" },
+  { key: "btn_topup", label: "زر الباقة المميزة", labelEn: "Featured Plan Button", type: "text", value: "اشحن الآن", valueEn: "Top Up Now" },
+  { key: "btn_choose", label: "زر الباقة العادية", labelEn: "Regular Plan Button", type: "text", value: "اختر الباقة", valueEn: "Choose Package" },
 ];
 
 const ensureSmsFields = (pages: PageData[]): PageData[] => {
@@ -1302,6 +1423,7 @@ const waChatbotFields: SectionField[] = [
   { key: "cta_secondary_text_en", label: "نص الزر الثانوي (إنجليزي)", labelEn: "Secondary CTA (EN)", type: "text", value: "تحدث مع المبيعات" },
   { key: "social_proof_ar", label: "نص الإثبات الاجتماعي (عربي)", labelEn: "Social Proof (AR)", type: "text", value: "+20,000 جهة تستخدم واتساب أعمال معنا", valueEn: "+20,000 entities use WhatsApp Business with us" },
   { key: "social_proof_en", label: "نص الإثبات الاجتماعي (إنجليزي)", labelEn: "Social Proof (EN)", type: "text", value: "+20,000 جهة تستخدم واتساب أعمال معنا" },
+  { key: "chat_tree", label: "شجرة محادثة البوت (JSON متقدم — اتركه فارغاً لاستخدام الافتراضي)", labelEn: "Bot Chat Tree (Advanced JSON — leave empty for default)", type: "textarea", value: "", valueEn: "" },
 ];
 
 const ensureWhatsAppSection = (pages: PageData[], sectionId: string, sectionName: string, sectionNameEn: string, fields: SectionField[]): PageData[] => {
@@ -1381,6 +1503,26 @@ const otFeaturesFields: SectionField[] = [
   { key: "local_subtitle", label: "وصف التوافق المحلي", labelEn: "Local Compliance Subtitle", type: "text", value: "دعم كامل للأنظمة واللوائح السعودية مع تحديثات مستمرة", valueEn: "Full support for Saudi regulations and policies with continuous updates" },
   { key: "footer_cta_title", label: "عنوان CTA النهائي", labelEn: "Footer CTA Title", type: "text", value: "هل أنت مستعد لنقل إدارة الموارد البشرية إلى مستوى جديد؟", valueEn: "Are you ready to take your HR management to a new level?" },
   { key: "footer_cta_subtitle", label: "وصف CTA النهائي", labelEn: "Footer CTA Subtitle", type: "textarea", value: "انضم إلى الشركات التي تعتمد على O-Time لتحقيق الكفاءة والامتثال", valueEn: "Join the companies relying on O-Time to achieve efficiency and compliance" },
+  { key: "tech_specs_json", label: "المواصفات التقنية (العنوان=الفئة، النقاط الفرعية=العناصر)", labelEn: "Technical Specs (title=category, sub-items=items)", type: "list", value: JSON.stringify([
+    { titleAr: "المنصات المدعومة", titleEn: "Supported Platforms", listAr: "Windows, macOS, Android, iOS, متصفحات الويب", listEn: "Windows, macOS, Android, iOS, Web Browsers" },
+    { titleAr: "المتصفحات", titleEn: "Browsers", listAr: "Chrome, Safari, Firefox, Edge, Opera", listEn: "Chrome, Safari, Firefox, Edge, Opera" },
+    { titleAr: "الأمان", titleEn: "Security", listAr: "تشفير SSL/TLS, مصادقة ثنائية (2FA), صلاحيات دقيقة, نسخ احتياطي يومي", listEn: "SSL/TLS Encryption, Two-Factor Auth (2FA), Granular Permissions, Daily Backups" },
+    { titleAr: "التكامل", titleEn: "Integration", listAr: "Zoom, Microsoft Teams, البنوك السعودية, أجهزة البصمة", listEn: "Zoom, Microsoft Teams, Saudi Banks, Biometric Devices" },
+  ]), valueEn: "" },
+  { key: "local_features_json", label: "الميزات المحلية", labelEn: "Local Features", type: "list", value: JSON.stringify([
+    { titleAr: "دعم التقويم الهجري والميلادي", titleEn: "Gregorian and Hijri Calendar Support" },
+    { titleAr: "العطلات الرسمية السعودية", titleEn: "Saudi Public Holidays" },
+    { titleAr: "نظام حماية الأجور (WPS)", titleEn: "Wage Protection System (WPS)" },
+    { titleAr: "تكامل مع منصة قوى", titleEn: "Integration with Qiwa Platform" },
+    { titleAr: "دعم الهويات الوطنية والإقامات", titleEn: "National ID and Iqama Support" },
+    { titleAr: "إدارة التأشيرات والجوازات", titleEn: "Visas and Passports Management" },
+  ]), valueEn: "" },
+  { key: "roles_title", label: "عنوان قسم الصلاحيات", labelEn: "Permissions Section Title", type: "text", value: "نظام صلاحيات متقدم", valueEn: "Advanced Permission System" },
+  { key: "roles_json", label: "الأدوار (العنوان=الدور، الوصف=الوصف)", labelEn: "Roles (title=role, description=desc)", type: "list", value: JSON.stringify([
+    { titleAr: "Admin", titleEn: "Admin", descAr: "صلاحيات كاملة", descEn: "Full Access" },
+    { titleAr: "HR Manager", titleEn: "HR Manager", descAr: "إدارة الموارد البشرية", descEn: "HR Management" },
+    { titleAr: "Employee", titleEn: "Employee", descAr: "الخدمة الذاتية", descEn: "Self Service" },
+  ]), valueEn: "" },
 ];
 
 const ggHeroFields: SectionField[] = [
@@ -1389,6 +1531,8 @@ const ggHeroFields: SectionField[] = [
   { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "بوابتك الآمنة للتواصل الحكومي", valueEn: "Your Secure Gateway for Government Communications" },
   { key: "subtitle", label: "العنوان الفرعي المميز", labelEn: "Highlight Subtitle", type: "text", value: "بموثوقية عالية", valueEn: "with High Reliability" },
   { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "حل مراسلة مؤسسي متكامل يوفر اتصالاً آمناً وموثوقاً للجهات الحكومية مع ضمان الامتثال والشفافية", valueEn: "An integrated enterprise messaging solution providing secure and reliable communication for government entities with compliance and transparency" },
+  { key: "portal_secure_login", label: "نص نافذة الدخول (Secure Login)", labelEn: "Login Widget Label", type: "text", value: "Secure Login", valueEn: "Secure Login" },
+  { key: "portal_name", label: "اسم البوابة في النافذة", labelEn: "Portal Widget Name", type: "text", value: "Gov Gate Portal", valueEn: "Gov Gate Portal" },
 ];
 
 const ggAboutFields: SectionField[] = [
@@ -1442,6 +1586,243 @@ const ensureGovGateFields = (pages: PageData[]): PageData[] => {
   result = ensurePageSection(result, "govgate", "/products/gov-gate", "gg-about", "عن Gov Gate", "About Gov Gate", ggAboutFields);
   result = ensurePageSection(result, "govgate", "/products/gov-gate", "gg-features", "مميزات Gov Gate", "Gov Gate Features", ggFeaturesFields);
   result = ensurePageSection(result, "govgate", "/products/gov-gate", "gg-cta", "CTA Gov Gate", "Gov Gate CTA", ggCtaFields);
+  return result;
+};
+
+// ──────────────────── Enterprise Page (/enterprise) ────────────────────
+const enterpriseHeroFields: SectionField[] = [
+  { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "حلول اتصالات وموارد بشرية تدعم نمو أعمالك", valueEn: "Business & Enterprise Solutions" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "نساعد الشركات والمؤسسات على تحسين التواصل الداخلي والخارجي، إدارة الموظفين بكفاءة، وتعزيز تجربة العملاء من منصة واحدة.", valueEn: "We help companies and organizations improve internal and external communication, efficiently manage employees, and enhance customer experience from a single platform." },
+  { key: "cta1_text", label: "نص الزر الأول", labelEn: "CTA 1 Text", type: "text", value: "ابدأ الآن", valueEn: "Get Started Now" },
+  { key: "cta1_url", label: "رابط الزر الأول", labelEn: "CTA 1 URL", type: "url", value: "/request-quote?source=enterprise&serviceType=sms-platform", valueEn: "/request-quote?source=enterprise&serviceType=sms-platform" },
+  { key: "cta2_text", label: "نص الزر الثاني", labelEn: "CTA 2 Text", type: "text", value: "تواصل مع المبيعات", valueEn: "Contact Sales" },
+  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "CTA 2 URL", type: "url", value: "/request-quote?source=enterprise&serviceType=whatsapp-business-api", valueEn: "/request-quote?source=enterprise&serviceType=whatsapp-business-api" },
+];
+const enterpriseChallengesFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "التحديات", valueEn: "Challenges" },
+  { key: "items_json", label: "قائمة التحديات", labelEn: "Challenges List", type: "list", value: JSON.stringify([
+    { titleAr: "ضعف التواصل الداخلي", titleEn: "Weak internal communication" },
+    { titleAr: "تعدد الأنظمة", titleEn: "Multiple systems" },
+    { titleAr: "صعوبة المتابعة والتقارير", titleEn: "Difficulty in tracking and reporting" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "ضعف التواصل الداخلي", titleEn: "Weak internal communication" },
+    { titleAr: "تعدد الأنظمة", titleEn: "Multiple systems" },
+    { titleAr: "صعوبة المتابعة والتقارير", titleEn: "Difficulty in tracking and reporting" },
+  ]) },
+];
+const enterpriseSolutionsFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "حلولنا للشركات", valueEn: "Our Solutions for Businesses" },
+  { key: "items_json", label: "قائمة الحلول", labelEn: "Solutions List", type: "list", value: JSON.stringify([
+    { titleAr: "منصة الرسائل النصية", titleEn: "SMS Messaging Platform" },
+    { titleAr: "واتساب أعمال API", titleEn: "WhatsApp Business API" },
+    { titleAr: "نظام OTime لإدارة الموارد البشرية", titleEn: "OTime HR Management System" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "منصة الرسائل النصية", titleEn: "SMS Messaging Platform" },
+    { titleAr: "واتساب أعمال API", titleEn: "WhatsApp Business API" },
+    { titleAr: "نظام OTime لإدارة الموارد البشرية", titleEn: "OTime HR Management System" },
+  ]) },
+];
+const enterpriseBenefitsFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "الفوائد", valueEn: "Benefits" },
+  { key: "items_json", label: "قائمة الفوائد", labelEn: "Benefits List", type: "list", value: JSON.stringify([
+    { titleAr: "كفاءة تشغيلية أعلى", titleEn: "Higher operational efficiency" },
+    { titleAr: "تقارير وتحليلات واضحة", titleEn: "Clear reports and analytics" },
+    { titleAr: "حلول قابلة للتوسع", titleEn: "Scalable solutions" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "كفاءة تشغيلية أعلى", titleEn: "Higher operational efficiency" },
+    { titleAr: "تقارير وتحليلات واضحة", titleEn: "Clear reports and analytics" },
+    { titleAr: "حلول قابلة للتوسع", titleEn: "Scalable solutions" },
+  ]) },
+];
+const enterpriseCtaFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "ابدأ الآن", valueEn: "Get Started Now" },
+  { key: "cta1_text", label: "نص الزر الأول", labelEn: "CTA 1 Text", type: "text", value: "ابدأ الآن", valueEn: "Get Started Now" },
+  { key: "cta1_url", label: "رابط الزر الأول", labelEn: "CTA 1 URL", type: "url", value: "/request-quote?source=enterprise&serviceType=sms-platform", valueEn: "/request-quote?source=enterprise&serviceType=sms-platform" },
+  { key: "cta2_text", label: "نص الزر الثاني", labelEn: "CTA 2 Text", type: "text", value: "تواصل مع المبيعات", valueEn: "Contact Sales" },
+  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "CTA 2 URL", type: "url", value: "/request-quote?source=enterprise&serviceType=whatsapp-business-api", valueEn: "/request-quote?source=enterprise&serviceType=whatsapp-business-api" },
+];
+
+const ensureEnterpriseFields = (pages: PageData[]): PageData[] => {
+  const pid = "enterprise";
+  const pp = "/enterprise";
+  let result = ensurePageSection(pages, pid, pp, "enterprise-hero", "البانر الرئيسي", "Hero Banner", enterpriseHeroFields);
+  result = ensurePageSection(result, pid, pp, "enterprise-challenges", "قسم التحديات", "Challenges Section", enterpriseChallengesFields);
+  result = ensurePageSection(result, pid, pp, "enterprise-solutions", "قسم الحلول", "Solutions Section", enterpriseSolutionsFields);
+  result = ensurePageSection(result, pid, pp, "enterprise-benefits", "قسم الفوائد", "Benefits Section", enterpriseBenefitsFields);
+  result = ensurePageSection(result, pid, pp, "enterprise-cta", "دعوة للإجراء", "Call to Action", enterpriseCtaFields);
+  return result;
+};
+
+// ──────────────────── Healthcare Page (/healthcare) ────────────────────
+const healthcareHeroFields: SectionField[] = [
+  { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "تحسين تجربة المرضى عبر تواصل ذكي وفعّال", valueEn: "Healthcare Solutions" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "حلولنا تساعد المنشآت الصحية على تقليل المواعيد الفائتة، تحسين التواصل مع المرضى، ورفع جودة الخدمة من خلال رسائل وتنبيهات ذكية.", valueEn: "Our solutions help healthcare facilities reduce missed appointments, improve patient communication, and enhance service quality through smart messages and notifications." },
+  { key: "cta1_text", label: "نص الزر الأول", labelEn: "CTA 1 Text", type: "text", value: "احصل على عرض سعر", valueEn: "Get a Quote" },
+  { key: "cta1_url", label: "رابط الزر الأول", labelEn: "CTA 1 URL", type: "url", value: "/request-quote?source=healthcare&serviceType=sms-platform", valueEn: "/request-quote?source=healthcare&serviceType=sms-platform" },
+  { key: "cta2_text", label: "نص الزر الثاني", labelEn: "CTA 2 Text", type: "text", value: "تواصل معنا", valueEn: "Contact Us" },
+  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "CTA 2 URL", type: "url", value: "/request-quote?source=healthcare&serviceType=whatsapp-business-api", valueEn: "/request-quote?source=healthcare&serviceType=whatsapp-business-api" },
+];
+const healthcareChallengesFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "التحديات", valueEn: "Challenges" },
+  { key: "items_json", label: "قائمة التحديات", labelEn: "Challenges List", type: "list", value: JSON.stringify([
+    { titleAr: "نسيان المواعيد", titleEn: "Missed appointments" },
+    { titleAr: "ضغط على فرق الاستقبال", titleEn: "Pressure on reception teams" },
+    { titleAr: "ضعف التواصل مع المرضى", titleEn: "Weak communication with patients" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "نسيان المواعيد", titleEn: "Missed appointments" },
+    { titleAr: "ضغط على فرق الاستقبال", titleEn: "Pressure on reception teams" },
+    { titleAr: "ضعف التواصل مع المرضى", titleEn: "Weak communication with patients" },
+  ]) },
+];
+const healthcareSolutionsFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "حلولنا للقطاع الصحي", valueEn: "Our Solutions for Healthcare" },
+  { key: "items_json", label: "قائمة الحلول", labelEn: "Solutions List", type: "list", value: JSON.stringify([
+    { titleAr: "رسائل تذكير بالمواعيد (SMS)", titleEn: "Appointment reminder messages (SMS)" },
+    { titleAr: "واتساب أعمال للتواصل مع المرضى", titleEn: "WhatsApp Business for patient communication" },
+    { titleAr: "تقارير فورية عن حالة الإرسال", titleEn: "Real-time delivery status reports" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "رسائل تذكير بالمواعيد (SMS)", titleEn: "Appointment reminder messages (SMS)" },
+    { titleAr: "واتساب أعمال للتواصل مع المرضى", titleEn: "WhatsApp Business for patient communication" },
+    { titleAr: "تقارير فورية عن حالة الإرسال", titleEn: "Real-time delivery status reports" },
+  ]) },
+];
+const healthcareBenefitsFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "الفوائد", valueEn: "Benefits" },
+  { key: "items_json", label: "قائمة الفوائد", labelEn: "Benefits List", type: "list", value: JSON.stringify([
+    { titleAr: "تقليل الغياب عن المواعيد", titleEn: "Reduced missed appointments" },
+    { titleAr: "تجربة أفضل للمريض", titleEn: "Better patient experience" },
+    { titleAr: "تواصل أسرع وأوضح", titleEn: "Faster and clearer communication" },
+  ]), valueEn: JSON.stringify([
+    { titleAr: "تقليل الغياب عن المواعيد", titleEn: "Reduced missed appointments" },
+    { titleAr: "تجربة أفضل للمريض", titleEn: "Better patient experience" },
+    { titleAr: "تواصل أسرع وأوضح", titleEn: "Faster and clearer communication" },
+  ]) },
+];
+const healthcareCtaFields: SectionField[] = [
+  { key: "title", label: "العنوان", labelEn: "Title", type: "text", value: "احصل على عرض سعر مخصص", valueEn: "Get a Custom Quote" },
+  { key: "description", label: "الوصف", labelEn: "Description", type: "textarea", value: "تواصل معنا اليوم واحصل على حل مخصص لتحسين تجربة مرضاك", valueEn: "Contact us today and get a custom solution to improve your patient experience" },
+  { key: "cta1_text", label: "نص الزر الأول", labelEn: "CTA 1 Text", type: "text", value: "احصل على عرض سعر", valueEn: "Get a Quote" },
+  { key: "cta1_url", label: "رابط الزر الأول", labelEn: "CTA 1 URL", type: "url", value: "/request-quote?source=healthcare&serviceType=sms-platform", valueEn: "/request-quote?source=healthcare&serviceType=sms-platform" },
+  { key: "cta2_text", label: "نص الزر الثاني", labelEn: "CTA 2 Text", type: "text", value: "تواصل مع المبيعات", valueEn: "Contact Sales" },
+  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "CTA 2 URL", type: "url", value: "/request-quote?source=healthcare&serviceType=whatsapp-business-api", valueEn: "/request-quote?source=healthcare&serviceType=whatsapp-business-api" },
+];
+
+const ensureHealthcareFields = (pages: PageData[]): PageData[] => {
+  const pid = "healthcare";
+  const pp = "/healthcare";
+  let result = ensurePageSection(pages, pid, pp, "healthcare-hero", "البانر الرئيسي", "Hero Banner", healthcareHeroFields);
+  result = ensurePageSection(result, pid, pp, "healthcare-challenges", "قسم التحديات", "Challenges Section", healthcareChallengesFields);
+  result = ensurePageSection(result, pid, pp, "healthcare-solutions", "قسم الحلول", "Solutions Section", healthcareSolutionsFields);
+  result = ensurePageSection(result, pid, pp, "healthcare-benefits", "قسم الفوائد", "Benefits Section", healthcareBenefitsFields);
+  result = ensurePageSection(result, pid, pp, "healthcare-cta", "دعوة للإجراء", "Call to Action", healthcareCtaFields);
+  return result;
+};
+
+// ──────────────────── About Us Page (/about-us) ────────────────────
+const aboutIntroFields: SectionField[] = [
+  { key: "brand", label: "اسم العلامة (مميّز بلون)", labelEn: "Brand Name (highlighted)", type: "text", value: "المدار", valueEn: "CORBIT" },
+  { key: "text", label: "فقرة التعريف", labelEn: "Intro Paragraph", type: "textarea", value: "شركة سعودية رائدة في تقديم الحلول التقنية الذكية، نعمل على تمكين المؤسسات من التطور عبر تقنيات حديثة تضمن كفاءة أعلى، تواصل أسرع، وتجربة رقمية متكاملة", valueEn: "is a leading Saudi company providing smart technical solutions. We work to enable organizations to evolve through modern technologies that ensure higher efficiency, faster communication, and an integrated digital experience" },
+];
+const aboutVisionFields: SectionField[] = [
+  { key: "title", label: "عنوان الرؤية", labelEn: "Vision Title", type: "text", value: "الرؤية", valueEn: "Vision" },
+  { key: "text", label: "نص الرؤية", labelEn: "Vision Text", type: "textarea", value: "أن نكون الشريك التقني الأول والأكثر ثقة في المملكة وخارجها", valueEn: "To be the first and most trusted technical partner in the Kingdom and beyond" },
+];
+const aboutMissionFields: SectionField[] = [
+  { key: "title", label: "عنوان الرسالة", labelEn: "Mission Title", type: "text", value: "الرسالة", valueEn: "Mission" },
+  { key: "text", label: "نص الرسالة", labelEn: "Mission Text", type: "textarea", value: "تقديم حلول تقنية مبتكرة بجودة واحترافية تلبي احتياجات عملائنا المتغيرة", valueEn: "Providing innovative technical solutions with quality and professionalism that meet our clients' changing needs" },
+];
+const aboutPromisesItems = JSON.stringify([
+  { titleAr: "دعم فني على مدار الساعة", titleEn: "24/7 Technical Support" },
+  { titleAr: "سرعة وصول", titleEn: "Fast Access" },
+  { titleAr: "التطوير المستمر", titleEn: "Continuous Development" },
+  { titleAr: "أفضل الأسعار", titleEn: "Best Prices" },
+]);
+const aboutPromisesFields: SectionField[] = [
+  { key: "title", label: "عنوان قسم الوعود", labelEn: "Promises Title", type: "text", value: "نعدكم", valueEn: "We Promise You" },
+  { key: "items_json", label: "قائمة الوعود", labelEn: "Promises List", type: "list", value: aboutPromisesItems, valueEn: aboutPromisesItems },
+];
+const aboutWhyStats = JSON.stringify([
+  { titleAr: "20+", titleEn: "20+", descAr: "عامًا خبرة", descEn: "Years of Experience" },
+  { titleAr: "20,000+", titleEn: "20,000+", descAr: "جهة حكومية وخاصة", descEn: "Government and Private Entities" },
+  { titleAr: "180+", titleEn: "180+", descAr: "مليون رسالة شهريًا", descEn: "Million Messages Monthly" },
+  { titleAr: "98%+", titleEn: "98%+", descAr: "نسبة رضا عملاء تتجاوز", descEn: "Customer Satisfaction Rate" },
+]);
+const aboutWhyFeatures = JSON.stringify([
+  { titleAr: "خبرة محلية وفهم لاحتياجات السوق", titleEn: "Local Expertise", descAr: "فهم عميق للسوق المحلي واحتياجاته الفريدة", descEn: "Deep understanding of local market needs" },
+  { titleAr: "بنية تقنية عالية الأداء", titleEn: "High-Performance Infrastructure", descAr: "بنية تحتية قوية ومستقرة تدعم عملياتك", descEn: "Robust and stable infrastructure supporting your operations" },
+  { titleAr: "دعم فني واستشارات متخصصة", titleEn: "Specialized Support", descAr: "فريق دعم محترف جاهز لمساعدتك في كل خطوة", descEn: "Professional support team ready to assist you every step" },
+  { titleAr: "حلول قابلة للتوسع", titleEn: "Scalable Solutions", descAr: "حلول تنمو مع نمو أعمالك وتوسعها", descEn: "Solutions that grow with your business expansion" },
+  { titleAr: "توافق كامل مع المتطلبات الحكومية", titleEn: "Government Compliance", descAr: "امتثال تام للمعايير واللوائح الحكومية", descEn: "Full compliance with government standards and regulations" },
+  { titleAr: "سرعة تشغيل وتكامل سلس مع الأنظمة", titleEn: "Fast Deployment", descAr: "تكامل سريع وسلس مع أنظمتك الحالية", descEn: "Quick and seamless integration with your existing systems" },
+]);
+const aboutWhyOrbitFields: SectionField[] = [
+  { key: "title", label: "عنوان القسم", labelEn: "Section Title", type: "text", value: "لماذا المدار التقني؟", valueEn: "Why CORBIT Technical?" },
+  { key: "features_json", label: "قائمة المميزات", labelEn: "Features List", type: "list", value: aboutWhyFeatures, valueEn: aboutWhyFeatures },
+  { key: "stats_json", label: "قائمة الإحصاءات (العنوان = الرقم، الوصف = التسمية)", labelEn: "Stats List (title = number, description = label)", type: "list", value: aboutWhyStats, valueEn: aboutWhyStats },
+];
+
+const ensureAboutFields = (pages: PageData[]): PageData[] => {
+  const pid = "about";
+  const pp = "/about-us";
+  let result = ensurePageSection(pages, pid, pp, "about-intro", "فقرة التعريف", "Intro", aboutIntroFields);
+  result = ensurePageSection(result, pid, pp, "about-vision", "الرؤية", "Vision", aboutVisionFields);
+  result = ensurePageSection(result, pid, pp, "about-mission", "الرسالة", "Mission", aboutMissionFields);
+  result = ensurePageSection(result, pid, pp, "about-promises", "الوعود", "Promises", aboutPromisesFields);
+  result = ensurePageSection(result, pid, pp, "about-whyorbit", "لماذا المدار", "Why CORBIT", aboutWhyOrbitFields);
+  return result;
+};
+
+// ──────────────────── Request a Quote Page (/request-quote) ────────────────────
+const rqHeroFields: SectionField[] = [
+  { key: "title", label: "العنوان الرئيسي", labelEn: "Main Title", type: "text", value: "اطلب عرض سعر", valueEn: "Request a Quote" },
+  { key: "subtitle", label: "العنوان الفرعي", labelEn: "Subtitle", type: "textarea", value: "دعنا نعرف كيف يمكننا مساعدتك", valueEn: "Let us know how we can help you" },
+];
+const rqBackFields: SectionField[] = [
+  { key: "packages_label", label: "زر العودة (الباقات)", labelEn: "Back Link (Packages)", type: "text", value: "العودة للباقات", valueEn: "Back to Packages" },
+  { key: "healthcare_label", label: "زر العودة (القطاع الصحي)", labelEn: "Back Link (Healthcare)", type: "text", value: "العودة لحلول القطاع الصحي", valueEn: "Back to Healthcare Solutions" },
+  { key: "enterprise_label", label: "زر العودة (المؤسسات)", labelEn: "Back Link (Enterprise)", type: "text", value: "العودة لحلول المؤسسات", valueEn: "Back to Enterprise Solutions" },
+];
+const rqBannerFields: SectionField[] = [
+  { key: "welcome_title", label: "عنوان الترحيب", labelEn: "Welcome Title", type: "text", value: "مرحباً بك!", valueEn: "Welcome!" },
+  { key: "message_healthcare", label: "رسالة الترحيب (القطاع الصحي)", labelEn: "Welcome Message (Healthcare)", type: "textarea", value: "نحن هنا لمساعدتك في تحسين تجربة مرضاك من خلال حلول التواصل الذكية", valueEn: "We're here to help you improve your patient experience through smart communication solutions" },
+  { key: "message_enterprise", label: "رسالة الترحيب (المؤسسات)", labelEn: "Welcome Message (Enterprise)", type: "textarea", value: "دعنا نساعدك في بناء حلول تواصل فعالة لعملك", valueEn: "Let us help you build effective communication solutions for your business" },
+];
+const rqFormFields: SectionField[] = [
+  { key: "package_select_label", label: "تسمية اختيار الباقة", labelEn: "Package Select Label", type: "text", value: "اختر الباقة (اختياري)", valueEn: "Select Package (Optional)" },
+  { key: "no_package_label", label: "خيار: لا باقة", labelEn: "No Package Option", type: "text", value: "لا يوجد باقة محددة", valueEn: "No package selected" },
+  { key: "custom_package_label", label: "خيار: باقة مخصصة", labelEn: "Custom Package Option", type: "text", value: "باقة مخصصة", valueEn: "Custom Package" },
+  { key: "name_label", label: "تسمية الاسم", labelEn: "Name Label", type: "text", value: "الاسم الكامل", valueEn: "Full Name" },
+  { key: "email_label", label: "تسمية البريد", labelEn: "Email Label", type: "text", value: "البريد الإلكتروني", valueEn: "Email" },
+  { key: "phone_label", label: "تسمية الهاتف", labelEn: "Phone Label", type: "text", value: "رقم الهاتف", valueEn: "Phone Number" },
+  { key: "company_label", label: "تسمية الشركة (عام)", labelEn: "Company Label (default)", type: "text", value: "اسم الشركة", valueEn: "Company Name" },
+  { key: "company_label_healthcare", label: "تسمية الشركة (صحي)", labelEn: "Company Label (Healthcare)", type: "text", value: "اسم المنشأة الصحية", valueEn: "Healthcare Facility Name" },
+  { key: "company_label_enterprise", label: "تسمية الشركة (مؤسسات)", labelEn: "Company Label (Enterprise)", type: "text", value: "اسم الشركة", valueEn: "Company Name" },
+  { key: "service_label", label: "تسمية نوع الحل", labelEn: "Solution Type Label", type: "text", value: "نوع الحل", valueEn: "Solution Type" },
+  { key: "service_placeholder", label: "نص افتراضي لنوع الحل", labelEn: "Solution Placeholder", type: "text", value: "اختر نوع الحل", valueEn: "Select Solution Type" },
+  { key: "auto_selected_label", label: "شارة التحديد التلقائي", labelEn: "Auto-selected Badge", type: "text", value: "✓ تم التحديد تلقائياً", valueEn: "✓ Auto-selected" },
+  { key: "service_sms", label: "خيار: الرسائل النصية", labelEn: "Option: SMS", type: "text", value: "منصة الرسائل النصية", valueEn: "SMS Platform" },
+  { key: "service_whatsapp", label: "خيار: واتساب", labelEn: "Option: WhatsApp", type: "text", value: "واتساب أعمال API", valueEn: "WhatsApp Business API" },
+  { key: "service_otime", label: "خيار: O-Time", labelEn: "Option: O-Time", type: "text", value: "اوتايم OTime", valueEn: "OTime - Attendance & HR" },
+  { key: "service_govgate", label: "خيار: Gov Gate", labelEn: "Option: Gov Gate", type: "text", value: "البوابة الحكومية Gov Gate", valueEn: "Gov Gate - Government Portal" },
+  { key: "service_other", label: "خيار: أخرى", labelEn: "Option: Other", type: "text", value: "أخرى", valueEn: "Other" },
+  { key: "message_label", label: "تسمية الرسالة", labelEn: "Message Label", type: "text", value: "رسالتك", valueEn: "Your Message" },
+  { key: "tip_text", label: "نص النصيحة", labelEn: "Tip Text", type: "textarea", value: "💡 نصيحة: كلما زادت التفاصيل، كلما استطعنا تقديم عرض أفضل", valueEn: "💡 Tip: The more details you provide, the better we can tailor our solution" },
+  { key: "budget_label", label: "تسمية الميزانية", labelEn: "Budget Label", type: "text", value: "الميزانية التقديرية (اختياري)", valueEn: "Estimated Budget (Optional)" },
+  { key: "budget_placeholder", label: "نص افتراضي للميزانية", labelEn: "Budget Placeholder", type: "text", value: "اختر الميزانية", valueEn: "Select Budget Range" },
+  { key: "budget_options", label: "خيارات الميزانية (صيغة: value|AR|EN)", labelEn: "Budget Options (format: value|AR|EN)", type: "list", value: "10k-50k|10,000 - 50,000 ريال|10,000 - 50,000 SAR\n50k-100k|50,000 - 100,000 ريال|50,000 - 100,000 SAR\n100k-500k|100,000 - 500,000 ريال|100,000 - 500,000 SAR\n500k+|500,000+ ريال|500,000+ SAR", valueEn: "10k-50k|10,000 - 50,000 SAR|10,000 - 50,000 SAR\n50k-100k|50,000 - 100,000 SAR|50,000 - 100,000 SAR\n100k-500k|100,000 - 500,000 SAR|100,000 - 500,000 SAR\n500k+|500,000+ SAR|500,000+ SAR" },
+  { key: "submit_text", label: "نص زر الإرسال", labelEn: "Submit Button Text", type: "text", value: "إرسال الاستفسار", valueEn: "Submit Inquiry" },
+  { key: "sending_text", label: "نص أثناء الإرسال", labelEn: "Sending Text", type: "text", value: "جاري الإرسال...", valueEn: "Submitting..." },
+  { key: "success_message", label: "رسالة النجاح", labelEn: "Success Message", type: "textarea", value: "تم إرسال طلبك بنجاح! سنتواصل معك قريباً.", valueEn: "Your request has been sent successfully! We'll contact you soon." },
+  { key: "error_message", label: "رسالة الخطأ", labelEn: "Error Message", type: "textarea", value: "حدث خطأ. يرجى المحاولة مرة أخرى.", valueEn: "An error occurred. Please try again." },
+];
+
+const ensureRequestQuoteFields = (pages: PageData[]): PageData[] => {
+  const pid = "request-quote";
+  const pp = "/request-quote";
+  let result = ensurePageSection(pages, pid, pp, "rq-hero", "البانر الرئيسي", "Hero", rqHeroFields);
+  result = ensurePageSection(result, pid, pp, "rq-back", "روابط العودة", "Back Links", rqBackFields);
+  result = ensurePageSection(result, pid, pp, "rq-banner", "شريط الترحيب", "Welcome Banner", rqBannerFields);
+  result = ensurePageSection(result, pid, pp, "rq-form", "نموذج الطلب", "Request Form", rqFormFields);
   return result;
 };
 
@@ -1540,6 +1921,46 @@ const defaultContactSections: PageSection[] = [
         value: "https://wa.me/966920006900",
         valueEn: "https://wa.me/966920006900",
       },
+      {
+        key: "whatsapp_subtitle",
+        label: "وصف بطاقة واتساب",
+        labelEn: "WhatsApp Card Subtitle",
+        type: "text",
+        value: "رد سريع خلال ساعات العمل",
+        valueEn: "Fast response during business hours",
+      },
+      {
+        key: "info_title",
+        label: "عنوان قسم المعلومات",
+        labelEn: "Info Section Title",
+        type: "text",
+        value: "معلومات الاتصال",
+        valueEn: "Contact Information",
+      },
+      {
+        key: "phone_label",
+        label: "تسمية الهاتف",
+        labelEn: "Phone Label",
+        type: "text",
+        value: "هاتف",
+        valueEn: "Phone",
+      },
+      {
+        key: "email_label",
+        label: "تسمية البريد",
+        labelEn: "Email Label",
+        type: "text",
+        value: "البريد الإلكتروني",
+        valueEn: "Email",
+      },
+      {
+        key: "address_label",
+        label: "تسمية العنوان",
+        labelEn: "Address Label",
+        type: "text",
+        value: "العنوان",
+        valueEn: "Address",
+      },
     ],
   },
   {
@@ -1590,6 +2011,25 @@ const defaultContactSections: PageSection[] = [
         value: "بإرسال النموذج، أنت توافق على شروط المستخدم.",
         valueEn: "By sending this form, you agree to the Terms of Use.",
       },
+      { key: "name_label", label: "تسمية الاسم", labelEn: "Name Label", type: "text", value: "الاسم الكامل", valueEn: "Full Name" },
+      { key: "name_placeholder", label: "نص افتراضي للاسم", labelEn: "Name Placeholder", type: "text", value: "أدخل اسمك الكامل", valueEn: "Enter your full name" },
+      { key: "email_label", label: "تسمية البريد", labelEn: "Email Label", type: "text", value: "البريد الإلكتروني", valueEn: "Email" },
+      { key: "phone_label", label: "تسمية الهاتف", labelEn: "Phone Label", type: "text", value: "رقم الهاتف", valueEn: "Phone Number" },
+      { key: "company_label", label: "تسمية الشركة", labelEn: "Company Label", type: "text", value: "اسم الشركة/الجهة", valueEn: "Company / Organization" },
+      { key: "company_placeholder", label: "نص افتراضي للشركة", labelEn: "Company Placeholder", type: "text", value: "مثال: شركة المدار", valueEn: "e.g. Orbit Co." },
+      { key: "subject_label", label: "تسمية الموضوع", labelEn: "Subject Label", type: "text", value: "الموضوع", valueEn: "Subject" },
+      { key: "subject_placeholder", label: "نص افتراضي للموضوع", labelEn: "Subject Placeholder", type: "text", value: "موضوع الاستفسار", valueEn: "Inquiry subject" },
+      { key: "message_label", label: "تسمية الرسالة", labelEn: "Message Label", type: "text", value: "الرسالة", valueEn: "Message" },
+      { key: "message_placeholder", label: "نص افتراضي للرسالة", labelEn: "Message Placeholder", type: "text", value: "اكتب رسالتك هنا...", valueEn: "Write your message here..." },
+      { key: "sending_text", label: "نص أثناء الإرسال", labelEn: "Sending Text", type: "text", value: "جاري الإرسال...", valueEn: "Sending..." },
+      { key: "success_message", label: "رسالة النجاح", labelEn: "Success Message", type: "textarea", value: "تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.", valueEn: "Your message has been sent successfully! We'll get back to you soon." },
+      { key: "error_message", label: "رسالة الخطأ", labelEn: "Error Message", type: "textarea", value: "فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.", valueEn: "Failed to send message. Please try again." },
+      { key: "privacy_prefix", label: "نص الخصوصية - المقدمة", labelEn: "Privacy Prefix", type: "text", value: "بإرسال النموذج، أنت توافق على", valueEn: "By sending this form, you agree to the" },
+      { key: "privacy_terms_label", label: "نص رابط الشروط", labelEn: "Terms Link Label", type: "text", value: "الشروط والأحكام", valueEn: "Terms & Conditions" },
+      { key: "privacy_terms_url", label: "رابط الشروط", labelEn: "Terms URL", type: "url", value: "/terms", valueEn: "/terms" },
+      { key: "privacy_connector", label: "أداة الربط", labelEn: "Connector", type: "text", value: "و", valueEn: "and" },
+      { key: "privacy_policy_label", label: "نص رابط الخصوصية", labelEn: "Privacy Link Label", type: "text", value: "سياسة الخصوصية", valueEn: "Privacy Policy" },
+      { key: "privacy_policy_url", label: "رابط الخصوصية", labelEn: "Privacy URL", type: "url", value: "/privacy", valueEn: "/privacy" },
     ],
   },
 ];
@@ -1653,6 +2093,38 @@ const DEFAULT_SEO: Record<string, { title: string; titleEn: string; description:
     keywords: 'مدونة, المدار, أخبار تقنية, مقالات',
     keywordsEn: 'blog, CORBIT, tech news, articles',
   },
+  enterprise: {
+    title: 'حلول الأعمال والمؤسسات | المدار',
+    titleEn: 'Business & Enterprise Solutions | CORBIT',
+    description: 'حلول المدار للأعمال والمؤسسات - منصة واحدة لتحسين التواصل وإدارة الموظفين وتعزيز تجربة العملاء.',
+    descriptionEn: 'CORBIT Enterprise Solutions - One platform to improve communication, manage employees, and enhance customer experience.',
+    keywords: 'حلول مؤسسية, أعمال, المدار, موارد بشرية, اتصالات الشركات',
+    keywordsEn: 'enterprise solutions, business, CORBIT, HR, corporate messaging',
+  },
+  healthcare: {
+    title: 'حلول القطاع الصحي | المدار',
+    titleEn: 'Healthcare Solutions | CORBIT',
+    description: 'حلول المدار للقطاع الصحي - تقليل المواعيد الفائتة وتحسين التواصل مع المرضى عبر رسائل وتنبيهات ذكية.',
+    descriptionEn: 'CORBIT Healthcare Solutions - Reduce missed appointments and improve patient communication via smart messages and notifications.',
+    keywords: 'حلول صحية, مستشفيات, عيادات, المدار, تذكير بالمواعيد, رسائل المرضى',
+    keywordsEn: 'healthcare solutions, hospitals, clinics, CORBIT, appointment reminders, patient messaging',
+  },
+  about: {
+    title: 'من نحن | المدار',
+    titleEn: 'About Us | CORBIT',
+    description: 'المدار - شركة سعودية رائدة في الحلول التقنية الذكية. تعرّف على رؤيتنا ورسالتنا ولماذا تختارنا.',
+    descriptionEn: 'CORBIT - A leading Saudi smart technology solutions company. Learn about our vision, mission, and why to choose us.',
+    keywords: 'من نحن, المدار, رؤية, رسالة, حلول تقنية, السعودية',
+    keywordsEn: 'about us, CORBIT, vision, mission, technical solutions, Saudi Arabia',
+  },
+  'request-quote': {
+    title: 'اطلب عرض سعر | المدار',
+    titleEn: 'Request a Quote | CORBIT',
+    description: 'اطلب عرض سعر مخصص من المدار لحلول الرسائل النصية وواتساب أعمال والموارد البشرية والبوابات الحكومية.',
+    descriptionEn: 'Request a custom quote from CORBIT for SMS, WhatsApp Business, HR, and government gateway solutions.',
+    keywords: 'عرض سعر, طلب تسعيرة, المدار, حلول تقنية',
+    keywordsEn: 'request a quote, pricing, CORBIT, technical solutions',
+  },
 };
 
 const PAGE_BLUEPRINTS: { id: string; path: string; title: string; titleEn: string }[] = [
@@ -1664,6 +2136,10 @@ const PAGE_BLUEPRINTS: { id: string; path: string; title: string; titleEn: strin
   { id: 'govgate', path: '/products/gov-gate', title: 'Gov Gate', titleEn: 'Gov Gate' },
   { id: 'contact', path: '/contact', title: 'تواصل معنا', titleEn: 'Contact Us' },
   { id: 'blog', path: '/blog', title: 'المدونة', titleEn: 'Blog' },
+  { id: 'enterprise', path: '/enterprise', title: 'حلول الأعمال والمؤسسات', titleEn: 'Enterprise Solutions' },
+  { id: 'healthcare', path: '/healthcare', title: 'حلول القطاع الصحي', titleEn: 'Healthcare Solutions' },
+  { id: 'about', path: '/about-us', title: 'من نحن', titleEn: 'About Us' },
+  { id: 'request-quote', path: '/request-quote', title: 'اطلب عرض سعر', titleEn: 'Request a Quote' },
 ];
 
 const ensureMissingPages = (pages: PageData[]): PageData[] => {
@@ -1969,7 +2445,7 @@ export const SiteDataProvider = ({ children }: { children: React.ReactNode }) =>
       if (!site) return;
 
 const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
-      const enhancedPages = ensureMissingPages(
+      const enhancedPages = ensureHomeStatsFields(ensureHomeTestimonialsFields(ensureHomeFaqFields(ensureHomeCtaFields(ensureRequestQuoteFields(ensureAboutFields(ensureHealthcareFields(ensureEnterpriseFields(ensureMissingPages(
         ensureSchoolBitFields(
           ensureContactPageFields(
             ensureGovGateFields(
@@ -1980,7 +2456,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
                       ensureHomeWhyUsFields(
                         ensureHomeTrustFields(
                           ensureSmsFields(
-                            ensureHomeHeroFields(ensureHomeSolutionsFields(loadedPages))
+                            ensureHomeNavbarFields(ensureHomeHeroFields(ensureHomeSolutionsFields(loadedPages)))
                           )
                         )
                       )
@@ -1991,7 +2467,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
             )
           )
         )
-      );
+      )))))))));
 
       setPages(enhancedPages);
       setPartners(Array.isArray(site.partners) ? site.partners : []);
@@ -2071,7 +2547,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
         
         let enhancedPages = ensuredPages;
         try {
-          enhancedPages = ensureSchoolBitFields(
+          enhancedPages = ensureHomeStatsFields(ensureHomeTestimonialsFields(ensureHomeFaqFields(ensureHomeCtaFields(ensureRequestQuoteFields(ensureAboutFields(ensureHealthcareFields(ensureEnterpriseFields(ensureSchoolBitFields(
             ensureContactPageFields(
               ensureGovGateFields(
                 ensureOTimeFields(
@@ -2081,7 +2557,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
                         ensureHomeWhyUsFields(
                           ensureHomeTrustFields(
                             ensureSmsFields(
-                              ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages))
+                              ensureHomeNavbarFields(ensureHomeHeroFields(ensureHomeSolutionsFields(ensuredPages)))
                             )
                           )
                         )
@@ -2091,7 +2567,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
                 )
               )
             )
-          );
+          )))))))));
         } catch (e) {
           console.error('Enhancement error:', e);
         }
@@ -2201,10 +2677,54 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
       if (page.id !== pageId) return page;
       return {
         ...page,
-        sections: page.sections.map(s => s.id === sectionId ? { ...s, visible: !s.visible } : s)
+        // القسم بلا `visible` معرّفة يُعتبر ظاهرًا، فالتبديل الصحيح: الظاهر→مخفي، المخفي→ظاهر.
+        sections: page.sections.map(s => s.id === sectionId ? { ...s, visible: s.visible === false } : s)
       };
     }));
   }, []);
+
+  // الأقسام المثبّتة (لا تُنقل ولا تُخفى): الهيرو دائمًا أولًا. والنافبار قسم بنيوي يبقى بآخر المصفوفة.
+  const PINNED_TOP_IDS = React.useMemo(() => new Set(["home-hero"]), []);
+  const STRUCTURAL_TAIL_IDS = React.useMemo(() => new Set(["home-navbar"]), []);
+
+  // يعيد بناء مصفوفة الأقسام: المثبّت أولًا ← الأقسام القابلة للنقل بالترتيب المعطى ← الأقسام البنيوية بآخرها.
+  const rebuildSections = useCallback((sections: PageSection[], movableOrderIds: string[]): PageSection[] => {
+    const byId = new Map(sections.map((s) => [s.id, s]));
+    const pinned = sections.filter((s) => PINNED_TOP_IDS.has(s.id));
+    const movable = movableOrderIds.map((id) => byId.get(id)).filter((s): s is PageSection => Boolean(s));
+    const placed = new Set([...pinned.map((s) => s.id), ...movable.map((s) => s.id)]);
+    const tail = sections.filter((s) => !placed.has(s.id)); // البنيوية (navbar) وأي بقايا
+    return [...pinned, ...movable, ...tail];
+  }, [PINNED_TOP_IDS]);
+
+  const getMovableOrderIds = useCallback((sections: PageSection[]): string[] =>
+    sections
+      .filter((s) => !PINNED_TOP_IDS.has(s.id) && !STRUCTURAL_TAIL_IDS.has(s.id))
+      .map((s) => s.id),
+  [PINNED_TOP_IDS, STRUCTURAL_TAIL_IDS]);
+
+  // إعادة الترتيب عبر السحب: قائمة معرّفات الأقسام القابلة للنقل بترتيبها الجديد.
+  const reorderSections = useCallback((pageId: string, orderedMovableIds: string[]) => {
+    setPages(prev => prev.map(page => {
+      if (page.id !== pageId) return page;
+      return { ...page, sections: rebuildSections(page.sections, orderedMovableIds) };
+    }));
+  }, [rebuildSections]);
+
+  // النقل بالأسهم خطوة واحدة لأعلى/أسفل داخل الأقسام القابلة للنقل فقط.
+  const moveSection = useCallback((pageId: string, sectionId: string, dir: "up" | "down") => {
+    setPages(prev => prev.map(page => {
+      if (page.id !== pageId) return page;
+      if (PINNED_TOP_IDS.has(sectionId) || STRUCTURAL_TAIL_IDS.has(sectionId)) return page;
+      const order = getMovableOrderIds(page.sections);
+      const i = order.indexOf(sectionId);
+      if (i === -1) return page;
+      const target = dir === "up" ? i - 1 : i + 1;
+      if (target < 0 || target >= order.length) return page;
+      [order[i], order[target]] = [order[target], order[i]];
+      return { ...page, sections: rebuildSections(page.sections, order) };
+    }));
+  }, [PINNED_TOP_IDS, STRUCTURAL_TAIL_IDS, getMovableOrderIds, rebuildSections]);
 
   const getField = useCallback((pageId: string, sectionId: string, fieldKey: string): string => {
     const page = pages.find(p => p.id === pageId);
@@ -2276,7 +2796,7 @@ const loadedPages = Array.isArray(site.pages) ? (site.pages as PageData[]) : [];
   return (
     <SiteDataContext.Provider value={{
       partners, setPartners, addPartner, removePartner, togglePartner, updatePartnerName,
-      pages, setPages, updateSectionField, toggleSectionVisibility, getField, isSectionVisible, updatePageSeo,
+      pages, setPages, updateSectionField, toggleSectionVisibility, moveSection, reorderSections, getField, isSectionVisible, updatePageSeo,
       socialLinks, setSocialLinks, addSocialLink, updateSocialLink, removeSocialLink,
       contactSubmissions, addContactSubmission, markSubmissionRead, deleteSubmission,
       whatsAppRequests, fetchWhatsAppRequests, updateWhatsAppRequestStatus, deleteWhatsAppRequest,

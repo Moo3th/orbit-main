@@ -6,30 +6,57 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import OrbitSectionBackground from './OrbitSectionBackground';
 import OrbitAnimatedBackground from './OrbitAnimatedBackground';
 import { useState } from 'react';
-import { createMainPageSettingsDefaults, type WhyOrbitSectionData } from '@/lib/mainPageSettings';
+import { createMainPageSettingsDefaults } from '@/lib/mainPageSettings';
+import type { CmsPage } from '@/lib/cms/types';
+import { getCmsField } from '@/lib/cms/helpers';
 
 interface WhyOrbitProps {
-  data?: WhyOrbitSectionData;
+  cmsPage?: CmsPage | null;
 }
 
-export default function WhyOrbit({ data }: WhyOrbitProps) {
+interface WhyListItem {
+  titleAr: string;
+  titleEn: string;
+  descAr: string;
+  descEn: string;
+}
+
+function parseList(raw: string, fallback: WhyListItem[]): WhyListItem[] {
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export default function WhyOrbit({ cmsPage = null }: WhyOrbitProps) {
   const { t, isRTL } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const whyOrbit = data ?? createMainPageSettingsDefaults().whyOrbit;
+  const defaults = createMainPageSettingsDefaults().whyOrbit;
 
-  const stats = whyOrbit.stats.map((stat) => ({
-    number: stat.number,
-    label: isRTL ? stat.labelAr : stat.labelEn
+  const whyTitle = getCmsField(cmsPage, 'about-whyorbit', 'title', isRTL, t.about.stats?.title || (isRTL ? 'لماذا المدار التقني؟' : 'Why CORBIT Technical?'));
+
+  const statsRaw = parseList(
+    getCmsField(cmsPage, 'about-whyorbit', 'stats_json', isRTL, ''),
+    defaults.stats.map((s) => ({ titleAr: s.number, titleEn: s.number, descAr: s.labelAr, descEn: s.labelEn }))
+  );
+  const stats = statsRaw.map((stat) => ({
+    number: isRTL ? stat.titleAr : stat.titleEn,
+    label: isRTL ? stat.descAr : stat.descEn,
   }));
 
-  const features = whyOrbit.features.map((feature) => ({
-    text: isRTL ? feature.textAr : feature.textEn,
-    textAr: feature.textAr,
-    description: isRTL ? feature.descriptionAr : feature.descriptionEn,
+  const featuresRaw = parseList(
+    getCmsField(cmsPage, 'about-whyorbit', 'features_json', isRTL, ''),
+    defaults.features.map((f) => ({ titleAr: f.textAr, titleEn: f.textEn, descAr: f.descriptionAr, descEn: f.descriptionEn }))
+  );
+  const features = featuresRaw.map((feature) => ({
+    text: isRTL ? feature.titleAr : feature.titleEn,
+    description: isRTL ? feature.descAr : feature.descEn,
   }));
 
   return (
@@ -151,7 +178,7 @@ export default function WhyOrbit({ data }: WhyOrbitProps) {
               className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading mb-6 uppercase tracking-tight leading-tight"
               style={{ fontFamily: isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif' }}
             >
-              {t.about.stats?.title || (isRTL ? 'لماذا المدار التقني؟' : 'Why CORBIT Technical?')}
+              {whyTitle}
             </motion.h2>
             <motion.div
               className="h-1 bg-white/80 mx-auto rounded-full"
@@ -244,7 +271,7 @@ export default function WhyOrbit({ data }: WhyOrbitProps) {
                         }}
                         transition={{ duration: 0.3 }}
                       >
-                        {isRTL ? feature.textAr : feature.text}
+                        {feature.text}
                       </motion.h4>
 
                       <motion.p

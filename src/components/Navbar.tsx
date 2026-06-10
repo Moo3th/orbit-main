@@ -28,6 +28,7 @@ export default function Navbar() {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [isInDarkSection, setIsInDarkSection] = useState(false);
   const [solutionsList, setSolutionsList] = useState(DEFAULT_SOLUTIONS);
+  const [blogLabel, setBlogLabel] = useState({ ar: 'المدونة', en: 'Blog' });
   const pathname = usePathname();
   const router = useRouter();
   const { t, isRTL } = useLanguage();
@@ -43,11 +44,33 @@ export default function Navbar() {
           const data = await res.json();
           if (data.success && data.site?.pages) {
             const pages = data.site.pages;
-            const filtered = DEFAULT_SOLUTIONS.filter(sol => {
-              const page = pages.find((p: any) => p.id === sol.id);
-              return page ? page.visible !== false : true;
-            });
-            setSolutionsList(filtered);
+            const homePage = pages.find((p: any) => p.id === 'home' || p.path === '/');
+            const navSection = homePage?.sections?.find((s: any) => s.id === 'home-navbar');
+            const fieldVal = (key: string): { ar: string; en: string } | null => {
+              const f = navSection?.fields?.find((x: any) => x.key === key);
+              if (!f) return null;
+              const ar = (f.value || '').trim();
+              const en = (f.valueEn || f.value || '').trim();
+              return { ar, en };
+            };
+            const mapped = DEFAULT_SOLUTIONS
+              .filter(sol => {
+                const page = pages.find((p: any) => p.id === sol.id);
+                return page ? page.visible !== false : true;
+              })
+              .map(sol => {
+                const nameF = fieldVal(`${sol.id}_name`);
+                const hrefF = fieldVal(`${sol.id}_href`);
+                return {
+                  ...sol,
+                  nameAr: nameF?.ar || sol.nameAr,
+                  nameEn: nameF?.en || sol.nameEn,
+                  href: hrefF?.ar || sol.href,
+                };
+              });
+            setSolutionsList(mapped);
+            const blogF = fieldVal('blog_label');
+            if (blogF) setBlogLabel({ ar: blogF.ar || 'المدونة', en: blogF.en || 'Blog' });
           }
         }
       } catch (e) {
@@ -256,7 +279,7 @@ export default function Navbar() {
             </div>
 
             {/* Blog - المدونة */}
-            <NavLink item={{ name: isRTL ? 'المدونة' : 'Blog', href: '/blog' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} index={3} />
+            <NavLink item={{ name: isRTL ? blogLabel.ar : blogLabel.en, href: '/blog' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} index={3} />
 
             {SHOW_NAV_OFFERS && (
               <NavLink item={{ name: t.nav.offers, href: '/offers' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} index={5} />
@@ -361,6 +384,7 @@ export default function Navbar() {
             t={t}
             pathname={pathname}
             router={router}
+            blogLabel={blogLabel}
           />
         )}
       </AnimatePresence>
@@ -473,9 +497,10 @@ interface MobileMenuProps {
   pathname: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   router: any;
+  blogLabel: { ar: string; en: string };
 }
 
-function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorClass, needsHighContrast, t, pathname, router }: MobileMenuProps) {
+function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorClass, needsHighContrast, t, pathname, router, blogLabel }: MobileMenuProps) {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
 
   return (
@@ -570,7 +595,7 @@ function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorCl
             </div>
 
             {/* Blog - المدونة */}
-            <MobileNavLink item={{ name: isRTL ? 'المدونة' : 'Blog', href: '/blog' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} setIsOpen={setIsOpen} />
+            <MobileNavLink item={{ name: isRTL ? blogLabel.ar : blogLabel.en, href: '/blog' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} setIsOpen={setIsOpen} />
 
             {SHOW_NAV_OFFERS && (
               <MobileNavLink item={{ name: t.nav.offers, href: '/offers' }} isRTL={isRTL} navbarIsDark={navbarIsDark} textColorClass={textColorClass} setIsOpen={setIsOpen} />

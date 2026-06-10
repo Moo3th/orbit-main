@@ -174,9 +174,12 @@ export function generatePageMetadata(page: PageMetadataInput | null, settings: I
     keywords: keywords,
     alternates: {
       canonical: canonical,
+      // Single-URL bilingual site (language via toggle, no /ar /en route prefixes):
+      // point every hreflang to the same page URL to avoid broken alternates.
       languages: {
-        'ar': `${baseUrl}/ar${page?.path || '/'}`,
-        'en': `${baseUrl}/en${page?.path || '/'}`,
+        'ar': canonical,
+        'en': canonical,
+        'x-default': canonical,
       },
     },
     robots: noIndex ? 'noindex, nofollow' : {
@@ -256,18 +259,13 @@ export function generateWebsiteJsonLd(settings: ISeoSettings | null) {
   const baseUrl = settings.siteUrl;
   const name = settings.siteName.ar || settings.siteName.en || 'CORBIT';
 
+  // Note: no SearchAction — the site has no /search results page, so emitting a
+  // sitelinks SearchBox action would point Google to a non-existent endpoint.
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: name,
     url: baseUrl,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${baseUrl}/search?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
+    inLanguage: ['ar', 'en'],
   };
 }

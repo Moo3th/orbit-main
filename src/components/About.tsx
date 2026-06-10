@@ -4,42 +4,56 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import OrbitSectionBackground from './OrbitSectionBackground';
-import { createMainPageSettingsDefaults, type AboutSectionData } from '@/lib/mainPageSettings';
+import { createMainPageSettingsDefaults } from '@/lib/mainPageSettings';
+import type { CmsPage } from '@/lib/cms/types';
+import { getCmsField } from '@/lib/cms/helpers';
 
 interface AboutProps {
-  data?: AboutSectionData;
+  cmsPage?: CmsPage | null;
 }
 
-export default function About({ data }: AboutProps) {
+interface PromiseItem {
+  titleAr: string;
+  titleEn: string;
+}
+
+function parseList(raw: string, fallback: PromiseItem[]): PromiseItem[] {
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export default function About({ cmsPage = null }: AboutProps) {
   const { isRTL } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
-  const about = data ?? createMainPageSettingsDefaults().about;
+  const defaults = createMainPageSettingsDefaults().about;
+
+  const brandText = getCmsField(cmsPage, 'about-intro', 'brand', isRTL, isRTL ? 'المدار' : 'CORBIT');
+  const introText = getCmsField(cmsPage, 'about-intro', 'text', isRTL, isRTL
+    ? 'شركة سعودية رائدة في تقديم الحلول التقنية الذكية، نعمل على تمكين المؤسسات من التطور عبر تقنيات حديثة تضمن كفاءة أعلى، تواصل أسرع، وتجربة رقمية متكاملة'
+    : 'is a leading Saudi company providing smart technical solutions. We work to enable organizations to evolve through modern technologies that ensure higher efficiency, faster communication, and an integrated digital experience');
 
   const vision = {
-    title: isRTL ? about.visionTitleAr : about.visionTitleEn,
-    titleAr: about.visionTitleAr,
-    text: isRTL ? about.visionTextAr : about.visionTextEn,
-    textAr: about.visionTextAr,
+    title: getCmsField(cmsPage, 'about-vision', 'title', isRTL, isRTL ? defaults.visionTitleAr : defaults.visionTitleEn),
+    text: getCmsField(cmsPage, 'about-vision', 'text', isRTL, isRTL ? defaults.visionTextAr : defaults.visionTextEn),
   };
 
   const mission = {
-    title: isRTL ? about.missionTitleAr : about.missionTitleEn,
-    titleAr: about.missionTitleAr,
-    text: isRTL ? about.missionTextAr : about.missionTextEn,
-    textAr: about.missionTextAr,
+    title: getCmsField(cmsPage, 'about-mission', 'title', isRTL, isRTL ? defaults.missionTitleAr : defaults.missionTitleEn),
+    text: getCmsField(cmsPage, 'about-mission', 'text', isRTL, isRTL ? defaults.missionTextAr : defaults.missionTextEn),
   };
 
-  const promises = {
-    title: isRTL ? about.promisesTitleAr : about.promisesTitleEn,
-    titleAr: about.promisesTitleAr,
-    items: about.promises.map((item) => ({
-      text: isRTL ? item.textAr : item.textEn,
-      textAr: item.textAr,
-    })),
-  };
+  const promisesTitle = getCmsField(cmsPage, 'about-promises', 'title', isRTL, isRTL ? defaults.promisesTitleAr : defaults.promisesTitleEn);
+  const promiseItems = parseList(
+    getCmsField(cmsPage, 'about-promises', 'items_json', isRTL, ''),
+    defaults.promises.map((p) => ({ titleAr: p.textAr, titleEn: p.textEn }))
+  );
 
   // Font sizes - hierarchy: 0 (largest), 2 (medium-large), 1 (medium), 3 (smallest)
   const getFontSize = (index: number) => {
@@ -246,7 +260,7 @@ export default function About({ data }: AboutProps) {
                     transition: { duration: 0.2 },
                   }}
                 >
-                  {isRTL ? 'المدار' : 'CORBIT'}
+                  {brandText}
                   {/* Glow effect on hover */}
                   <motion.span
                     className="absolute inset-0 blur-xl bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -267,9 +281,7 @@ export default function About({ data }: AboutProps) {
                     },
                   }}
                 >
-                  {isRTL
-                    ? 'شركة سعودية رائدة في تقديم الحلول التقنية الذكية، نعمل على تمكين المؤسسات من التطور عبر تقنيات حديثة تضمن كفاءة أعلى، تواصل أسرع، وتجربة رقمية متكاملة'
-                    : 'is a leading Saudi company providing smart technical solutions. We work to enable organizations to evolve through modern technologies that ensure higher efficiency, faster communication, and an integrated digital experience'}
+                  {introText}
                 </motion.span>
               </motion.p>
             </motion.div>
@@ -371,7 +383,7 @@ export default function About({ data }: AboutProps) {
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.6, delay: 0.3 }}
                 >
-                  {isRTL ? vision.titleAr : vision.title}
+                  {vision.title}
                 </motion.h3>
 
                 <motion.div
@@ -389,7 +401,7 @@ export default function About({ data }: AboutProps) {
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.7 }}
                 >
-                  {isRTL ? vision.textAr : vision.text}
+                  {vision.text}
                 </motion.p>
               </div>
 
@@ -419,7 +431,7 @@ export default function About({ data }: AboutProps) {
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.6, delay: 0.5 }}
                 >
-                  {isRTL ? mission.titleAr : mission.title}
+                  {mission.title}
                 </motion.h3>
 
                 <motion.div
@@ -437,7 +449,7 @@ export default function About({ data }: AboutProps) {
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.9 }}
                 >
-                  {isRTL ? mission.textAr : mission.text}
+                  {mission.text}
                 </motion.p>
               </div>
 
@@ -462,12 +474,12 @@ export default function About({ data }: AboutProps) {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              {isRTL ? promises.titleAr : promises.title}
+              {promisesTitle}
             </motion.h3>
 
             {/* Responsive Grid - First one larger, others smaller */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-              {promises.items.map((promise, index) => (
+              {promiseItems.map((promise, index) => (
                 <motion.div
                   key={index}
                   variants={{
@@ -523,7 +535,7 @@ export default function About({ data }: AboutProps) {
                         animate={inView ? { opacity: 1 } : {}}
                         transition={{ duration: 0.6, delay: 1.2 + index * 0.12 }}
                       >
-                        {isRTL ? promise.textAr : promise.text}
+                        {isRTL ? promise.titleAr : promise.titleEn}
                       </motion.h4>
 
                       {/* Elegant Underline */}

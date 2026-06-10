@@ -6,6 +6,23 @@ import { SeoSettings } from '@/models/SeoSettings';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// Recursively remove Mongo internal keys (_id, __v) so round-tripped sub-objects
+// (which may carry a serialized ObjectId buffer) don't fail ObjectId casting on save.
+function stripMongoKeys<T>(val: T): T {
+  if (Array.isArray(val)) {
+    return val.map((v) => stripMongoKeys(v)) as unknown as T;
+  }
+  if (val && typeof val === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const key of Object.keys(val as Record<string, unknown>)) {
+      if (key === '_id' || key === '__v' || key === 'createdAt' || key === 'updatedAt') continue;
+      out[key] = stripMongoKeys((val as Record<string, unknown>)[key]);
+    }
+    return out as unknown as T;
+  }
+  return val;
+}
+
 export async function GET() {
   try {
     await connectDB();
@@ -121,13 +138,13 @@ export async function PUT(request: NextRequest) {
     } = body;
 
     const updateData: Record<string, unknown> = {};
-    if (siteName !== undefined) updateData.siteName = siteName;
+    if (siteName !== undefined) updateData.siteName = stripMongoKeys(siteName);
     if (siteUrl !== undefined) updateData.siteUrl = siteUrl;
     if (notificationEmail !== undefined) updateData.notificationEmail = notificationEmail;
-    if (emailConfig !== undefined) updateData.emailConfig = emailConfig;
-    if (defaultSeo !== undefined) updateData.defaultSeo = defaultSeo;
-    if (organization !== undefined) updateData.organization = organization;
-    if (analytics !== undefined) updateData.analytics = analytics;
+    if (emailConfig !== undefined) updateData.emailConfig = stripMongoKeys(emailConfig);
+    if (defaultSeo !== undefined) updateData.defaultSeo = stripMongoKeys(defaultSeo);
+    if (organization !== undefined) updateData.organization = stripMongoKeys(organization);
+    if (analytics !== undefined) updateData.analytics = stripMongoKeys(analytics);
     if (robotsTxt !== undefined) updateData.robotsTxt = robotsTxt;
 
     console.log('Update data:', JSON.stringify(updateData, null, 2));

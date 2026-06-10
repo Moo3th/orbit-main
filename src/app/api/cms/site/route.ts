@@ -118,6 +118,9 @@ export async function PUT(request: NextRequest) {
       '/products/o-time',
       '/products/gov-gate',
       '/products/schoolbit',
+      '/enterprise',
+      '/healthcare',
+      '/request-quote',
     ];
     
     try {

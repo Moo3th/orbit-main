@@ -157,13 +157,31 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
     isRTL ? 'اختر الخدمة...' : 'Select a service...'
   );
   const submitText = getCmsField(cmsPage, 'contact-form', 'submit_text', isRTL, isRTL ? 'إرسال الرسالة' : 'Send Message');
-  const privacyNote = getCmsField(
-    cmsPage,
-    'contact-form',
-    'privacy_note',
-    isRTL,
-    isRTL ? 'بإرسال النموذج، أنت توافق على شروط المستخدم.' : 'By sending this form, you agree to the Terms of Use.'
-  );
+  const infoTitle = getCmsField(cmsPage, 'contact-info', 'info_title', isRTL, isRTL ? 'معلومات الاتصال' : 'Contact Information');
+  const phoneLabel = getCmsField(cmsPage, 'contact-info', 'phone_label', isRTL, isRTL ? 'هاتف' : 'Phone');
+  const emailLabel = getCmsField(cmsPage, 'contact-info', 'email_label', isRTL, isRTL ? 'البريد الإلكتروني' : 'Email');
+  const addressLabel = getCmsField(cmsPage, 'contact-info', 'address_label', isRTL, isRTL ? 'العنوان' : 'Address');
+  const whatsappSubtitle = getCmsField(cmsPage, 'contact-info', 'whatsapp_subtitle', isRTL, isRTL ? 'رد سريع خلال ساعات العمل' : 'Fast response during business hours');
+
+  const nameLabel = getCmsField(cmsPage, 'contact-form', 'name_label', isRTL, isRTL ? 'الاسم الكامل' : 'Full Name');
+  const namePlaceholder = getCmsField(cmsPage, 'contact-form', 'name_placeholder', isRTL, isRTL ? 'أدخل اسمك الكامل' : 'Enter your full name');
+  const emailFieldLabel = getCmsField(cmsPage, 'contact-form', 'email_label', isRTL, isRTL ? 'البريد الإلكتروني' : 'Email');
+  const phoneFieldLabel = getCmsField(cmsPage, 'contact-form', 'phone_label', isRTL, isRTL ? 'رقم الهاتف' : 'Phone Number');
+  const companyLabel = getCmsField(cmsPage, 'contact-form', 'company_label', isRTL, isRTL ? 'اسم الشركة/الجهة' : 'Company / Organization');
+  const companyPlaceholder = getCmsField(cmsPage, 'contact-form', 'company_placeholder', isRTL, isRTL ? 'مثال: شركة المدار' : 'e.g. Orbit Co.');
+  const subjectLabel = getCmsField(cmsPage, 'contact-form', 'subject_label', isRTL, isRTL ? 'الموضوع' : 'Subject');
+  const subjectPlaceholder = getCmsField(cmsPage, 'contact-form', 'subject_placeholder', isRTL, isRTL ? 'موضوع الاستفسار' : 'Inquiry subject');
+  const messageLabel = getCmsField(cmsPage, 'contact-form', 'message_label', isRTL, isRTL ? 'الرسالة' : 'Message');
+  const messagePlaceholder = getCmsField(cmsPage, 'contact-form', 'message_placeholder', isRTL, isRTL ? 'اكتب رسالتك هنا...' : 'Write your message here...');
+  const sendingText = getCmsField(cmsPage, 'contact-form', 'sending_text', isRTL, isRTL ? 'جاري الإرسال...' : 'Sending...');
+  const successMessage = getCmsField(cmsPage, 'contact-form', 'success_message', isRTL, isRTL ? 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.' : "Your message has been sent successfully! We'll get back to you soon.");
+  const errorMessage = getCmsField(cmsPage, 'contact-form', 'error_message', isRTL, isRTL ? 'فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.' : 'Failed to send message. Please try again.');
+  const privacyPrefix = getCmsField(cmsPage, 'contact-form', 'privacy_prefix', isRTL, isRTL ? 'بإرسال النموذج، أنت توافق على' : 'By sending this form, you agree to the');
+  const privacyTermsLabel = getCmsField(cmsPage, 'contact-form', 'privacy_terms_label', isRTL, isRTL ? 'الشروط والأحكام' : 'Terms & Conditions');
+  const privacyTermsUrl = getCmsField(cmsPage, 'contact-form', 'privacy_terms_url', isRTL, '/terms');
+  const privacyConnector = getCmsField(cmsPage, 'contact-form', 'privacy_connector', isRTL, isRTL ? 'و' : 'and');
+  const privacyPolicyLabel = getCmsField(cmsPage, 'contact-form', 'privacy_policy_label', isRTL, isRTL ? 'سياسة الخصوصية' : 'Privacy Policy');
+  const privacyPolicyUrl = getCmsField(cmsPage, 'contact-form', 'privacy_policy_url', isRTL, '/privacy');
 
   const serviceOptions = useMemo(() => {
     const fallback = parseServiceOptions(DEFAULT_SERVICE_OPTIONS_AR, []);
@@ -279,7 +297,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                   className={`text-2xl font-heading font-semibold mb-6 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`}
                   dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  {isRTL ? 'معلومات الاتصال' : 'Contact Information'}
+                  {infoTitle}
                 </h3>
 
                 <div className="space-y-6">
@@ -291,7 +309,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     </div>
                     <div>
                       <p className={`text-sm text-gray-500 dark:text-gray-400 mb-1 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                        {isRTL ? 'هاتف' : 'Phone'}
+                        {phoneLabel}
                       </p>
                       <a href={`tel:${dialPhone || phoneNumber}`} className={`text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir="ltr">
                         {phoneNumber}
@@ -310,7 +328,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     </div>
                     <div>
                       <p className={`text-sm text-gray-500 dark:text-gray-400 mb-1 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                        {isRTL ? 'البريد الإلكتروني' : 'Email'}
+                        {emailLabel}
                       </p>
                       <a href={emailHref} className={`text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir="ltr">
                         {emailAddress}
@@ -330,7 +348,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     </div>
                     <div>
                       <p className={`text-sm text-gray-500 dark:text-gray-400 mb-1 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                        {isRTL ? 'العنوان' : 'Address'}
+                        {addressLabel}
                       </p>
                       <p className={`text-lg font-semibold text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
                         {address}
@@ -359,7 +377,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                             {whatsappTitle}
                           </p>
                           <p className={`text-[11px] sm:text-xs text-white/80 mt-1 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                            {isRTL ? 'رد سريع خلال ساعات العمل' : 'Fast response during business hours'}
+                            {whatsappSubtitle}
                           </p>
                         </div>
                       </div>
@@ -395,9 +413,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
                   >
                     <p className={`text-green-800 dark:text-green-300 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL
-                        ? 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.'
-                        : "Your message has been sent successfully! We'll get back to you soon."}
+                      {successMessage}
                     </p>
                   </motion.div>
                 )}
@@ -409,7 +425,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
                   >
                     <p className={`text-red-800 dark:text-red-300 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL ? 'فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.' : 'Failed to send message. Please try again.'}
+                      {errorMessage}
                     </p>
                   </motion.div>
                 )}
@@ -417,7 +433,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL ? 'الاسم الكامل' : 'Full Name'} <span className="text-primary">*</span>
+                      {nameLabel} <span className="text-primary">*</span>
                     </label>
                     <input
                       type="text"
@@ -428,12 +444,12 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                       onChange={handleChange}
                       className={`w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${isRTL ? 'font-ibm-plex-arabic' : ''}`}
                       dir={isRTL ? 'rtl' : 'ltr'}
-                      placeholder={isRTL ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                      placeholder={namePlaceholder}
                     />
                   </div>
                   <div>
                     <label htmlFor="email" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL ? 'البريد الإلكتروني' : 'Email'} <span className="text-primary">*</span>
+                      {emailFieldLabel} <span className="text-primary">*</span>
                     </label>
                     <input
                       type="email"
@@ -452,7 +468,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="phone" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL ? 'رقم الهاتف' : 'Phone Number'} <span className="text-primary">*</span>
+                      {phoneFieldLabel} <span className="text-primary">*</span>
                     </label>
                     <input
                       type="tel"
@@ -468,7 +484,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                   </div>
                   <div>
                     <label htmlFor="company" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                      {isRTL ? 'اسم الشركة/الجهة' : 'Company / Organization'}
+                      {companyLabel}
                     </label>
                     <input
                       type="text"
@@ -478,7 +494,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                       onChange={handleChange}
                       className={`w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${isRTL ? 'font-ibm-plex-arabic' : ''}`}
                       dir={isRTL ? 'rtl' : 'ltr'}
-                      placeholder={isRTL ? 'مثال: شركة المدار' : 'e.g. Orbit Co.'}
+                      placeholder={companyPlaceholder}
                     />
                   </div>
                 </div>
@@ -506,7 +522,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
 
                 <div>
                   <label htmlFor="subject" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                    {isRTL ? 'الموضوع' : 'Subject'}
+                    {subjectLabel}
                   </label>
                   <input
                     type="text"
@@ -516,13 +532,13 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     onChange={handleChange}
                     className={`w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${isRTL ? 'font-ibm-plex-arabic' : ''}`}
                     dir={isRTL ? 'rtl' : 'ltr'}
-                    placeholder={isRTL ? 'موضوع الاستفسار' : 'Inquiry subject'}
+                    placeholder={subjectPlaceholder}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="message" className={`block text-sm font-semibold mb-2 text-gray-900 dark:text-white ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                    {isRTL ? 'الرسالة' : 'Message'} <span className="text-primary">*</span>
+                    {messageLabel} <span className="text-primary">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -533,7 +549,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                     onChange={handleChange}
                     className={`w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors resize-none ${isRTL ? 'font-ibm-plex-arabic' : ''}`}
                     dir={isRTL ? 'rtl' : 'ltr'}
-                    placeholder={isRTL ? 'اكتب رسالتك هنا...' : 'Write your message here...'}
+                    placeholder={messagePlaceholder}
                   />
                 </div>
 
@@ -545,35 +561,19 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {isSubmitting ? (isRTL ? 'جاري الإرسال...' : 'Sending...') : submitText}
+                  {isSubmitting ? sendingText : submitText}
                 </motion.button>
 
                 <p className={`text-xs text-center text-gray-500 dark:text-gray-400 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                  {isRTL ? (
-                    <>
-                      بإرسال النموذج، أنت توافق على{' '}
-                      <a href="/terms" className="underline hover:text-primary transition-colors">
-                        الشروط والأحكام
-                      </a>
-                      {' '}و{' '}
-                      <a href="/privacy" className="underline hover:text-primary transition-colors">
-                        سياسة الخصوصية
-                      </a>
-                      .
-                    </>
-                  ) : (
-                    <>
-                      By sending this form, you agree to the{' '}
-                      <a href="/terms" className="underline hover:text-primary transition-colors">
-                        Terms &amp; Conditions
-                      </a>
-                      {' '}and{' '}
-                      <a href="/privacy" className="underline hover:text-primary transition-colors">
-                        Privacy Policy
-                      </a>
-                      .
-                    </>
-                  )}
+                  {privacyPrefix}{' '}
+                  <a href={privacyTermsUrl} className="underline hover:text-primary transition-colors">
+                    {privacyTermsLabel}
+                  </a>
+                  {' '}{privacyConnector}{' '}
+                  <a href={privacyPolicyUrl} className="underline hover:text-primary transition-colors">
+                    {privacyPolicyLabel}
+                  </a>
+                  .
                 </p>
               </motion.form>
             </motion.div>

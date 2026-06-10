@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Save, Plus, ChevronDown, Eye, EyeOff, ExternalLink, FileText, Search, Image as ImageIcon, Globe, Shield, Lightbulb, Users, ArrowRight, Star, Mail, Newspaper, Zap, Palette, MessageSquare, LayoutGrid, Settings, Tag, Layers } from 'lucide-react';
+import { Reorder, useDragControls } from 'framer-motion';
+import { Save, Plus, ChevronDown, ChevronUp, GripVertical, Pin, ExternalLink, FileText, Search, Image as ImageIcon, Globe, Shield, Lightbulb, Users, ArrowRight, Star, Mail, Newspaper, Zap, Palette, MessageSquare, LayoutGrid, Settings, Tag, Layers } from 'lucide-react';
 import { Button } from '@/components/business/ui/button';
 import { Card, CardContent } from '@/components/business/ui/card';
 import { Badge } from '@/components/business/ui/badge';
+import { Switch } from '@/components/business/ui/switch';
 import { useSiteData, PageData, PageSection, SectionField, PageSeo } from '../SiteDataContext';
 import { parseSmsPlanRows, stringifySmsPlanRows, type SmsPlanRow } from '@/lib/cms/smsPricing';
 import {
@@ -969,6 +971,176 @@ const IntegrationsListEditor = ({ value, onChange, isAr, pageId }: { value: stri
   );
 };
 
+const TestimonialsListEditor = ({ value, onChange, isAr, pageId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string }) => {
+  let items: { nameAr?: string; nameEn?: string; roleAr?: string; roleEn?: string; quoteAr?: string; quoteEn?: string; avatar?: string; rating?: number }[] = [];
+  try {
+    items = value ? JSON.parse(value) : [];
+  } catch (e) {
+    console.error("Parse error in TestimonialsListEditor", e);
+  }
+
+  const commit = (next: typeof items) => onChange(JSON.stringify(next));
+  const updateItem = (index: number, patch: any) => {
+    const next = [...items];
+    next[index] = { ...next[index], ...patch };
+    commit(next);
+  };
+  const addItem = () => commit([...items, { nameAr: "", nameEn: "", roleAr: "", roleEn: "", quoteAr: "", quoteEn: "", avatar: "", rating: 5 }]);
+  const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
+  const moveItem = (index: number, dir: "up" | "down") => {
+    const next = [...items];
+    const target = dir === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    commit(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? "آراء العملاء" : "Testimonials"}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة رأي" : "Add Testimonial"}
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">#{idx + 1}</span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => moveItem(idx, "up")} disabled={idx === 0} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? "للأعلى" : "Up"}><ChevronDown className="w-3.5 h-3.5 rotate-180" /></button>
+                <button onClick={() => moveItem(idx, "down")} disabled={idx === items.length - 1} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? "للأسفل" : "Down"}><ChevronDown className="w-3.5 h-3.5" /></button>
+                <button onClick={() => removeItem(idx)} className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title={isAr ? "حذف" : "Remove"}><Plus className="w-3.5 h-3.5 rotate-45" /></button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الاسم (عربي)" : "Name (AR)"}</label>
+                    <input type="text" value={item.nameAr || ""} onChange={e => updateItem(idx, { nameAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">Name (EN)</label>
+                    <input type="text" value={item.nameEn || ""} onChange={e => updateItem(idx, { nameEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "المسمى (عربي)" : "Role (AR)"}</label>
+                    <input type="text" value={item.roleAr || ""} onChange={e => updateItem(idx, { roleAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">Role (EN)</label>
+                    <input type="text" value={item.roleEn || ""} onChange={e => updateItem(idx, { roleEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "التقييم (1-5)" : "Rating (1-5)"}</label>
+                  <select value={String(item.rating ?? 5)} onChange={e => updateItem(idx, { rating: Number(e.target.value) })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]">
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "صورة العميل" : "Avatar"}</label>
+                  <ImageUploader value={item.avatar || ""} onChange={(url) => updateItem(idx, { avatar: url })} folder={`pages/${pageId}/testimonials`} isAr={isAr} aspectRatio="square" />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الاقتباس (عربي)" : "Quote (AR)"}</label>
+                <textarea value={item.quoteAr || ""} onChange={e => updateItem(idx, { quoteAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">Quote (EN)</label>
+                <textarea value={item.quoteEn || ""} onChange={e => updateItem(idx, { quoteEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {items.length === 0 && <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">{isAr ? "لا توجد آراء مضافة (ستظهر آراء افتراضية في الموقع)" : "No testimonials added (site shows defaults)"}</div>}
+    </div>
+  );
+};
+
+const FaqListEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  let items: { qAr?: string; qEn?: string; aAr?: string; aEn?: string }[] = [];
+  try {
+    items = value ? JSON.parse(value) : [];
+  } catch (e) {
+    console.error("Parse error in FaqListEditor", e);
+  }
+
+  const commit = (next: typeof items) => onChange(JSON.stringify(next));
+  const updateItem = (index: number, patch: any) => {
+    const next = [...items];
+    next[index] = { ...next[index], ...patch };
+    commit(next);
+  };
+  const addItem = () => commit([...items, { qAr: "", qEn: "", aAr: "", aEn: "" }]);
+  const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
+  const moveItem = (index: number, dir: "up" | "down") => {
+    const next = [...items];
+    const target = dir === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    commit(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? "الأسئلة الشائعة" : "FAQ"}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? "إضافة سؤال" : "Add Question"}
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">#{idx + 1}</span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => moveItem(idx, "up")} disabled={idx === 0} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? "للأعلى" : "Up"}><ChevronDown className="w-3.5 h-3.5 rotate-180" /></button>
+                <button onClick={() => moveItem(idx, "down")} disabled={idx === items.length - 1} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? "للأسفل" : "Down"}><ChevronDown className="w-3.5 h-3.5" /></button>
+                <button onClick={() => removeItem(idx)} className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title={isAr ? "حذف" : "Remove"}><Plus className="w-3.5 h-3.5 rotate-45" /></button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "السؤال (عربي)" : "Question (AR)"}</label>
+                  <input type="text" value={item.qAr || ""} onChange={e => updateItem(idx, { qAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? "الإجابة (عربي)" : "Answer (AR)"}</label>
+                  <textarea value={item.aAr || ""} onChange={e => updateItem(idx, { aAr: e.target.value })} rows={3} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Question (EN)</label>
+                  <input type="text" value={item.qEn || ""} onChange={e => updateItem(idx, { qEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Answer (EN)</label>
+                  <textarea value={item.aEn || ""} onChange={e => updateItem(idx, { aEn: e.target.value })} rows={3} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {items.length === 0 && <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">{isAr ? "لا توجد أسئلة مضافة (ستظهر أسئلة افتراضية في الموقع)" : "No questions added (site shows defaults)"}</div>}
+    </div>
+  );
+};
+
 const SchoolBitPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
   const plans = parseSchoolBitPlans(value, getDefaultSchoolBitPlans(isAr));
 
@@ -1321,8 +1493,145 @@ const shouldUseGroupedFields = (sectionId: string) => {
   return <IconComponent className={`w-4 h-4 ${theme.color}`} />;
 };
 
+interface SectionCardProps {
+  section: PageSection;
+  isAr: boolean;
+  isExpanded: boolean;
+  isExternallyManaged: boolean;
+  // وضع البطاقة
+  reorderEnabled: boolean; // تُظهر مقبض السحب والأسهم (الصفحة الرئيسية فقط)
+  pinned?: boolean;        // الهيرو: مثبّت أعلى، لا يُنقل ولا يُخفى
+  structural?: boolean;    // النافبار: بنيوي، لا يُنقل
+  position?: number;       // رقم الترتيب (1-based) للأقسام القابلة للنقل
+  isFirst?: boolean;
+  isLast?: boolean;
+  onToggleExpand: () => void;
+  onToggleVisibility: () => void;
+  onMove: (dir: 'up' | 'down') => void;
+  renderFields: (sectionId: string, fields: SectionField[]) => React.ReactNode;
+}
+
+const SectionCard = ({
+  section, isAr, isExpanded, isExternallyManaged, reorderEnabled,
+  pinned = false, structural = false, position, isFirst = false, isLast = false,
+  onToggleExpand, onToggleVisibility, onMove, renderFields,
+}: SectionCardProps) => {
+  const controls = useDragControls();
+  const theme = getSectionTheme(section.id);
+  const visible = section.visible !== false;
+  const lockedControls = pinned || structural; // لا أسهم/سحب/مفتاح إخفاء
+
+  const inner = (
+    <div className={`rounded-xl overflow-hidden shadow-sm transition-all duration-200 ${isExpanded ? 'shadow-md' : ''} ${!visible ? 'opacity-60' : ''}`}>
+      <div className={`border ${isExpanded ? 'border-gray-200' : 'border-gray-100'} border-l-4 ${theme.border} bg-white transition-colors`}>
+        <div className="flex items-center justify-between p-3.5 gap-2">
+          {/* يسار: مقبض السحب + الرقم + الأيقونة + العنوان */}
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer" onClick={onToggleExpand}>
+            {reorderEnabled && !lockedControls && (
+              <button
+                onPointerDown={(e) => { e.preventDefault(); controls.start(e); }}
+                onClick={(e) => e.stopPropagation()}
+                className="p-1 -m-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none"
+                title={isAr ? 'اسحب لإعادة الترتيب' : 'Drag to reorder'}
+              >
+                <GripVertical className="w-4 h-4" />
+              </button>
+            )}
+            {pinned ? (
+              <span className="flex items-center justify-center w-5 h-5 rounded-md bg-amber-100 text-amber-600" title={isAr ? 'مثبّت في الأعلى' : 'Pinned to top'}>
+                <Pin className="w-3 h-3" />
+              </span>
+            ) : typeof position === 'number' ? (
+              <span className="flex items-center justify-center w-5 h-5 rounded-md bg-gray-100 text-gray-500 text-[10px] font-bold tabular-nums">{position}</span>
+            ) : null}
+            <div className={`flex items-center justify-center w-9 h-9 rounded-xl ${theme.bg} ${theme.color} transition-colors shrink-0`}>
+              {getSectionIcon(section.id)}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                {isExternallyManaged ? (
+                  <span className="text-[10px] text-amber-600 font-medium">{isAr ? 'يُدار مركزياً' : 'Managed centrally'}</span>
+                ) : pinned ? (
+                  <span className="text-[10px] text-amber-600 font-medium">{isAr ? 'ثابت في أعلى الصفحة' : 'Fixed at top'}</span>
+                ) : structural ? (
+                  <span className="text-[10px] text-gray-400 font-medium">{isAr ? 'قسم بنيوي (قائمة التنقّل)' : 'Structural (navbar)'}</span>
+                ) : (
+                  <>
+                    <span className="text-[10px] text-gray-400 font-medium">{section.fields.length} {isAr ? 'حقول' : 'fields'}</span>
+                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                    <span className={`text-[10px] font-medium ${visible ? 'text-green-600' : 'text-gray-400'}`}>
+                      {visible ? (isAr ? 'ظاهر' : 'Visible') : (isAr ? 'مخفي' : 'Hidden')}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* يمين: الأسهم + مفتاح الإظهار + التوسعة */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {reorderEnabled && !lockedControls && (
+              <div className="flex items-center">
+                <button
+                  onClick={(e) => { e.stopPropagation(); onMove('up'); }}
+                  disabled={isFirst}
+                  className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+                  title={isAr ? 'نقل لأعلى' : 'Move up'}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onMove('down'); }}
+                  disabled={isLast}
+                  className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+                  title={isAr ? 'نقل لأسفل' : 'Move down'}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            {!lockedControls && !isExternallyManaged && (
+              <div className="flex items-center gap-1.5 px-1" onClick={(e) => e.stopPropagation()}>
+                <Switch
+                  checked={visible}
+                  onCheckedChange={onToggleVisibility}
+                  className="data-[state=checked]:bg-green-600"
+                  title={visible ? (isAr ? 'إخفاء القسم' : 'Hide section') : (isAr ? 'إظهار القسم' : 'Show section')}
+                />
+              </div>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}
+              className={`flex items-center justify-center w-7 h-7 rounded-md transition-all ${isExpanded ? 'bg-[#104E8B]/10' : 'bg-gray-100 hover:bg-gray-200'}`}
+              title={isExpanded ? (isAr ? 'طي' : 'Collapse') : (isAr ? 'توسعة' : 'Expand')}
+            >
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#104E8B]' : 'text-gray-400'}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isExpanded && !isExternallyManaged && (
+        <div className="px-5 pb-5 pt-4 bg-gray-50/60 border-t border-gray-100">
+          {renderFields(section.id, section.fields)}
+        </div>
+      )}
+    </div>
+  );
+
+  if (reorderEnabled && !lockedControls) {
+    return (
+      <Reorder.Item as="div" value={section.id} dragListener={false} dragControls={controls} className="relative">
+        {inner}
+      </Reorder.Item>
+    );
+  }
+  return inner;
+};
+
 export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
-  const { pages, updateSectionField, toggleSectionVisibility, saveSiteData, updatePageSeo } = useSiteData();
+  const { pages, updateSectionField, toggleSectionVisibility, moveSection, reorderSections, saveSiteData, updatePageSeo } = useSiteData();
   const page = useMemo(() => pages.find(p => p.id === pageId) || pages[0], [pages, pageId]);
   const [activeLangTab, setActiveLangTab] = useState<"ar" | "en">("ar");
   const [activeEditorTab, setActiveEditorTab] = useState<"content" | "seo" | "image">("content");
@@ -1500,6 +1809,29 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
           onChange={(v) => handleFieldChange(sectionId, field.key, v)}
           isAr={isAr}
           pageId={page.id}
+        />
+      );
+    }
+
+    if (field.key === 'testimonials_json') {
+      return (
+        <TestimonialsListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+          pageId={page.id}
+        />
+      );
+    }
+
+    if (field.key === 'faq_json') {
+      return (
+        <FaqListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
         />
       );
     }
@@ -1911,65 +2243,66 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         </Card>
       )}
 
-      {activeEditorTab === 'content' && (
-      <div className="space-y-3">
-        {page.sections.map((section, sIndex) => {
-          const isExpanded = expandedSections.has(section.id);
-          const isExternallyManagedSection = section.id === "sms-trust";
-          const theme = getSectionTheme(section.id);
-          return (
-            <div key={section.id} className={`rounded-xl overflow-hidden shadow-sm transition-all duration-200 ${isExpanded ? 'shadow-md' : 'shadow-sm'} ${!section.visible ? "opacity-50" : ""}`}>
-              <div className={`border ${isExpanded ? `border-gray-200` : 'border-gray-100'} border-l-4 ${theme.border} bg-white transition-colors`}>
-                <div
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/80 transition-colors gap-3"
-                  onClick={() => toggleSection(section.id)}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`flex items-center justify-center w-9 h-9 rounded-xl ${theme.bg} ${theme.color} transition-colors`}>
-                      {getSectionIcon(section.id)}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{isAr ? section.name : section.nameEn}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {isExternallyManagedSection ? (
-                          <span className="text-[10px] text-amber-600 font-medium">{isAr ? "يُدار مركزياً" : "Managed centrally"}</span>
-                        ) : (
-                          <>
-                            <span className="text-[10px] text-gray-400 font-medium">{section.fields.length} {isAr ? "حقول" : "fields"}</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                            <span className={`text-[10px] font-medium ${section.visible ? 'text-green-600' : 'text-gray-400'}`}>
-                              {section.visible ? (isAr ? 'منشور' : 'Published') : (isAr ? 'مخفي' : 'Hidden')}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); toggleSectionVisibility(page.id, section.id); }}
-                      className={`p-1.5 rounded-lg transition-all ${section.visible ? "text-green-600 hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
-                      title={section.visible ? (isAr ? "إخفاء القسم" : "Hide section") : (isAr ? "إظهار القسم" : "Show section")}
-                    >
-                      {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    </button>
-                    <div className={`flex items-center justify-center w-7 h-7 rounded-md transition-all ${isExpanded ? 'bg-[#104E8B]/10' : 'bg-gray-100'}`}>
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? "rotate-180 text-[#104E8B]" : "text-gray-400"}`} />
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {activeEditorTab === 'content' && (() => {
+        const isHome = page.id === 'home' || page.path === '/';
+        const PINNED = new Set(['home-hero']);
+        const TAIL = new Set(['home-navbar']);
+        const pinnedSections = isHome ? page.sections.filter(s => PINNED.has(s.id)) : [];
+        const tailSections = isHome ? page.sections.filter(s => TAIL.has(s.id)) : [];
+        const movableSections = isHome
+          ? page.sections.filter(s => !PINNED.has(s.id) && !TAIL.has(s.id))
+          : page.sections;
+        const movableIds = movableSections.map(s => s.id);
 
-              {isExpanded && !isExternallyManagedSection && (
-                <div className="px-5 pb-5 pt-4 bg-gray-50/60 border-t border-gray-100">
-                  {renderFields(section.id, section.fields)}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      )}
+        const cardProps = (section: PageSection) => ({
+          section,
+          isAr,
+          isExpanded: expandedSections.has(section.id),
+          isExternallyManaged: section.id === 'sms-trust',
+          onToggleExpand: () => toggleSection(section.id),
+          onToggleVisibility: () => toggleSectionVisibility(page.id, section.id),
+          renderFields,
+        });
+
+        return (
+          <div className="space-y-3">
+            {isHome && (
+              <p className="text-[11px] text-gray-400 px-1 flex items-center gap-1.5">
+                <GripVertical className="w-3.5 h-3.5" />
+                {isAr ? 'اسحب الأقسام لإعادة ترتيبها على الصفحة، أو استخدم الأسهم. الهيرو ثابت دائماً في الأعلى.' : 'Drag sections to reorder them on the page, or use the arrows. The Hero is always pinned to the top.'}
+              </p>
+            )}
+
+            {pinnedSections.map((section) => (
+              <SectionCard key={section.id} {...cardProps(section)} reorderEnabled={false} pinned onMove={() => {}} />
+            ))}
+
+            {isHome ? (
+              <Reorder.Group as="div" axis="y" values={movableIds} onReorder={(ids) => reorderSections(page.id, ids as string[])} className="space-y-3">
+                {movableSections.map((section, i) => (
+                  <SectionCard
+                    key={section.id}
+                    {...cardProps(section)}
+                    reorderEnabled
+                    position={i + 1}
+                    isFirst={i === 0}
+                    isLast={i === movableSections.length - 1}
+                    onMove={(dir) => moveSection(page.id, section.id, dir)}
+                  />
+                ))}
+              </Reorder.Group>
+            ) : (
+              movableSections.map((section) => (
+                <SectionCard key={section.id} {...cardProps(section)} reorderEnabled={false} onMove={() => {}} />
+              ))
+            )}
+
+            {tailSections.map((section) => (
+              <SectionCard key={section.id} {...cardProps(section)} reorderEnabled={false} structural onMove={() => {}} />
+            ))}
+          </div>
+        );
+      })()}
 
       {page.sections.length === 0 && (
         <Card className="border border-gray-200">
