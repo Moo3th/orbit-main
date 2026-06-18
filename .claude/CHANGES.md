@@ -655,3 +655,16 @@
 > إخفاء رابط سياسة الخصوصية في نموذج «تواصل معنا» إذا كانت الصفحة القانونية مخفية (isActive: false). مكوّن الخادم contact/page.tsx يجلب getAllLegalPages() ويمرّر hiddenLegalSlugs (الصفحات غير النشطة) إلى Contact؛ يُخفي الرابط (والوصلة «و») إن طابق مسار الرابط slug صفحة قانونية مخفية. عام (يشمل terms أيضًا)، يتجاهل الروابط الخارجية/mailto/tel، ولا يُخفي روابط لا تطابق صفحة مخفية. لا وميض (تحديد خادمي)، والتغيير يظهر تلقائيًا لأن تبديل isActive يستدعي revalidateTag('legal-pages'). تحقّق حيّ على /contact: privacy مخفية فعلًا (activeLegalSlugs=['terms']) → الجملة صارت «...توافق على الشروط والأحكام.» بلا رابط الخصوصية ولا فاصل معلّق، 0 أخطاء console.
 - 2026-06-14 10:13 — `.claude\CHANGES.md`
 - 2026-06-18 11:01 — `.gitignore`
+- 2026-06-18 11:04 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\deploy-mechanism.md`
+- 2026-06-18 11:04 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`
+- 2026-06-18 12:37 — `src\lib\uploads\clientUpload.ts`
+- 2026-06-18 12:37 — `src\components\business\ImageUploader.tsx`
+- 2026-06-18 12:38 — `src\components\business\ImageUploader.tsx`
+- 2026-06-18 12:38 — `src\components\business\ImageUploader.tsx`
+- 2026-06-18 12:38 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-18 12:38 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-18 12:38 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-18 12:39 — `src\app\api\upload-image\route.ts`
+
+> إصلاح رفع الصور («Unexpected token '<'» في سكول بت وكل حقول الصور). **السبب الجذري**: مسارات Vercel (serverless) تحدّ جسم الطلب بـ ~4.5MB، والعميل كان يسمح حتى 10MB ويستدعي `res.json()` دون فحص؛ فحين يرجّع Vercel صفحة خطأ HTML (413) يتحطّم التحليل. كذلك `/api/upload-image` كان يكتب على نظام الملفات المحلي (معطّل على Vercel: للقراءة فقط) — يؤثّر على شعارات الموقع وصور المدونة. **الحل**: (1) مكتبة عميل مشتركة `src/lib/uploads/clientUpload.ts` تضغط الصورة في المتصفح (canvas، حد 1920px، JPEG للصور وWebP للشفافية) لتنزل تحت الحد، ثم ترفع إلى `/api/uploads` (GridFS) مع فحص `res.ok` ونوع المحتوى قبل `json()` ورسائل خطأ واضحة (عربي/إنجليزي، تمييز 413). (2) `ImageUploader` (سكول بت + كل حقول CMS + شعار SEO) و`AdminDashboard` (صور المدونة + شعارات الموقع) صارا يستخدمان المكتبة. (3) تحويل `/api/upload-image` من نظام الملفات إلى GridFS مع إبقاء التوافق للخلف (حقل `image`، رد `{success,url,filename}`). **التحقق**: tsc نظيف، lint 0 أخطاء على الملفات المعدّلة، بناء إنتاج ناجح (41 صفحة). يلزم اختبار حيّ في لوحة الأدمن (يتطلب تسجيل دخول + قاعدة) بعد النشر.
+- 2026-06-18 12:41 — `.claude\CHANGES.md`

@@ -20,6 +20,7 @@ import { Badge } from "@/components/business/ui/badge";
 import { encodeImagePath } from "@/utils/imagePath";
 import { useSiteData, type FooterData, type FooterNavItem, type FooterSocialItem, type FooterPaymentItem, type SectionField } from "./SiteDataContext";
 import { ImageUploader } from "@/components/business/ImageUploader";
+import { uploadImageFile } from "@/lib/uploads/clientUpload";
 import {
   parseWhatsAppConversationPrices,
   parseWhatsAppPlans,
@@ -785,19 +786,14 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
   };
 
   const uploadImage = async (file: File) => {
-    const formData = new FormData();
-    formData.append("image", file);
     try {
       setUploading(true);
-      const res = await fetch("/api/upload-image", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-      if (!data?.url) throw new Error("No URL returned");
-      setDraft((prev) => ({ ...prev, image: data.url as string }));
+      const url = await uploadImageFile(file, { folder: "blog", isAr });
+      setDraft((prev) => ({ ...prev, image: url }));
       toast.success(isAr ? "تم رفع الصورة" : "Image uploaded");
     } catch (error) {
       console.error(error);
-      toast.error(isAr ? "فشل رفع الصورة" : "Image upload failed");
+      toast.error(error instanceof Error ? error.message : (isAr ? "فشل رفع الصورة" : "Image upload failed"));
     } finally {
       setUploading(false);
     }
@@ -2486,13 +2482,8 @@ const FooterView = ({ isAr }: { isAr: boolean }) => {
   };
 
   const uploadLogo = async (key: "logoDefault" | "logoDark" | "logoWhatsApp", file: File) => {
-    const formData = new FormData();
-    formData.append("image", file);
-    const res = await fetch("/api/upload-image", { method: "POST", body: formData });
-    if (!res.ok) throw new Error("Upload failed");
-    const data = await res.json();
-    if (!data?.url) throw new Error("No upload URL");
-    updateField(key, data.url as string);
+    const url = await uploadImageFile(file, { folder: "logos" });
+    updateField(key, url);
   };
 
   return (

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/business/ui/button';
+import { uploadImageFile } from '@/lib/uploads/clientUpload';
 
 interface UploadedImage {
   id: string;
@@ -35,37 +36,14 @@ export function ImageUploader({
   const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
 
   const handleUpload = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setError(isAr ? 'يرجى اختيار ملف صورة' : 'Please select an image file');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setError(isAr ? 'حجم الملف كبير جداً (الحد الأقصى 10MB)' : 'File too large (max 10MB)');
-      return;
-    }
-
     setUploading(true);
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', folder);
-
-      const res = await fetch('/api/uploads', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Upload failed');
-      }
-
-      onChange(data.upload.url);
-      setPreviewUrl(data.upload.url);
+      // الضغط في المتصفح + فحص الاستجابة يجريان داخل المكتبة المشتركة.
+      const url = await uploadImageFile(file, { folder, isAr });
+      onChange(url);
+      setPreviewUrl(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : (isAr ? 'فشل الرفع' : 'Upload failed'));
     } finally {
@@ -168,7 +146,7 @@ export function ImageUploader({
                 </span>
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                {isAr ? 'PNG, JPG, GIF, WebP (حد أقصى 10MB)' : 'PNG, JPG, GIF, WebP (max 10MB)'}
+                {isAr ? 'PNG, JPG, GIF, WebP, SVG — تُحسَّن تلقائياً' : 'PNG, JPG, GIF, WebP, SVG — auto-optimized'}
               </p>
             </div>
           </button>
