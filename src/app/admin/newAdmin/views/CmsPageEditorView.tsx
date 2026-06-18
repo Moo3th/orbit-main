@@ -758,6 +758,220 @@ const SectionMarginEditor = ({ value, onChange, isAr, direction }: { value: stri
   );
 };
 
+// ─────────── محرّر قوائم موجّه بمخطّط (يطابق أشكال بيانات SchoolBit الفعلية) ───────────
+// يدعم: نص ثنائي اللغة (arKey/enKey)، قائمة نقاط (مصفوفة، عنصر/سطر)، أيقونة lucide بالاسم، قيمة منطقية.
+// يكتب دائمًا blobًا ثنائي اللغة واحدًا في value (لا يعتمد على تبويب اللغة) لتفادي تقسيم البيانات.
+const SB_ICON_NAMES = [
+  'LayoutDashboard', 'Clock', 'Users', 'MessageCircle', 'BarChart3', 'Shield', 'Eye', 'Zap',
+  'Globe', 'FileSpreadsheet', 'Bell', 'CalendarDays', 'BookOpen', 'ClipboardCheck',
+  'GraduationCap', 'ScanLine', 'AlertTriangle', 'Check', 'Lock', 'AlertCircle',
+];
+
+type SbFieldDef =
+  | { kind: 'biText'; arKey: string; enKey: string; labelAr: string; labelEn: string; textarea?: boolean }
+  | { kind: 'biList'; arKey: string; enKey: string; labelAr: string; labelEn: string }
+  | { kind: 'icon'; key: string; labelAr: string; labelEn: string }
+  | { kind: 'image'; key: string; labelAr: string; labelEn: string }
+  | { kind: 'bool'; key: string; labelAr: string; labelEn: string };
+
+interface SbSchema { titleAr: string; titleEn: string; addAr: string; addEn: string; fields: SbFieldDef[]; defaultItem: Record<string, unknown>; }
+
+const inputCls = "w-full h-9 border border-gray-200 rounded-xl px-3 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all";
+const areaCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all resize-none";
+
+const SchemaListEditor = ({ value, onChange, isAr, schema, pageId, sectionId }: { value: string; onChange: (value: string) => void; isAr: boolean; schema: SbSchema; pageId?: string; sectionId?: string }) => {
+  let items: any[] = [];
+  try { items = value ? JSON.parse(value) : []; } catch { items = []; }
+  if (!Array.isArray(items)) items = [];
+
+  const commit = (next: any[]) => onChange(JSON.stringify(next));
+  const updateItem = (i: number, patch: any) => { const n = [...items]; n[i] = { ...n[i], ...patch }; commit(n); };
+  const addItem = () => commit([...items, JSON.parse(JSON.stringify(schema.defaultItem))]);
+  const removeItem = (i: number) => commit(items.filter((_, idx) => idx !== i));
+  const moveItem = (i: number, dir: 'up' | 'down') => {
+    const n = [...items]; const t = dir === 'up' ? i - 1 : i + 1;
+    if (t < 0 || t >= n.length) return;
+    [n[i], n[t]] = [n[t], n[i]]; commit(n);
+  };
+
+  const toText = (v: any) => (Array.isArray(v) ? v.join('\n') : (v ?? ''));
+
+  const renderItemField = (item: any, idx: number, f: SbFieldDef) => {
+    if (f.kind === 'icon') {
+      return (
+        <div key={f.key}>
+          <label className="text-[10px] text-gray-400 block mb-1">{isAr ? f.labelAr : f.labelEn}</label>
+          <select value={item[f.key] || ''} onChange={e => updateItem(idx, { [f.key]: e.target.value })} className={inputCls}>
+            <option value="">—</option>
+            {SB_ICON_NAMES.map(ic => <option key={ic} value={ic}>{ic}</option>)}
+          </select>
+        </div>
+      );
+    }
+    if (f.kind === 'image') {
+      return (
+        <div key={f.key} className="space-y-1.5">
+          <label className="text-[10px] text-gray-400 block">{isAr ? f.labelAr : f.labelEn}</label>
+          <ImageUploader
+            value={item[f.key] || ''}
+            onChange={url => updateItem(idx, { [f.key]: url })}
+            folder={`pages/${pageId || 'schoolbit'}/${sectionId || 'list'}`}
+            isAr={isAr}
+            aspectRatio="video"
+          />
+        </div>
+      );
+    }
+    if (f.kind === 'bool') {
+      return (
+        <label key={f.key} className="flex items-center gap-1.5 text-[11px] text-gray-600 cursor-pointer bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-100">
+          <input type="checkbox" checked={!!item[f.key]} onChange={e => updateItem(idx, { [f.key]: e.target.checked })} className="w-3.5 h-3.5 rounded" />
+          {isAr ? f.labelAr : f.labelEn}
+        </label>
+      );
+    }
+    const isList = f.kind === 'biList';
+    const useArea = isList || f.textarea;
+    const fromText = (s: string) => (isList ? s.split('\n').map(x => x.trim()).filter(Boolean) : s);
+    const label = isAr ? f.labelAr : f.labelEn;
+    return (
+      <div key={f.arKey} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="text-[10px] text-gray-400 block mb-1">{label} (AR)</label>
+          {useArea
+            ? <textarea value={toText(item[f.arKey])} onChange={e => updateItem(idx, { [f.arKey]: fromText(e.target.value) })} rows={isList ? 4 : 2} className={areaCls} placeholder={isList ? (isAr ? 'عنصر في كل سطر' : 'one item per line') : ''} />
+            : <input type="text" value={toText(item[f.arKey])} onChange={e => updateItem(idx, { [f.arKey]: e.target.value })} className={inputCls} />}
+        </div>
+        <div>
+          <label className="text-[10px] text-gray-400 block mb-1">{label} (EN)</label>
+          {useArea
+            ? <textarea value={toText(item[f.enKey])} onChange={e => updateItem(idx, { [f.enKey]: fromText(e.target.value) })} rows={isList ? 4 : 2} className={areaCls} dir="ltr" placeholder={isList ? 'one item per line' : ''} />
+            : <input type="text" value={toText(item[f.enKey])} onChange={e => updateItem(idx, { [f.enKey]: e.target.value })} className={inputCls} dir="ltr" />}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? schema.titleAr : schema.titleEn}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? schema.addAr : schema.addEn}
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {items.map((item, idx) => (
+          <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">#{idx + 1}</span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => moveItem(idx, 'up')} disabled={idx === 0} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? 'للأعلى' : 'Up'}><ChevronDown className="w-3.5 h-3.5 rotate-180" /></button>
+                <button onClick={() => moveItem(idx, 'down')} disabled={idx === items.length - 1} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? 'للأسفل' : 'Down'}><ChevronDown className="w-3.5 h-3.5" /></button>
+                <button onClick={() => removeItem(idx)} className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title={isAr ? 'حذف' : 'Remove'}><Plus className="w-3.5 h-3.5 rotate-45" /></button>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {schema.fields.filter(f => f.kind !== 'icon' && f.kind !== 'bool').map(f => renderItemField(item, idx, f))}
+              {(schema.fields.some(f => f.kind === 'icon' || f.kind === 'bool')) && (
+                <div className="flex flex-wrap items-end gap-3">
+                  {schema.fields.filter(f => f.kind === 'icon').map(f => <div key={(f as { key: string }).key} className="min-w-[160px]">{renderItemField(item, idx, f)}</div>)}
+                  {schema.fields.filter(f => f.kind === 'bool').map(f => renderItemField(item, idx, f))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      {items.length === 0 && <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">{isAr ? 'لا توجد عناصر (سيعرض الموقع الافتراضي)' : 'No items (site shows defaults)'}</div>}
+    </div>
+  );
+};
+
+const SCHOOLBIT_LIST_SCHEMAS: Record<string, SbSchema> = {
+  'schoolbit-benefits:benefits_json': {
+    titleAr: 'المميزات', titleEn: 'Benefits', addAr: 'إضافة ميزة', addEn: 'Add Benefit',
+    fields: [
+      { kind: 'biText', arKey: 'title', enKey: 'titleEn', labelAr: 'العنوان', labelEn: 'Title' },
+      { kind: 'biText', arKey: 'desc', enKey: 'descEn', labelAr: 'الوصف', labelEn: 'Description', textarea: true },
+      { kind: 'icon', key: 'icon', labelAr: 'الأيقونة', labelEn: 'Icon' },
+    ],
+    defaultItem: { icon: 'LayoutDashboard', title: '', titleEn: '', desc: '', descEn: '' },
+  },
+  'schoolbit-roles:roles_json': {
+    titleAr: 'الأدوار', titleEn: 'Roles', addAr: 'إضافة دور', addEn: 'Add Role',
+    fields: [
+      { kind: 'biText', arKey: 'name', enKey: 'nameEn', labelAr: 'اسم الدور', labelEn: 'Role Name' },
+      { kind: 'biList', arKey: 'bullets', enKey: 'bulletsEn', labelAr: 'النقاط', labelEn: 'Bullets' },
+      { kind: 'icon', key: 'icon', labelAr: 'الأيقونة', labelEn: 'Icon' },
+      { kind: 'image', key: 'image', labelAr: 'الصورة (تظهر بجانب الدور)', labelEn: 'Image (shown beside the role)' },
+    ],
+    defaultItem: { name: '', nameEn: '', icon: 'LayoutDashboard', image: '', bullets: [], bulletsEn: [] },
+  },
+  'schoolbit-modules:modules_json': {
+    titleAr: 'الوحدات', titleEn: 'Modules', addAr: 'إضافة وحدة', addEn: 'Add Module',
+    fields: [
+      { kind: 'biText', arKey: 'label', enKey: 'labelEn', labelAr: 'تبويب', labelEn: 'Tab Label' },
+      { kind: 'biText', arKey: 'title', enKey: 'titleEn', labelAr: 'العنوان', labelEn: 'Title' },
+      { kind: 'biText', arKey: 'subtitle', enKey: 'subtitleEn', labelAr: 'العنوان الفرعي', labelEn: 'Subtitle', textarea: true },
+      { kind: 'biList', arKey: 'bullets', enKey: 'bulletsEn', labelAr: 'النقاط', labelEn: 'Bullets' },
+      { kind: 'icon', key: 'icon', labelAr: 'الأيقونة', labelEn: 'Icon' },
+      { kind: 'image', key: 'image', labelAr: 'الصورة (تظهر بجانب الوحدة)', labelEn: 'Image (shown beside the module)' },
+    ],
+    defaultItem: { label: '', labelEn: '', title: '', titleEn: '', subtitle: '', subtitleEn: '', icon: 'LayoutDashboard', image: '', bullets: [], bulletsEn: [] },
+  },
+  'schoolbit-automation:automation_json': {
+    titleAr: 'عناصر الأتمتة', titleEn: 'Automation Items', addAr: 'إضافة عنصر', addEn: 'Add Item',
+    fields: [
+      { kind: 'biText', arKey: 'title', enKey: 'titleEn', labelAr: 'العنوان', labelEn: 'Title' },
+      { kind: 'biText', arKey: 'desc', enKey: 'descEn', labelAr: 'الوصف', labelEn: 'Description', textarea: true },
+      { kind: 'icon', key: 'icon', labelAr: 'الأيقونة', labelEn: 'Icon' },
+    ],
+    defaultItem: { icon: 'Bell', title: '', titleEn: '', desc: '', descEn: '' },
+  },
+  'schoolbit-integrations:integrations_json': {
+    titleAr: 'التكاملات', titleEn: 'Integrations', addAr: 'إضافة تكامل', addEn: 'Add Integration',
+    fields: [
+      { kind: 'biText', arKey: 'name', enKey: 'nameEn', labelAr: 'الاسم', labelEn: 'Name' },
+    ],
+    defaultItem: { name: '', nameEn: '' },
+  },
+  'schoolbit-security:features_json': {
+    titleAr: 'ميزات الأمان', titleEn: 'Security Features', addAr: 'إضافة ميزة', addEn: 'Add Feature',
+    fields: [
+      { kind: 'biText', arKey: 'text', enKey: 'textEn', labelAr: 'النص', labelEn: 'Text' },
+    ],
+    defaultItem: { text: '', textEn: '' },
+  },
+  'schoolbit-security:perm_rows_json': {
+    titleAr: 'صفوف الصلاحيات', titleEn: 'Permission Rows', addAr: 'إضافة صف', addEn: 'Add Row',
+    fields: [
+      { kind: 'biText', arKey: 'permAr', enKey: 'permEn', labelAr: 'الصلاحية', labelEn: 'Permission' },
+      { kind: 'bool', key: 'admin', labelAr: 'المدير', labelEn: 'Principal' },
+      { kind: 'bool', key: 'vice', labelAr: 'الوكيل', labelEn: 'Vice' },
+      { kind: 'bool', key: 'teacher', labelAr: 'المعلم', labelEn: 'Teacher' },
+    ],
+    defaultItem: { permAr: '', permEn: '', admin: false, vice: false, teacher: false },
+  },
+  'schoolbit-outcomes:outcomes_json': {
+    titleAr: 'النتائج', titleEn: 'Outcomes', addAr: 'إضافة نتيجة', addEn: 'Add Outcome',
+    fields: [
+      { kind: 'biText', arKey: 'title', enKey: 'titleEn', labelAr: 'العنوان', labelEn: 'Title' },
+      { kind: 'biText', arKey: 'desc', enKey: 'descEn', labelAr: 'الوصف', labelEn: 'Description', textarea: true },
+      { kind: 'icon', key: 'icon', labelAr: 'الأيقونة', labelEn: 'Icon' },
+    ],
+    defaultItem: { icon: 'Clock', title: '', titleEn: '', desc: '', descEn: '' },
+  },
+  'schoolbit-faq:faq_json': {
+    titleAr: 'الأسئلة الشائعة', titleEn: 'FAQ', addAr: 'إضافة سؤال', addEn: 'Add Question',
+    fields: [
+      { kind: 'biText', arKey: 'q', enKey: 'qEn', labelAr: 'السؤال', labelEn: 'Question' },
+      { kind: 'biText', arKey: 'a', enKey: 'aEn', labelAr: 'الإجابة', labelEn: 'Answer', textarea: true },
+    ],
+    defaultItem: { q: '', qEn: '', a: '', aEn: '' },
+  },
+};
+
 const GenericListEditor = ({ value, onChange, isAr, pageId, sectionId }: { value: string; onChange: (value: string) => void; isAr: boolean; pageId: string; sectionId: string }) => {
   let items: any[] = [];
   try {
@@ -1141,6 +1355,114 @@ const FaqListEditor = ({ value, onChange, isAr }: { value: string; onChange: (va
   );
 };
 
+const SOLUTION_ICONS = ['message', 'sms', 'users', 'shield', 'rocket', 'zap', 'support', 'globe', 'send'];
+const SOLUTION_COLORS = [
+  { key: 'primary', ar: 'نبيذي', en: 'Wine' },
+  { key: 'green', ar: 'أخضر', en: 'Green' },
+  { key: 'blue', ar: 'أزرق', en: 'Blue' },
+  { key: 'amber', ar: 'كهرماني', en: 'Amber' },
+];
+
+const SolutionsListEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
+  let items: any[] = [];
+  try { items = value ? JSON.parse(value) : []; } catch (e) { console.error('Parse error in SolutionsListEditor', e); }
+
+  const commit = (next: any[]) => onChange(JSON.stringify(next));
+  const updateItem = (index: number, patch: any) => { const next = [...items]; next[index] = { ...next[index], ...patch }; commit(next); };
+  const addItem = () => commit([...items, { titleAr: '', titleEn: '', descAr: '', descEn: '', featuresAr: '', featuresEn: '', link: '/products/', icon: 'message', color: 'primary', ctaAr: 'اكتشف المزيد', ctaEn: 'Learn More', visible: true }]);
+  const removeItem = (index: number) => commit(items.filter((_, i) => i !== index));
+  const moveItem = (index: number, dir: 'up' | 'down') => {
+    const next = [...items]; const target = dir === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]]; commit(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-gray-500 font-medium">{isAr ? 'الحلول (إضافة/حذف/إظهار/ترتيب)' : 'Solutions (add/remove/show/reorder)'}</label>
+        <Button size="sm" onClick={addItem} className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-7 text-[10px] rounded-lg">
+          <Plus className="w-3 h-3 mr-1" /> {isAr ? 'إضافة حل' : 'Add Solution'}
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {items.map((item, idx) => {
+          const visible = item.visible !== false;
+          return (
+            <div key={idx} className={`border border-gray-100 rounded-xl p-4 bg-white space-y-3 relative shadow-sm hover:border-gray-200 transition-all ${!visible ? 'opacity-60' : ''}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">#{idx + 1}</span>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1.5 text-[10px] text-gray-500 cursor-pointer">
+                    <input type="checkbox" checked={visible} onChange={(e) => updateItem(idx, { visible: e.target.checked })} className="w-3.5 h-3.5 rounded" />
+                    {visible ? (isAr ? 'ظاهر' : 'Visible') : (isAr ? 'مخفي' : 'Hidden')}
+                  </label>
+                  <button onClick={() => moveItem(idx, 'up')} disabled={idx === 0} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? 'للأعلى' : 'Up'}><ChevronDown className="w-3.5 h-3.5 rotate-180" /></button>
+                  <button onClick={() => moveItem(idx, 'down')} disabled={idx === items.length - 1} className="p-1 text-gray-300 hover:text-[#104E8B] hover:bg-blue-50 rounded-md transition-colors disabled:opacity-30" title={isAr ? 'للأسفل' : 'Down'}><ChevronDown className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => removeItem(idx)} className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title={isAr ? 'حذف' : 'Remove'}><Plus className="w-3.5 h-3.5 rotate-45" /></button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'العنوان (عربي)' : 'Title (AR)'}</label>
+                  <input type="text" value={item.titleAr || ''} onChange={(e) => updateItem(idx, { titleAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Title (EN)</label>
+                  <input type="text" value={item.titleEn || ''} onChange={(e) => updateItem(idx, { titleEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'الوصف (عربي)' : 'Description (AR)'}</label>
+                  <textarea value={item.descAr || ''} onChange={(e) => updateItem(idx, { descAr: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Description (EN)</label>
+                  <textarea value={item.descEn || ''} onChange={(e) => updateItem(idx, { descEn: e.target.value })} rows={2} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'المزايا (عربي، مفصولة بفواصل)' : 'Features (AR, comma-separated)'}</label>
+                  <input type="text" value={item.featuresAr || ''} onChange={(e) => updateItem(idx, { featuresAr: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" placeholder="ميزة 1, ميزة 2" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">Features (EN, comma-separated)</label>
+                  <input type="text" value={item.featuresEn || ''} onChange={(e) => updateItem(idx, { featuresEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" placeholder="feature 1, feature 2" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'الرابط' : 'Link'}</label>
+                  <input type="text" value={item.link || ''} onChange={(e) => updateItem(idx, { link: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir="ltr" placeholder="/products/..." />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'الأيقونة' : 'Icon'}</label>
+                  <select value={item.icon || 'message'} onChange={(e) => updateItem(idx, { icon: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]">
+                    {SOLUTION_ICONS.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'اللون' : 'Color'}</label>
+                  <select value={item.color || 'primary'} onChange={(e) => updateItem(idx, { color: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]">
+                    {SOLUTION_COLORS.map((c) => <option key={c.key} value={c.key}>{isAr ? c.ar : c.en}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 block mb-1">{isAr ? 'نص الزر' : 'Button'}</label>
+                  <input type="text" value={isAr ? (item.ctaAr || '') : (item.ctaEn || '')} onChange={(e) => updateItem(idx, isAr ? { ctaAr: e.target.value } : { ctaEn: e.target.value })} className="w-full h-9 border border-gray-200 rounded-xl px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B]" dir={isAr ? 'rtl' : 'ltr'} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {items.length === 0 && <div className="text-center py-6 text-xs text-gray-400 italic border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">{isAr ? 'لا توجد حلول مضافة (تظهر الحلول الافتراضية في الموقع)' : 'No solutions added (site shows defaults)'}</div>}
+    </div>
+  );
+};
+
 const SchoolBitPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
   const plans = parseSchoolBitPlans(value, getDefaultSchoolBitPlans(isAr));
 
@@ -1445,7 +1767,34 @@ const getGroupLabel = (sectionId: string, groupKey: string, isAr: boolean): stri
     otime: { ar: "بطاقة O-Time", en: "O-Time Card" },
     govgate: { ar: "بطاقة Gov Gate", en: "Gov Gate Card" },
   };
-  const labels = sectionId === "sms-hero" ? heroLabels : sectionId === "sms-pricing" ? pricingLabels : genericLabels;
+  const valueLabels: Record<string, { ar: string; en: string }> = {
+    general: { ar: "عنوان القسم", en: "Section Title" },
+    features: { ar: "المميزات (محرّر)", en: "Features (editor)" },
+    feature1: { ar: "الميزة الأولى", en: "Feature 1" },
+    feature2: { ar: "الميزة الثانية", en: "Feature 2" },
+    feature3: { ar: "الميزة الثالثة", en: "Feature 3" },
+  };
+  const usecasesLabels: Record<string, { ar: string; en: string }> = {
+    general: { ar: "عنوان القسم", en: "Section Title" },
+    usecases: { ar: "حالات الاستخدام (محرّر)", en: "Use Cases (editor)" },
+    otp: { ar: "حالة: التحقق OTP", en: "Use Case: OTP" },
+    api: { ar: "حالة: تكامل API", en: "Use Case: API" },
+    marketing: { ar: "حالة: التسويق", en: "Use Case: Marketing" },
+    log: { ar: "بطاقة سجل الإرسال", en: "Delivery Log Card" },
+  };
+  const developersLabels: Record<string, { ar: string; en: string }> = {
+    general: { ar: "محتوى أساسي", en: "Core Content" },
+    platforms: { ar: "منصات التكامل (محرّر)", en: "Integration Platforms (editor)" },
+    platform: { ar: "منصات التكامل (قديم)", en: "Integration Platforms (legacy)" },
+    code: { ar: "مثال الكود البرمجي", en: "Code Example" },
+    cta: { ar: "زر التوثيق", en: "Docs Button" },
+  };
+  const labels = sectionId === "sms-hero" ? heroLabels
+    : sectionId === "sms-pricing" ? pricingLabels
+    : sectionId === "sms-value" ? valueLabels
+    : sectionId === "sms-usecases" ? usecasesLabels
+    : sectionId === "sms-developers" ? developersLabels
+    : genericLabels;
   return isAr ? (labels[groupKey]?.ar || groupKey) : (labels[groupKey]?.en || groupKey);
 };
 
@@ -1460,11 +1809,13 @@ const getGroupedFields = (sectionId: string, sectionFields: SectionField[]) => {
 
   const preferredOrderMap: Record<string, string[]> = {
     "sms-hero": ["retail", "finance", "education", "logistics", "health", "general"],
-    "sms-pricing": ["general", "benefit1", "benefit2", "benefit3", "plans"],
+    "sms-pricing": ["general", "benefit1", "benefit2", "benefit3", "plans", "popular", "messages", "custom", "btn"],
+    "sms-value": ["general", "features", "feature1", "feature2", "feature3"],
+    "sms-usecases": ["general", "usecases", "otp", "api", "marketing", "log"],
+    "sms-developers": ["general", "platforms", "platform", "code", "cta"],
     "wa-hero": ["general", "cta"],
     "wa-features": ["general", "solutions", "campaigns", "api"],
     "wa-pricing": ["general", "plans", "api", "contact"],
-    "wa-request-form": ["industry_options", "employee_count_options", "service_goals", "notification_email"],
     "home-solutions": ["general", "wa", "sms", "otime", "govgate"],
     "ot-hero": ["general", "cta"],
     "ot-features": ["general", "modules", "screenshots", "tech"],
@@ -1481,8 +1832,9 @@ const getGroupedFields = (sectionId: string, sectionFields: SectionField[]) => {
 
 const shouldUseGroupedFields = (sectionId: string) => {
   const groupedSectionIds = new Set([
-    "sms-hero", "sms-pricing", "wa-hero", "wa-features", "wa-pricing",
-    "wa-request-form", "home-solutions", "ot-hero", "ot-features", "gg-hero", "gg-cta",
+    "sms-hero", "sms-pricing", "sms-value", "sms-usecases", "sms-developers",
+    "wa-hero", "wa-features", "wa-pricing",
+    "home-solutions", "ot-hero", "ot-features", "gg-hero", "gg-cta",
   ]);
   return groupedSectionIds.has(sectionId);
 };
@@ -1765,6 +2117,22 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         />
       );
     }
+
+    // قوائم SchoolBit الموجّهة بمخطّط (تطابق أشكال البيانات الفعلية وتكتب blobًا واحدًا في value).
+    const sbSchema = page.id === 'schoolbit' ? SCHOOLBIT_LIST_SCHEMAS[`${sectionId}:${field.key}`] : undefined;
+    if (sbSchema) {
+      return (
+        <SchemaListEditor
+          key={fieldKey}
+          value={field.value}
+          onChange={(v) => updateSectionField(page.id, sectionId, field.key, v, 'ar')}
+          isAr={isAr}
+          schema={sbSchema}
+          pageId={page.id}
+          sectionId={sectionId}
+        />
+      );
+    }
     
     if (field.key === 'wa_pricing') {
       const plansField = page.sections.find(s => s.id === sectionId)?.fields.find(f => f.key === 'plans_list');
@@ -1828,6 +2196,17 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
     if (field.key === 'faq_json') {
       return (
         <FaqListEditor
+          key={fieldKey}
+          value={value}
+          onChange={(v) => handleFieldChange(sectionId, field.key, v)}
+          isAr={isAr}
+        />
+      );
+    }
+
+    if (field.key === 'solutions_json') {
+      return (
+        <SolutionsListEditor
           key={fieldKey}
           value={value}
           onChange={(v) => handleFieldChange(sectionId, field.key, v)}
@@ -2244,12 +2623,14 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
       )}
 
       {activeEditorTab === 'content' && (() => {
-        const isHome = page.id === 'home' || page.path === '/';
-        const PINNED = new Set(['home-hero']);
+        // الصفحات التي تدعم إعادة ترتيب الأقسام (تعرض الأقسام بترتيب الـ CMS عبر flex order).
+        const REORDERABLE = new Set(['home', 'sms', 'whatsapp', 'schoolbit']);
+        const isReorderable = REORDERABLE.has(page.id);
+        const PINNED = new Set(['home-hero', 'sms-hero', 'wa-chatbot', 'schoolbit-hero']);
         const TAIL = new Set(['home-navbar']);
-        const pinnedSections = isHome ? page.sections.filter(s => PINNED.has(s.id)) : [];
-        const tailSections = isHome ? page.sections.filter(s => TAIL.has(s.id)) : [];
-        const movableSections = isHome
+        const pinnedSections = isReorderable ? page.sections.filter(s => PINNED.has(s.id)) : [];
+        const tailSections = isReorderable ? page.sections.filter(s => TAIL.has(s.id)) : [];
+        const movableSections = isReorderable
           ? page.sections.filter(s => !PINNED.has(s.id) && !TAIL.has(s.id))
           : page.sections;
         const movableIds = movableSections.map(s => s.id);
@@ -2266,7 +2647,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
 
         return (
           <div className="space-y-3">
-            {isHome && (
+            {isReorderable && (
               <p className="text-[11px] text-gray-400 px-1 flex items-center gap-1.5">
                 <GripVertical className="w-3.5 h-3.5" />
                 {isAr ? 'اسحب الأقسام لإعادة ترتيبها على الصفحة، أو استخدم الأسهم. الهيرو ثابت دائماً في الأعلى.' : 'Drag sections to reorder them on the page, or use the arrows. The Hero is always pinned to the top.'}
@@ -2277,7 +2658,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
               <SectionCard key={section.id} {...cardProps(section)} reorderEnabled={false} pinned onMove={() => {}} />
             ))}
 
-            {isHome ? (
+            {isReorderable ? (
               <Reorder.Group as="div" axis="y" values={movableIds} onReorder={(ids) => reorderSections(page.id, ids as string[])} className="space-y-3">
                 {movableSections.map((section, i) => (
                   <SectionCard

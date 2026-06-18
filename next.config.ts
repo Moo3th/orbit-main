@@ -2,11 +2,28 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  // React Compiler تمريرة Babel ثقيلة جداً على الذاكرة/المعالج لكل ملف. على أجهزة
+  // محدودة الذاكرة تسبّب ذروة تُفشِل توليد عمّال webpack ("Jest worker child process
+  // exceptions") مع ملفات الأدمن الضخمة. نقصرها على الإنتاج: البناء النهائي يبقى
+  // مُحسَّناً، والتطوير يصبح أخفّ بكثير (السلوك الوظيفي مطابق، فقط دون حفظ تلقائي للذاكرة).
+  reactCompiler: process.env.NODE_ENV === 'production',
   // Disable Turbopack to avoid Windows symlink permission issues
   // Turbopack requires admin privileges for symlinks on Windows
   // Using standard webpack bundler instead
-  
+
+  // يقلّل ذروة استهلاك ذاكرة webpack (مقابل بطء ترجمة طفيف). يمنع انهيار
+  // عمّال خادم التطوير ("Jest worker child process exceptions") على أجهزة
+  // محدودة الذاكرة مع reactCompiler + ملفات الأدمن الضخمة. خيار Next.js رسمي.
+  experimental: {
+    webpackMemoryOptimizations: true,
+  },
+
+  // أبقِ عدداً أقل من الصفحات المترجَمة في الذاكرة أثناء التطوير (تقليل البصمة).
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+
   // Fix multiple lockfiles warning by setting explicit root
   outputFileTracingRoot: path.join(__dirname),
   

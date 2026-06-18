@@ -16,7 +16,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import type { CmsPage } from '@/lib/cms/types';
-import { getCmsField } from '@/lib/cms/helpers';
+import { getCmsField, getCmsJson, resolveCtaLink } from '@/lib/cms/helpers';
+import CtaTracker from '@/components/analytics/CtaTracker';
+import { trackProductView } from '@/lib/analytics/events';
 
 // استخدام الصور من المجلد العام
 const dashboardImg = "/otime/dashboardOtime.png";
@@ -35,7 +37,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   const [touchEnd, setTouchEnd] = useState(0);
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const slidesJson = getCmsField(cmsPage, 'ot-hero', 'slides_json', isRTL, '');
+  const slidesJson = getCmsJson(cmsPage, 'ot-hero', 'slides_json', '');
   const slides = useMemo(() => {
     try {
       if (slidesJson) {
@@ -71,12 +73,11 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   const heroTitle = isRTL ? currentSlide.titleAr : currentSlide.titleEn;
   const heroDescription = isRTL ? currentSlide.descAr : currentSlide.descEn;
   const primaryCtaText = isRTL ? currentSlide.ctaTextAr : currentSlide.ctaTextEn;
-  const primaryCtaUrl = currentSlide.ctaUrl || "https://wa.me/966920006900";
+  const primaryCtaUrl = resolveCtaLink(cmsPage, 'ot-hero', 'cta_primary', 'o-time', isRTL, currentSlide.ctaUrl || "https://wa.me/966920006900");
 
   const heroHighlight = getCmsField(cmsPage, 'ot-hero', 'highlight', isRTL, isRTL ? "لإدارة الموارد البشرية" : "For Human Resources Management");
   const secondaryCtaText = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_text', isRTL, isRTL ? "جرب النظام مجاناً" : "Try the System for Free");
-  const secondaryCtaUrlRaw = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_url', isRTL, "https://otime.mobile.sa/register");
-  const secondaryCtaUrl = getCmsField(cmsPage, 'ot-hero', 'cta_secondary_type', isRTL, "external") === 'form' ? '/products/o-time/form' : secondaryCtaUrlRaw;
+  const secondaryCtaUrl = resolveCtaLink(cmsPage, 'ot-hero', 'cta_secondary', 'o-time', isRTL, "https://otime.mobile.sa/register");
   const valueSectionTitle = getCmsField(cmsPage, 'ot-features', 'title', isRTL, isRTL ? "لماذا O-Time؟" : "Why O-Time?");
   const valueSectionSubtitle = getCmsField(cmsPage, 'ot-features', 'subtitle', isRTL, isRTL ? "منصة موحدة تجمع كل ما تحتاجه لإدارة الموارد البشرية بكفاءة عالية." : "A unified platform covering everything you need to manage HR efficiently.");
   const modulesSectionTitle = getCmsField(cmsPage, 'ot-features', 'modules_title', isRTL, isRTL ? "وحدات متكاملة لإدارة الموارد البشرية" : "Integrated HR Management Modules");
@@ -85,7 +86,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
 
   // Screenshots للنظام
   const screenshots = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'screenshots_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'screenshots_json', '');
     try {
       if (json) {
         const items = JSON.parse(json);
@@ -141,7 +142,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   };
 
   const valueProps = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'value_props_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'value_props_json', '');
     try {
       if (json) {
         const items = JSON.parse(json);
@@ -184,7 +185,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   }, [cmsPage, isRTL]);
 
   const modules = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'modules_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'modules_json', '');
     try {
       if (json) {
         const items = JSON.parse(json);
@@ -265,7 +266,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   }, [cmsPage, isRTL]);
 
   const uxFeatures = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'ux_features_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'ux_features_json', '');
     try {
        if (json) {
          const items = JSON.parse(json);
@@ -307,7 +308,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
 
 
   const technicalSpecs = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'tech_specs_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'tech_specs_json', '');
     try {
       if (json) {
         const items = JSON.parse(json);
@@ -328,7 +329,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
   }, [cmsPage, isRTL]);
 
   const localFeatures = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'local_features_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'local_features_json', '');
     try {
       if (json) {
         const items = JSON.parse(json);
@@ -349,7 +350,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
 
   const rolesTitle = getCmsField(cmsPage, 'ot-features', 'roles_title', isRTL, isRTL ? "نظام صلاحيات متقدم" : "Advanced Permission System");
   const roles = useMemo(() => {
-    const json = getCmsField(cmsPage, 'ot-features', 'roles_json', isRTL, '');
+    const json = getCmsJson(cmsPage, 'ot-features', 'roles_json', '');
     const iconArr = [Settings, Users, Smartphone];
     const colorArr = ['red', 'blue', 'green'];
     try {
@@ -372,6 +373,9 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
     ];
   }, [cmsPage, isRTL]);
 
+  // تتبّع GTM: مشاهدة صفحة المنتج عند الدخول.
+  useEffect(() => { trackProductView('otime'); }, []);
+
   return (
     <div
       className={`min-h-screen bg-white ${isRTL ? "font-ibm-plex-arabic" : "font-ibm-plex"}`}
@@ -379,6 +383,7 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
       style={{ fontFamily: isRTL ? "'IBM Plex Sans Arabic', sans-serif" : "'IBM Plex Sans', sans-serif" }}
       dir={isRTL ? "rtl" : "ltr"}
     >
+      <CtaTracker />
       {/* Hero Section */}
       <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 bg-gradient-to-br from-[#E8DCCB] via-white to-[#D4CEC0] overflow-hidden min-h-[600px] flex items-center">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdBMUUyRSIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
@@ -415,8 +420,9 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                 </p>
                 
                 <div className="flex gap-4 flex-wrap">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
+                    data-cta data-cta-id="otime_hero_primary" data-cta-text={primaryCtaText} data-destination={primaryCtaUrl}
                     className="bg-gradient-to-r from-[#104E8B] to-[#0d3d6e] hover:from-[#0d3d6e] hover:to-[#0a2f56] text-white font-bold px-8 h-14 text-lg shadow-lg shadow-[#104E8B]/30"
                     onClick={() => {
                       if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');
@@ -426,9 +432,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                     {primaryCtaText}
                     <Play className={`w-5 h-5 ${isRTL ? "mr-2" : "ml-2"}`} />
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    data-cta data-cta-id="otime_hero_secondary" data-cta-text={secondaryCtaText} data-destination={secondaryCtaUrl}
                     className="border-2 border-[#FFA502] text-[#FFA502] hover:bg-[#FFA502] hover:text-white font-bold px-8 h-14 text-lg"
                     onClick={() => {
                       if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
@@ -934,8 +941,9 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
               {getCmsField(cmsPage, 'ot-features', 'footer_cta_subtitle', isRTL, isRTL ? "انضم إلى الشركات التي تعتمد على O-Time لتحقيق الكفاءة والامتثال" : "Join the companies relying on O-Time to achieve efficiency and compliance")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
+                data-cta data-cta-id="otime_footer_secondary" data-cta-text={secondaryCtaText} data-destination={secondaryCtaUrl}
                 className="bg-[#FFA502] text-white hover:bg-[#e69302] font-bold px-10 h-14 text-lg shadow-2xl"
                 onClick={() => {
                   if (secondaryCtaUrl.startsWith('http')) window.open(secondaryCtaUrl, '_blank');
@@ -945,9 +953,10 @@ export const OTimePage = ({ cmsPage = null }: OTimePageProps) => {
                 {secondaryCtaText}
                 <ArrowRight className={`w-6 h-6 ${isRTL ? "mr-2" : "ml-2"}`} />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
+                data-cta data-cta-id="otime_footer_primary" data-cta-text={primaryCtaText} data-destination={primaryCtaUrl}
                 className="bg-white/10 border-2 border-[#00BCD4] text-[#00BCD4] hover:bg-[#00BCD4] hover:text-white font-bold px-10 h-14 text-lg backdrop-blur-sm"
                 onClick={() => {
                   if (primaryCtaUrl.startsWith('http')) window.open(primaryCtaUrl, '_blank');

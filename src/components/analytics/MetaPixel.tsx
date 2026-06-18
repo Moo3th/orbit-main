@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
 
 interface MetaPixelProps {
@@ -30,8 +30,9 @@ function getConsentLevel(): string {
 }
 
 export default function MetaPixel({ pixelId }: MetaPixelProps) {
-  const [adsConsent, setAdsConsent] = useState(getConsentLevel() === 'accepted');
-  const initializedRef = useRef(false);
+  // يجب أن يبدأ false دائمًا ليتطابق أول رسمٍ على العميل مع الخادم (الخادم لا يرى الموافقة).
+  // الموافقة الفعلية تُقرأ بعد الترطيب في useEffect أدناه — وإلا حدث عدم تطابق ترطيب (hydration mismatch).
+  const [adsConsent, setAdsConsent] = useState(false);
   const isValidPixelId = /^\d+$/.test(pixelId);
 
   useEffect(() => {
@@ -50,17 +51,8 @@ export default function MetaPixel({ pixelId }: MetaPixelProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!adsConsent || initializedRef.current || !pixelId || !isValidPixelId) return;
-    if (typeof window === 'undefined') return;
-
-    if (window.fbq) {
-      window.fbq('init', pixelId);
-      window.fbq('track', 'PageView');
-      initializedRef.current = true;
-      return;
-    }
-  }, [adsConsent, pixelId, isValidPixelId]);
+  // ملاحظة: التهيئة وتتبّع PageView يتمّان مرّة واحدة داخل السكربت المضمّن أدناه.
+  // لا تُكرّرهما هنا (كان ذلك يسبّب "Duplicate Pixel ID" وحدث PageView مزدوجًا).
 
   if (!pixelId || !isValidPixelId) return null;
 

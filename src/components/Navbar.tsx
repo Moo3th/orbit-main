@@ -125,8 +125,9 @@ export default function Navbar() {
   // Navigation items - ordered from right to left: الرئيسية - من نحن - حلولنا - الاخبار - العروض
   // Note: Items are rendered individually in the nav for proper ordering
 
-  // Navbar should be light when in dark section (WhyOrbit) for better contrast
-  const navbarIsDark = isInDarkSection ? false : isDark;
+  // صفحة واتساب داكنة دائماً → الهيدر داكن دائماً فيها (شعار داكن واضح + لمسة خضراء).
+  // وإلا: فاتح عند المرور بقسم داكن (WhyOrbit) لتباين أفضل، وغير ذلك حسب الثيم.
+  const navbarIsDark = pathname === '/products/whatsapp' ? true : (isInDarkSection ? false : isDark);
 
   // Detect pages where navbar needs better text contrast (light pages with white background)
   const isBlogRoute = pathname?.startsWith('/blog') || pathname?.startsWith('/news');
@@ -290,7 +291,7 @@ export default function Navbar() {
           <div className={`hidden md:flex items-center gap-3 flex-shrink-0 min-w-0 order-3`}>
             {/* Language Controls */}
             <div className={`flex items-center rounded-full ${navbarIsDark ? 'bg-white/5 border border-white/10' : 'bg-secondary/40 border border-secondary/50'} p-1.5 backdrop-blur-md gap-1 shadow-sm flex-shrink-0`}>
-              <LanguageSwitcher />
+              <LanguageSwitcher dark={navbarIsDark} />
             </div>
 
             {/* Contact Button */}
@@ -535,7 +536,7 @@ function MobileMenu({ setIsOpen, navbarIsDark, isRTL, solutionsList, textColorCl
           <div className={`flex items-center gap-3 p-4 rounded-2xl ${navbarIsDark ? 'bg-white/5 border border-white/10' : 'bg-secondary/40 border border-secondary/50'} backdrop-blur-md`}>
             <div className="flex items-center gap-2">
               <div className={`p-1.5 rounded-lg ${navbarIsDark ? 'bg-black/50' : 'bg-white'}`}>
-                <LanguageSwitcher />
+                <LanguageSwitcher dark={navbarIsDark} />
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { ArrowRight, ArrowLeft, CheckCircle, Loader2, Ban, Phone, Mail } from 'l
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackFormStart, trackFormSubmit, trackFormError } from '@/lib/analytics/events';
 
 interface FormField {
   id: string;
@@ -35,6 +36,7 @@ export const FormsFormPage = ({ slug }: Props) => {
   const { isRTL } = useLanguage();
   const [fields, setFields] = useState<FormField[]>([]);
   const [formData, setFormData] = useState<Record<string, string | string[]>>({});
+  const formStartedRef = useRef(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -166,6 +168,10 @@ export const FormsFormPage = ({ slug }: Props) => {
   const stepFields = (step: number) => fields.filter(f => f.step === step);
 
   const handleChange = (fieldId: string, value: string | string[]) => {
+    if (!formStartedRef.current) {
+      formStartedRef.current = true;
+      trackFormStart({ formId: slug, product: productId || slug });
+    }
     setFormData(prev => ({ ...prev, [fieldId]: value }));
     if (errors[fieldId]) setErrors(prev => ({ ...prev, [fieldId]: '' }));
   };
@@ -220,9 +226,9 @@ export const FormsFormPage = ({ slug }: Props) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, data: formData }),
       });
-      if (res.ok) { setIsComplete(true); toast.success(isRTL ? 'تم إرسال طلبك بنجاح!' : 'Request submitted successfully!'); }
-      else { const err = await res.json(); toast.error(err.error || (isRTL ? 'حدث خطأ' : 'Error occurred')); }
-    } catch { toast.error(isRTL ? 'حدث خطأ' : 'Error occurred'); }
+      if (res.ok) { trackFormSubmit({ formId: slug, product: productId || slug, source: 'custom_form' }); setIsComplete(true); toast.success(isRTL ? 'تم إرسال طلبك بنجاح!' : 'Request submitted successfully!'); }
+      else { const err = await res.json(); trackFormError({ formId: slug, product: productId || slug, message: err.error }); toast.error(err.error || (isRTL ? 'حدث خطأ' : 'Error occurred')); }
+    } catch { trackFormError({ formId: slug, product: productId || slug }); toast.error(isRTL ? 'حدث خطأ' : 'Error occurred'); }
     finally { setIsSubmitting(false); }
   };
 
@@ -455,19 +461,36 @@ export const FormsFormPage = ({ slug }: Props) => {
 
         {displayMode === 'wizard' ? (
           <>
-            <div className="flex items-center justify-center gap-2 mb-8">
-              {stepNumbers.map((step, i) => (
-                <div key={step} className="flex items-center gap-2">
-                  <button 
-                    onClick={() => { if (step <= currentStep) setCurrentStep(step); }} 
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${currentStep === step ? `${theme.primary} text-[var(--button-text-color)]` : step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-                    style={currentStep === step ? { backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' } : {}}
-                  >
-                    {step < currentStep ? <CheckCircle className="w-4 h-4" /> : stepNumbers.indexOf(step) + 1}
-                  </button>
-                  {i < stepNumbers.length - 1 && <div className={`w-8 h-0.5 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'}`} />}
-                </div>
-              ))}
+            <div className="mb-8">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3">
+                {stepNumbers.map((step, i) => {
+                  const done = step < currentStep;
+                  const active = currentStep === step;
+                  return (
+                    <div key={step} className="flex items-center gap-1.5 sm:gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { if (step <= currentStep) setCurrentStep(step); }}
+                        aria-current={active ? 'step' : undefined}
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm"
+                        style={active
+                          ? { backgroundColor: 'var(--primary-color)', color: 'var(--button-text-color)' }
+                          : done
+                            ? { backgroundColor: 'var(--success-color)', color: '#ffffff' }
+                            : { backgroundColor: '#e5e7eb', color: '#6b7280' }}
+                      >
+                        {done ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                      </button>
+                      {i < stepNumbers.length - 1 && (
+                        <div className="w-7 sm:w-9 h-1 rounded-full transition-all" style={{ backgroundColor: done ? 'var(--success-color)' : '#e5e7eb' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-center text-xs font-medium" style={{ color: 'var(--field-label-color)' }}>
+                {isRTL ? `الخطوة ${stepNumbers.indexOf(currentStep) + 1} من ${stepNumbers.length}` : `Step ${stepNumbers.indexOf(currentStep) + 1} of ${stepNumbers.length}`}
+              </p>
             </div>
 
             <div className="rounded-2xl shadow-lg p-6 md:p-8 space-y-5" style={{ backgroundColor: 'var(--form-card-bg-color)' }}>

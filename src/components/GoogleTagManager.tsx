@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+import { getConsentLevel } from '@/lib/analytics/consent';
 
 interface GoogleTagManagerProps {
   gtmId: string;
@@ -51,18 +52,6 @@ export default function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
       } else {
         window.gtag('consent', 'update', CONSENT_NECESSARY);
       }
-    };
-
-    const getConsentLevel = (): string => {
-      const stored = localStorage.getItem('cookie-consent');
-      if (stored === 'accepted' || stored === 'necessary') return stored;
-
-      const cookie = document.cookie.split(';').find(c => c.trim().startsWith('cookie-consent='));
-      if (cookie) {
-        const value = cookie.split('=')[1].trim();
-        if (value === 'accepted' || value === 'necessary') return value;
-      }
-      return '';
     };
 
     const level = getConsentLevel();

@@ -12,10 +12,18 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrustedPartners } from "./TrustedPartners";
+import { Faq } from "@/components/business/landing/Faq";
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CmsPage, CmsPartner } from '@/lib/cms/types';
-import { getCmsField } from '@/lib/cms/helpers';
+import { getCmsField, makeSectionStyle, resolveCtaLink } from '@/lib/cms/helpers';
 import { encodeImagePath } from '@/utils/imagePath';
+import { SMS_FAQ_DEFAULTS } from '@/lib/cms/smsFaq';
+import CtaTracker from '@/components/analytics/CtaTracker';
+import { trackProductView, trackPricingView, trackPlanSelected } from '@/lib/analytics/events';
+import { useInViewOnce } from '@/lib/analytics/useInViewOnce';
+
+// الترتيب القانوني لأقسام صفحة SMS (الهيرو مثبّت أولاً، والبقية قابلة لإعادة الترتيب من اللوحة).
+const SMS_SECTION_ORDER = ['sms-hero', 'sms-trust', 'sms-value', 'sms-special-offer', 'sms-usecases', 'sms-pricing', 'sms-developers', 'sms-faq', 'sms-final-cta'];
 
 interface SMSPageProps {
   cmsPage?: CmsPage | null;
@@ -265,6 +273,22 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
     return () => window.clearInterval(autoplay);
   }, [heroTabs.length]);
 
+  // ترتيب الأقسام من اللوحة عبر flex order (الهيرو مثبّت خارج الحاوية المرنة).
+  const secStyle = useMemo(() => makeSectionStyle(cmsPage, SMS_SECTION_ORDER), [cmsPage]);
+
+  // تتبّع GTM: مشاهدة صفحة المنتج عند الدخول، وعرض قسم التسعير عند ظهوره.
+  useEffect(() => { trackProductView('sms'); }, []);
+  const pricingRef = useInViewOnce<HTMLElement>(() => {
+    trackPricingView({
+      serviceType: 'sms',
+      plans: packages.map((p) => ({
+        id: p.isCustom ? 'custom' : String(p.messages ?? ''),
+        name: p.feature,
+        price: p.price ?? undefined,
+      })),
+    });
+  });
+
   return (
     <div 
       className={`min-h-screen bg-white ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'}`}
@@ -272,6 +296,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
       style={{ fontFamily: isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif' }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
+      <CtaTracker />
       <section ref={heroSectionRef} className={`pt-24 pb-8 md:pt-32 md:pb-16 overflow-hidden transition-colors duration-700 ${currentHeroTab.color} min-h-[700px] flex flex-col justify-center`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center flex-1">
@@ -298,7 +323,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                   {currentHeroTab.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-                  <Button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[#7A1E2E] hover:bg-[#601824] text-white h-14 md:h-16 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#7A1E2E]/20 w-full sm:w-auto transform transition-transform hover:scale-105">
+                  <Button data-cta data-cta-id="sms_hero" data-cta-text={currentHeroTab.cta} data-destination="#pricing" onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[#7A1E2E] hover:bg-[#601824] text-white h-14 md:h-16 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#7A1E2E]/20 w-full sm:w-auto transform transition-transform hover:scale-105">
                     {currentHeroTab.cta}
                   </Button>
                   <div className="hidden sm:flex items-center gap-4 px-6 py-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 shadow-sm">
@@ -364,8 +389,9 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           </div>
         </div>
       </section>
-      <TrustedPartners partners={partners} />
-      <section className="py-24 bg-white">
+      <div className="flex flex-col">
+      <div style={secStyle('sms-trust')}><TrustedPartners partners={partners} /></div>
+      <section style={secStyle('sms-value')} className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#7A1E2E] mb-4`}>{cmsValueTitle}</h2>
@@ -395,7 +421,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           </div>
         </div>
       </section>
-      <section className="py-20 bg-gradient-to-r from-[#7A1E2E] to-[#5a1622] text-white relative overflow-hidden">
+      <section style={secStyle('sms-special-offer')} className="py-20 bg-gradient-to-r from-[#7A1E2E] to-[#5a1622] text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -403,14 +429,14 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           <h2 className={`${headingFontClass} text-3xl md:text-5xl font-bold mb-6`}>{getCmsField(cmsPage, 'sms-special-offer', 'title_part1', isRTL, t.products.sms.specialOffer.titlePart1)}<br /><span className="text-[#F8A36B] mt-4 block">{getCmsField(cmsPage, 'sms-special-offer', 'title_part2', isRTL, t.products.sms.specialOffer.titlePart2)}</span></h2>
           <div className="mt-10 flex flex-col items-center gap-4">
             <Button asChild className="bg-white text-[#7A1E2E] hover:bg-[#E8DCCB] h-14 px-10 text-lg font-bold rounded-xl shadow-2xl shadow-black/20 transform hover:scale-105 transition-all">
-              <a href={getCmsField(cmsPage, 'sms-special-offer', 'cta_url', isRTL, '#pricing')} target="_blank" rel="noopener noreferrer">{getCmsField(cmsPage, 'sms-special-offer', 'cta_text', isRTL, t.products.sms.specialOffer.cta)}</a>
+              <a data-cta data-cta-id="sms_special_offer" href={resolveCtaLink(cmsPage, 'sms-special-offer', 'cta', 'sms', isRTL, '#pricing')} target="_blank" rel="noopener noreferrer">{getCmsField(cmsPage, 'sms-special-offer', 'cta_text', isRTL, t.products.sms.specialOffer.cta)}</a>
             </Button>
             <p className="text-white/60 text-sm">{getCmsField(cmsPage, 'sms-special-offer', 'disclaimer', isRTL, t.products.sms.specialOffer.disclaimer)}</p>
           </div>
         </div>
       </section>
       {/* 5. Use Cases */}
-      <section className="py-24 bg-[#E8DCCB]/30">
+      <section style={secStyle('sms-usecases')} className="py-24 bg-[#E8DCCB]/30">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
@@ -454,8 +480,8 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
               <div className="flex items-center gap-3 mb-6 pb-4 border-b">
                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><Smartphone className="w-5 h-5 text-slate-600" /></div>
                 <div className={`text-${isRTL ? 'right' : 'left'}`}>
-                  <h4 className={`${headingFontClass} font-bold text-slate-900`}>{isRTL ? "سجل الإرسال المباشر" : "Live Delivery Log"}</h4>
-                  <span className="text-xs text-green-600 flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>{isRTL ? "متصل الآن" : "Online Now"}</span>
+                  <h4 className={`${headingFontClass} font-bold text-slate-900`}>{getCmsField(cmsPage, 'sms-usecases', 'log_title', isRTL, isRTL ? "سجل الإرسال المباشر" : "Live Delivery Log")}</h4>
+                  <span className="text-xs text-green-600 flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>{getCmsField(cmsPage, 'sms-usecases', 'log_status', isRTL, isRTL ? "متصل الآن" : "Online Now")}</span>
                 </div>
               </div>
               <div className="space-y-4">
@@ -464,10 +490,10 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                     <div className="mt-1"><CheckCircle2 className="w-4 h-4 text-green-600" /></div>
                     <div>
                       <div className="flex justify-between items-center w-full gap-8 mb-1">
-                        <span className="text-xs font-bold text-slate-700">96650xxxxxxx</span>
-                        <span className="text-[10px] text-slate-400">{isRTL ? "الآن" : "Now"}</span>
+                        <span className="text-xs font-bold text-slate-700">{getCmsField(cmsPage, 'sms-usecases', 'log_phone', isRTL, "96650xxxxxxx")}</span>
+                        <span className="text-[10px] text-slate-400">{getCmsField(cmsPage, 'sms-usecases', 'log_time', isRTL, isRTL ? "الآن" : "Now")}</span>
                       </div>
-                      <p className={`text-xs text-slate-500 text-${isRTL ? 'right' : 'left'}`}>{isRTL ? "تم استلام طلبك رقم #8821 بنجاح وسيتم تجهيزه..." : "Your order #8821 has been received successfully and will be processed..."}</p>
+                      <p className={`text-xs text-slate-500 text-${isRTL ? 'right' : 'left'}`}>{getCmsField(cmsPage, 'sms-usecases', 'log_message', isRTL, isRTL ? "تم استلام طلبك رقم #8821 بنجاح وسيتم تجهيزه..." : "Your order #8821 has been received successfully and will be processed...")}</p>
                     </div>
                   </div>
                 ))}
@@ -476,7 +502,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           </div>
         </div>
       </section>
-      <section id="pricing" className="py-24 bg-white">
+      <section id="pricing" ref={pricingRef} style={secStyle('sms-pricing')} className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto mb-16">
             <h2 className={`${headingFontClass} text-3xl md:text-5xl font-extrabold text-[#7A1E2E] mb-4`}>{cmsPricingTitle}</h2>
@@ -501,7 +527,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
             {packages.map((pkg, index) => (
               <div key={index} className={`relative flex flex-col p-4 md:p-6 rounded-2xl transition-all duration-300 ${pkg.featured ? "border-2 border-[#7A1E2E] bg-white shadow-xl scale-105 z-10" : "border border-slate-200 bg-white hover:border-[#7A1E2E]/30 hover:shadow-lg"}`}>
-                {pkg.featured && <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#7A1E2E] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md whitespace-nowrap">{t.products.sms.packages.items.professional.description}</div>}
+                {pkg.featured && <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#7A1E2E] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md whitespace-nowrap">{getCmsField(cmsPage, 'sms-pricing', 'popular_badge', isRTL, t.products.sms.packages.items.professional.description)}</div>}
                 
                 {/* Discount Badge */}
                 {!pkg.isCustom && pkg.price && pkg.originalPrice && pkg.originalPrice > pkg.price && (
@@ -511,7 +537,7 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 )}
 
                 <div className="mb-4 text-center">
-                  <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{pkg.messages ? `${formatNumber(pkg.messages)} ${isRTL ? 'رسالة' : 'Messages'}` : (isRTL ? "مخصص" : "Custom")}</h3>
+                  <h3 className={`${headingFontClass} text-xl font-bold text-slate-900`}>{pkg.messages ? `${formatNumber(pkg.messages)} ${getCmsField(cmsPage, 'sms-pricing', 'messages_unit', isRTL, isRTL ? 'رسالة' : 'Messages')}` : getCmsField(cmsPage, 'sms-pricing', 'custom_label', isRTL, isRTL ? "مخصص" : "Custom")}</h3>
                   <p className="text-sm text-slate-500 mt-1">{pkg.description}</p>
                 </div>
                 {!pkg.isCustom && pkg.price !== null ? (
@@ -529,14 +555,14 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
                 ) : <div className="mb-6 text-center"><p className="text-lg text-slate-600 font-semibold">{t.products.sms.packages.items.custom.feature}</p></div>}
                 <div className={`mt-auto bg-slate-50 rounded-xl p-3 mb-6 text-center border ${pkg.featured ? "bg-[#7A1E2E]/5 border-[#7A1E2E]/10" : "border-transparent"}`}><p className="text-sm text-slate-700 font-medium">{pkg.feature}</p></div>
                 <Button className={`w-full font-bold ${pkg.featured ? "bg-[#7A1E2E] hover:bg-[#601824] text-white" : "bg-transparent border border-[#7A1E2E] text-[#7A1E2E] hover:bg-[#7A1E2E]/5"}`} asChild>
-                  {pkg.isCustom ? <Link href="/contact">{t.products.sms.packages.buttons.contact}</Link> : <a href="https://app.mobile.net.sa/reg" target="_blank" rel="noopener noreferrer">{pkg.featured ? getCmsField(cmsPage, 'sms-pricing', 'btn_topup', isRTL, isRTL ? "اشحن الآن" : "Top Up Now") : getCmsField(cmsPage, 'sms-pricing', 'btn_choose', isRTL, isRTL ? "اختر الباقة" : "Choose Package")}</a>}
+                  {pkg.isCustom ? <Link href={resolveCtaLink(cmsPage, 'sms-pricing', 'plans_cta', 'sms', isRTL, '/contact')} onClick={() => trackPlanSelected({ serviceType: 'sms', planId: 'custom', planName: pkg.feature })}>{getCmsField(cmsPage, 'sms-pricing', 'btn_custom', isRTL, t.products.sms.packages.buttons.contact)}</Link> : <a href={resolveCtaLink(cmsPage, 'sms-pricing', 'plans_cta', 'sms', isRTL, 'https://app.mobile.net.sa/reg')} target="_blank" rel="noopener noreferrer" onClick={() => trackPlanSelected({ serviceType: 'sms', planId: String(pkg.messages ?? ''), planName: pkg.feature, price: pkg.price ?? undefined })}>{pkg.featured ? getCmsField(cmsPage, 'sms-pricing', 'btn_topup', isRTL, isRTL ? "اشحن الآن" : "Top Up Now") : getCmsField(cmsPage, 'sms-pricing', 'btn_choose', isRTL, isRTL ? "اختر الباقة" : "Choose Package")}</a>}
                 </Button>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <section className="py-20 bg-[#F9FAFB] border-t border-slate-200">
+      <section style={secStyle('sms-developers')} className="py-20 bg-[#F9FAFB] border-t border-slate-200">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="max-w-xl">
@@ -572,26 +598,28 @@ export const SMSPage = ({ cmsPage = null, partners = [] }: SMSPageProps) => {
             <div className="w-full max-w-md bg-[#1E293B] rounded-xl p-6 shadow-2xl overflow-hidden font-mono text-xs text-blue-300">
               <div className="flex gap-1.5 mb-4"><div className="w-3 h-3 rounded-full bg-red-500"></div><div className="w-3 h-3 rounded-full bg-yellow-500"></div><div className="w-3 h-3 rounded-full bg-green-500"></div></div>
               <p className="text-slate-400 mb-2">{`// Send SMS Example`}</p>
-              <p className="mb-1"><span className="text-purple-400">await</span> orbit.send({`{`}</p>
-              <p className="pl-4"><span className="text-blue-400">to</span>: <span className="text-green-400">&quot;96650xxxxxxx&quot;</span>,</p>
-              <p className="pl-4"><span className="text-blue-400">body</span>: <span className="text-green-400">&quot;Your OTP is 1234&quot;</span>,</p>
-              <p className="pl-4"><span className="text-blue-400">sender</span>: <span className="text-green-400">&quot;MyStore&quot;</span></p>
+              <p className="mb-1"><span className="text-purple-400">await</span> corbit.send({`{`}</p>
+              <p className="pl-4"><span className="text-blue-400">to</span>: <span className="text-green-400">&quot;{getCmsField(cmsPage, 'sms-developers', 'code_to', isRTL, '96650xxxxxxx')}&quot;</span>,</p>
+              <p className="pl-4"><span className="text-blue-400">body</span>: <span className="text-green-400">&quot;{getCmsField(cmsPage, 'sms-developers', 'code_body', isRTL, 'Your OTP is 1234')}&quot;</span>,</p>
+              <p className="pl-4"><span className="text-blue-400">sender</span>: <span className="text-green-400">&quot;{getCmsField(cmsPage, 'sms-developers', 'code_sender', isRTL, 'MyStore')}&quot;</span></p>
               <p className="mb-1">{`}`});</p>
               <p className="mt-2 text-green-500">{`// Result: Message Sent ✅`}</p>
             </div>
           </div>
         </div>
       </section>
-      <section className="py-24 bg-white text-center">
+      <div style={secStyle('sms-faq')}><Faq pageData={cmsPage} sectionId="sms-faq" defaults={SMS_FAQ_DEFAULTS} /></div>
+      <section style={secStyle('sms-final-cta')} className="py-24 bg-white text-center">
         <div className="container mx-auto px-4 max-w-2xl">
           <MessageSquare className="w-16 h-16 text-[#7A1E2E] mx-auto mb-6 opacity-20" />
           <h2 className={`${headingFontClass} text-3xl font-bold text-[#7A1E2E] mb-6`}>{getCmsField(cmsPage, 'sms-final-cta', 'title', isRTL, t.products.sms.finalCta.title)}</h2>
           <Button size="lg" className="bg-[#7A1E2E] hover:bg-[#601824] text-white text-lg px-10 h-16 rounded-xl shadow-xl shadow-[#7A1E2E]/20" asChild>
-            <a href={getCmsField(cmsPage, 'sms-final-cta', 'cta_url', isRTL, 'https://app.mobile.net.sa/reg')} target="_blank" rel="noopener noreferrer">{getCmsField(cmsPage, 'sms-final-cta', 'cta_text', isRTL, t.products.sms.finalCta.cta)}</a>
+            <a data-cta data-cta-id="sms_final_cta" href={resolveCtaLink(cmsPage, 'sms-final-cta', 'cta', 'sms', isRTL, 'https://app.mobile.net.sa/reg')} target="_blank" rel="noopener noreferrer">{getCmsField(cmsPage, 'sms-final-cta', 'cta_text', isRTL, t.products.sms.finalCta.cta)}</a>
           </Button>
           <p className="mt-4 text-slate-400 text-sm">{getCmsField(cmsPage, 'sms-final-cta', 'subtitle', isRTL, t.products.sms.finalCta.sub)}</p>
         </div>
       </section>
+      </div>
     </div>
   );
 };

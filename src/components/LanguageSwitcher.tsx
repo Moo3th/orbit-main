@@ -4,9 +4,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ dark }: { dark?: boolean } = {}) {
   const { language, setLanguage } = useLanguage();
   const { isDark } = useTheme();
+  // يُسمح للأب (مثل الهيدر الداكن على صفحة واتساب) بفرض الوضع الداكن بغضّ النظر عن ثيم الموقع.
+  const useDark = dark ?? isDark;
 
   return (
     <motion.button
@@ -15,8 +17,8 @@ export default function LanguageSwitcher() {
       whileTap={{ scale: 0.98 }}
       className={`
         relative group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
-        ${isDark 
-          ? 'bg-white/5 hover:bg-white/10 text-white/90' 
+        ${useDark
+          ? 'bg-white/5 hover:bg-white/10 text-white/90'
           : 'bg-black/5 hover:bg-black/10 text-gray-800'}
         backdrop-blur-md border border-transparent hover:border-current/10
       `}

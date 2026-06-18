@@ -22,6 +22,51 @@ export function getCmsField(
   return value?.trim() ? value : fallback;
 }
 
+/**
+ * يحلّل وجهة زر الدعوة (CTA) القابلة للضبط من اللوحة:
+ *  - `<baseKey>_type` = 'form'      → فورم الخدمة الداخلي `/products/<productSlug>/form` (الافتراضي).
+ *  - `<baseKey>_type` = 'external'  → الرابط المخصّص في `<baseKey>_url` (أو defaultUrl، وإلا الفورم).
+ *
+ * productSlug هو سلَج المسار: 'sms' | 'whatsapp' | 'o-time' | 'gov-gate' | 'schoolbit'.
+ * يعمّم النمط الذي كان في OTimePage. defaultUrl يُمرَّر للحفاظ على الرابط الخارجي القديم عند اختيار 'external'
+ * بلا قيمة محفوظة.
+ */
+export function resolveCtaLink(
+  page: CmsPage | null,
+  sectionId: string,
+  baseKey: string,
+  productSlug: string,
+  isRTL: boolean,
+  defaultUrl = ''
+): string {
+  const formPath = `/products/${productSlug}/form`;
+  const type = getCmsField(page, sectionId, `${baseKey}_type`, isRTL, 'form');
+  if (type === 'form') return formPath;
+  const url = getCmsField(page, sectionId, `${baseKey}_url`, isRTL, '');
+  return url || defaultUrl || formPath;
+}
+
+/**
+ * قراءة حقل JSON ثنائي اللغة مخزّن كـ blob واحد في `value` (والمكوّن يختار اللغة لكل عنصر).
+ * بخلاف getCmsField، لا يعتمد على isRTL — فالـ blob يحوي اللغتين معاً؛ يقرأ value ثم يحتاط بـ valueEn.
+ * هذا يمنع اختفاء محتوى القوائم في الوضع الإنجليزي حين تكون valueEn فارغة.
+ */
+export function getCmsJson(
+  page: CmsPage | null,
+  sectionId: string,
+  fieldKey: string,
+  fallback: string = ''
+): string {
+  if (!page) return fallback;
+  const section = page.sections?.find((s) => s.id === sectionId);
+  if (!section) return fallback;
+  const field = section.fields?.find((f) => f.key === fieldKey);
+  if (!field) return fallback;
+  if (field.value?.trim()) return field.value;
+  if (field.valueEn?.trim()) return field.valueEn;
+  return fallback;
+}
+
 export function getCmsSpacing(
   page: CmsPage | null,
   sectionId: string,
@@ -94,6 +139,28 @@ export function getColumnClasses(
   };
 
   return `${gridCols[mobile] || 'grid-cols-1'} ${mdGridCols[tablet] || 'md:grid-cols-2'} ${lgGridCols[desktop] || 'lg:grid-cols-3'}`;
+}
+
+/**
+ * يبني دالة تُرجِع `style` (order + إظهار/إخفاء) لكل قسم بحسب ترتيب مصفوفة أقسام الصفحة في الـ CMS.
+ * تُستخدم مع flexbox (`display:flex; flex-direction:column`) لإعادة ترتيب الأقسام من اللوحة دون نقل الكود.
+ * canonical: الترتيب الافتراضي للأقسام (يُستخدم حين لا يوجد القسم في بيانات الـ CMS).
+ */
+export function makeSectionStyle(
+  page: CmsPage | null,
+  canonical: string[]
+): (id: string) => { order: number; display?: 'none' } {
+  const orderOf = new Map<string, number>();
+  (page?.sections || []).forEach((s, i) => orderOf.set(s.id, i));
+  const hidden = new Set(
+    (page?.sections || []).filter((s) => (s as { visible?: boolean }).visible === false).map((s) => s.id)
+  );
+  return (id: string) => {
+    const order = orderOf.has(id)
+      ? (orderOf.get(id) as number)
+      : (canonical.indexOf(id) >= 0 ? canonical.indexOf(id) + 100 : 999);
+    return hidden.has(id) ? { order, display: 'none' as const } : { order };
+  };
 }
 
 export interface PageSeoInput {

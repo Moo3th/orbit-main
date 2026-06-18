@@ -52,3 +52,6 @@ next-env.d.ts
 /.playwright-mcp/
 /*.jpeg
 /*.png
+
+# scheduled-tasks runtime lock (generated, not for repo)
+/.claude/scheduled_tasks.lock

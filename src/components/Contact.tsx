@@ -1,16 +1,19 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import OrbitSectionBackground from './OrbitSectionBackground';
 import { getCmsField } from '@/lib/cms/helpers';
+import { trackContactFormSubmit, trackFormStart, trackFormError } from '@/lib/analytics/events';
 import type { CmsFooterData, CmsPage } from '@/lib/cms/types';
 
 interface ContactProps {
   cmsPage?: CmsPage | null;
   footerData?: CmsFooterData;
+  /** slugs الصفحات القانونية المخفيّة (isActive: false) — تُمرَّر من الخادم لإخفاء روابطها هنا. */
+  hiddenLegalSlugs?: string[];
 }
 
 interface ServiceOption {
@@ -81,7 +84,7 @@ const normalizePhoneForWhatsapp = (rawPhone: string): string => {
   return digits;
 };
 
-export default function Contact({ cmsPage = null, footerData }: ContactProps) {
+export default function Contact({ cmsPage = null, footerData, hiddenLegalSlugs }: ContactProps) {
   const { isRTL } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -183,6 +186,15 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
   const privacyPolicyLabel = getCmsField(cmsPage, 'contact-form', 'privacy_policy_label', isRTL, isRTL ? 'سياسة الخصوصية' : 'Privacy Policy');
   const privacyPolicyUrl = getCmsField(cmsPage, 'contact-form', 'privacy_policy_url', isRTL, '/privacy');
 
+  // إخفاء الرابط القانوني إن كانت صفحته مخفية (isActive: false). تُمرَّر slugs المخفيّة من الخادم.
+  // الروابط الخارجية/الخاصة (http/mailto/tel) لا تُخفى أبدًا، ولا تُخفى الروابط التي لا تطابق صفحة قانونية مخفية.
+  const toLegalSlug = (url: string) =>
+    (url || '').trim().replace(/[?#].*$/, '').replace(/^\/+|\/+$/g, '').toLowerCase();
+  const isHiddenLegalLink = (url: string) =>
+    !!url && !/^(https?:|mailto:|tel:)/i.test(url) && (hiddenLegalSlugs ?? []).includes(toLegalSlug(url));
+  const showTermsLink = !isHiddenLegalLink(privacyTermsUrl);
+  const showPrivacyLink = !isHiddenLegalLink(privacyPolicyUrl);
+
   const serviceOptions = useMemo(() => {
     const fallback = parseServiceOptions(DEFAULT_SERVICE_OPTIONS_AR, []);
     const arRaw = getCmsField(cmsPage, 'contact-form', 'service_options', true, DEFAULT_SERVICE_OPTIONS_AR);
@@ -201,6 +213,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
     subject: '',
     message: '',
   });
+  const formStartedRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,6 +235,12 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
 
       if (!response.ok) throw new Error('Failed to submit');
 
+      trackContactFormSubmit({
+        serviceType: formData.product || 'general-inquiry',
+        product: formData.product || undefined,
+        source: 'contact-page',
+      });
+
       setShowSuccess(true);
       setFormData({
         name: '',
@@ -238,6 +257,7 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
       }, 5000);
     } catch (error) {
       console.error('Error submitting contact form:', error);
+      trackFormError({ formId: 'contact', product: formData.product || undefined, message: error instanceof Error ? error.message : undefined });
       setShowError(true);
       setTimeout(() => {
         setShowError(false);
@@ -248,6 +268,10 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if (!formStartedRef.current) {
+      formStartedRef.current = true;
+      trackFormStart({ formId: 'contact' });
+    }
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -564,17 +588,23 @@ export default function Contact({ cmsPage = null, footerData }: ContactProps) {
                   {isSubmitting ? sendingText : submitText}
                 </motion.button>
 
-                <p className={`text-xs text-center text-gray-500 dark:text-gray-400 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                  {privacyPrefix}{' '}
-                  <a href={privacyTermsUrl} className="underline hover:text-primary transition-colors">
-                    {privacyTermsLabel}
-                  </a>
-                  {' '}{privacyConnector}{' '}
-                  <a href={privacyPolicyUrl} className="underline hover:text-primary transition-colors">
-                    {privacyPolicyLabel}
-                  </a>
-                  .
-                </p>
+                {(showTermsLink || showPrivacyLink) && (
+                  <p className={`text-xs text-center text-gray-500 dark:text-gray-400 ${isRTL ? 'font-ibm-plex-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                    {privacyPrefix}{' '}
+                    {showTermsLink && (
+                      <a href={privacyTermsUrl} className="underline hover:text-primary transition-colors">
+                        {privacyTermsLabel}
+                      </a>
+                    )}
+                    {showTermsLink && showPrivacyLink && <>{' '}{privacyConnector}{' '}</>}
+                    {showPrivacyLink && (
+                      <a href={privacyPolicyUrl} className="underline hover:text-primary transition-colors">
+                        {privacyPolicyLabel}
+                      </a>
+                    )}
+                    .
+                  </p>
+                )}
               </motion.form>
             </motion.div>
           </div>

@@ -1,18 +1,7 @@
-import { WhatsAppRequestWizard } from './WhatsAppRequestWizard';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
-import { getCmsPageById } from '@/lib/cms/helpers';
+import { redirect } from 'next/navigation';
 
-export default async function WhatsAppRequestPage() {
-  const snapshot = await getSiteCmsSnapshot();
-  const cmsPage = getCmsPageById(snapshot, 'whatsapp');
-
-  return (
-    <>
-      <Navbar />
-      <WhatsAppRequestWizard cmsPage={cmsPage} />
-      <Footer />
-    </>
-  );
+// وُحِّد فورم الواتساب مع نظام الفورمات (FormConfig) — يُدار من «إدارة الفورمات».
+// هذا المسار القديم يحوّل إلى الفورم الموحّد للحفاظ على أي روابط سابقة.
+export default function WhatsAppRequestRedirect() {
+  redirect('/products/whatsapp/form');
 }

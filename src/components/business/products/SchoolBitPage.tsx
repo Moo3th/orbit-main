@@ -15,14 +15,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TrustedPartners } from "./TrustedPartners";
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CmsPage, CmsPartner } from '@/lib/cms/types';
-import { getCmsField, getCmsSpacing, getCmsMarginBefore, getCmsMarginAfter } from '@/lib/cms/helpers';
+import { getCmsField, getCmsJson, getCmsSpacing, getCmsMarginBefore, getCmsMarginAfter, makeSectionStyle, resolveCtaLink } from '@/lib/cms/helpers';
 import { encodeImagePath } from '@/utils/imagePath';
 import { parseSchoolBitPlans, getDefaultSchoolBitPlans, getDiscountPercent, get3MonthDiscountPercent, getYearlyTotal, get3MonthTotal, parseSchoolBitSmsPlans, getDefaultSchoolBitSmsPlans } from '@/lib/cms/schoolbitPricing';
+import CtaTracker from '@/components/analytics/CtaTracker';
+import { trackProductView, trackPricingView, trackPlanSelected } from '@/lib/analytics/events';
+import { useInViewOnce } from '@/lib/analytics/useInViewOnce';
 
 interface SchoolBitPageProps {
   cmsPage?: CmsPage | null;
   partners?: CmsPartner[];
 }
+
+// الترتيب البصري القانوني لأقسام الصفحة (الهيرو مثبّت أولاً خارج الحاوية المرنة).
+// يُستخدم مع makeSectionStyle لجعل ترتيب/إظهار الأقسام مدفوعًا من لوحة التحكم (flex order).
+const SCHOOLBIT_SECTION_ORDER = [
+  'schoolbit-hero', 'schoolbit-trust', 'schoolbit-partners', 'schoolbit-problem',
+  'schoolbit-benefits', 'schoolbit-roles', 'schoolbit-modules', 'schoolbit-automation',
+  'schoolbit-integrations', 'schoolbit-security', 'schoolbit-pricing', 'schoolbit-outcomes',
+  'schoolbit-cta', 'schoolbit-faq',
+];
 
 const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, Clock, Users, MessageCircle, BarChart3,
@@ -71,52 +83,76 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
   }, [cmsPage, isRTL]);
 
   const benefits = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-benefits', 'benefits_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-benefits', 'benefits_json', '');
     return parseJsonField<{ icon: string; title: string; titleEn: string; desc: string; descEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
 
   const roles = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-roles', 'roles_json', isRTL, '');
-    return parseJsonField<{ key: string; name: string; nameEn: string; icon: string; bullets: string[]; bulletsEn: string[] }>(raw, []);
-  }, [cmsPage, isRTL]);
+    const raw = getCmsJson(cmsPage, 'schoolbit-roles', 'roles_json', '');
+    return parseJsonField<{ key: string; name: string; nameEn: string; icon: string; image?: string; bullets: string[]; bulletsEn: string[] }>(raw, []);
+  }, [cmsPage]);
 
   const modules = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-modules', 'modules_json', isRTL, '');
-    return parseJsonField<{ key: string; label: string; labelEn: string; title: string; titleEn: string; subtitle: string; subtitleEn: string; icon: string; bullets: string[]; bulletsEn: string[] }>(raw, []);
-  }, [cmsPage, isRTL]);
+    const raw = getCmsJson(cmsPage, 'schoolbit-modules', 'modules_json', '');
+    return parseJsonField<{ key: string; label: string; labelEn: string; title: string; titleEn: string; subtitle: string; subtitleEn: string; icon: string; image?: string; bullets: string[]; bulletsEn: string[] }>(raw, []);
+  }, [cmsPage]);
 
   const automationItems = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-automation', 'automation_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-automation', 'automation_json', '');
     return parseJsonField<{ icon: string; title: string; titleEn: string; desc: string; descEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
 
   const integrationItems = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-integrations', 'integrations_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-integrations', 'integrations_json', '');
     return parseJsonField<{ name: string; nameEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
 
   const securityFeatures = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-security', 'features_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-security', 'features_json', '');
     return parseJsonField<{ text: string; textEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
+
+  const permRows = useMemo(() => {
+    const raw = getCmsJson(cmsPage, 'schoolbit-security', 'perm_rows_json', '');
+    return parseJsonField<{ permAr: string; permEn: string; admin: boolean; vice: boolean; teacher: boolean }>(raw, [
+      { permAr: 'إدارة الطلاب', permEn: 'Student Management', admin: true, vice: true, teacher: false },
+      { permAr: 'التقارير', permEn: 'Reports', admin: true, vice: true, teacher: true },
+      { permAr: 'إرسال رسائل', permEn: 'Send Messages', admin: true, vice: true, teacher: false },
+      { permAr: 'إدارة الجداول', permEn: 'Schedule Management', admin: true, vice: true, teacher: false },
+    ]);
+  }, [cmsPage]);
 
   const outcomeItems = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-outcomes', 'outcomes_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-outcomes', 'outcomes_json', '');
     return parseJsonField<{ icon: string; title: string; titleEn: string; desc: string; descEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
 
   const faqItems = useMemo(() => {
-    const raw = getCmsField(cmsPage, 'schoolbit-faq', 'faq_json', isRTL, '');
+    const raw = getCmsJson(cmsPage, 'schoolbit-faq', 'faq_json', '');
     return parseJsonField<{ q: string; qEn: string; a: string; aEn: string }>(raw, []);
-  }, [cmsPage, isRTL]);
+  }, [cmsPage]);
 
+  const secStyle = useMemo(() => makeSectionStyle(cmsPage, SCHOOLBIT_SECTION_ORDER), [cmsPage]);
+
+  // تتبّع GTM: مشاهدة صفحة المنتج عند الدخول، وعرض قسم التسعير عند ظهوره.
+  useEffect(() => { trackProductView('schoolbit'); }, []);
+  const pricingRef = useInViewOnce<HTMLElement>(() => {
+    trackPricingView({
+      serviceType: 'schoolbit',
+      plans: plans.map((p) => ({
+        id: p.isCustom ? 'custom' : (p.nameEn || p.name),
+        name: p.nameEn || p.name,
+        price: p.price ?? undefined,
+      })),
+    });
+  });
+
+  // يقرأ خاصية القسم visible (التي يضبطها زر العين في اللوحة) — لا حقلًا باسم visible.
   const isSectionVisible = useCallback((sectionId: string): boolean => {
     if (!cmsPage?.sections) return true;
     const section = cmsPage.sections.find(s => s.id === sectionId);
     if (!section) return true;
-    const visibleField = section.fields?.find(f => f.key === 'visible');
-    if (visibleField) return visibleField.value !== 'false';
-    return true;
+    return (section as { visible?: boolean }).visible !== false;
   }, [cmsPage]);
 
   const moduleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -159,6 +195,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
       style={{ fontFamily: isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif' }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
+      <CtaTracker />
       {/* ===== HERO SECTION ===== */}
       {isSectionVisible('schoolbit-hero') && (
         <section className={`relative ${getCmsMarginBefore(cmsPage, 'schoolbit-hero', '')} ${getCmsSpacing(cmsPage, 'schoolbit-hero', 'pt-24 pb-16 md:pt-32 md:pb-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-hero', '')} overflow-hidden bg-white`}>
@@ -181,10 +218,10 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
                   <Button asChild className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#FF7A1A]/20 w-full sm:w-auto transform transition-transform hover:scale-105">
-                    <Link href={getCmsField(cmsPage, 'schoolbit-hero', 'cta1_url', isRTL, '#contact') || '#contact'}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta1_text', isRTL, st.hero.cta1)}</Link>
+                    <Link data-cta data-cta-id="schoolbit_hero_primary" href={resolveCtaLink(cmsPage, 'schoolbit-hero', 'cta1', 'schoolbit', isRTL, '#contact')}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta1_text', isRTL, st.hero.cta1)}</Link>
                   </Button>
                   <Button asChild className="bg-transparent border-2 border-[#021E4A] text-[#021E4A] hover:bg-[#021E4A] hover:text-white h-14 px-10 text-lg font-bold rounded-2xl w-full sm:w-auto">
-                    <Link href={getCmsField(cmsPage, 'schoolbit-hero', 'cta2_url', isRTL, '#features') || '#features'}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta2_text', isRTL, st.hero.cta2)}</Link>
+                    <Link data-cta data-cta-id="schoolbit_hero_secondary" href={getCmsField(cmsPage, 'schoolbit-hero', 'cta2_url', isRTL, '#features') || '#features'}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta2_text', isRTL, st.hero.cta2)}</Link>
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-3 pt-2 justify-center lg:justify-start">
@@ -268,9 +305,12 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
         </section>
       )}
 
+      {/* الأقسام القابلة لإعادة الترتيب/الإخفاء من اللوحة (الهيرو مثبّت أعلاه). الترتيب عبر CSS flex order. */}
+      <div className="flex flex-col">
+
       {/* ===== TRUST BAR ===== */}
       {isSectionVisible('schoolbit-trust') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-trust', '')} ${getCmsSpacing(cmsPage, 'schoolbit-trust', 'py-10 md:py-14')} ${getCmsMarginAfter(cmsPage, 'schoolbit-trust', '')} bg-white border-y border-[#E3E7EF]`}>
+        <section style={secStyle('schoolbit-trust')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-trust', '')} ${getCmsSpacing(cmsPage, 'schoolbit-trust', 'py-10 md:py-14')} ${getCmsMarginAfter(cmsPage, 'schoolbit-trust', '')} bg-white border-y border-[#E3E7EF]`}>
           <div className="container mx-auto px-4 md:px-6">
             <p className="text-center text-sm text-slate-500 font-medium mb-8">
               {getCmsField(cmsPage, 'schoolbit-trust', 'title', isRTL, st.trust.title)}
@@ -294,11 +334,15 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
         </section>
       )}
 
-      <TrustedPartners partners={partners} />
+      {isSectionVisible('schoolbit-partners') && (
+        <div style={secStyle('schoolbit-partners')}>
+          <TrustedPartners partners={partners} />
+        </div>
+      )}
 
       {/* ===== PROBLEM / VALUE SECTION ===== */}
       {isSectionVisible('schoolbit-problem') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-problem', '')} ${getCmsSpacing(cmsPage, 'schoolbit-problem', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-problem', '')} bg-[#F7F9FC]`}>
+        <section style={secStyle('schoolbit-problem')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-problem', '')} ${getCmsSpacing(cmsPage, 'schoolbit-problem', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-problem', '')} bg-[#F7F9FC]`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A] mb-4`}>
@@ -332,7 +376,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== BENEFITS GRID ===== */}
       {isSectionVisible('schoolbit-benefits') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-benefits', '')} ${getCmsSpacing(cmsPage, 'schoolbit-benefits', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-benefits', '')} bg-white`}>
+        <section style={secStyle('schoolbit-benefits')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-benefits', '')} ${getCmsSpacing(cmsPage, 'schoolbit-benefits', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-benefits', '')} bg-white`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A]`}>
@@ -366,7 +410,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== ROLE-BASED TABS ===== */}
       {isSectionVisible('schoolbit-roles') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-roles', '')} ${getCmsSpacing(cmsPage, 'schoolbit-roles', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-roles', '')} bg-[#F7F9FC]`}>
+        <section style={secStyle('schoolbit-roles')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-roles', '')} ${getCmsSpacing(cmsPage, 'schoolbit-roles', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-roles', '')} bg-[#F7F9FC]`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto mb-10">
               <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A]`}>
@@ -381,7 +425,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                       const Icon = getIcon(role.icon);
                       return (
                         <button
-                          key={role.key}
+                          key={role.key || `role-${i}`}
                           onClick={() => setActiveRoleTab(i)}
                           className={`flex items-center gap-2 px-4 md:px-6 py-3 rounded-xl font-semibold text-sm transition-all whitespace-nowrap ${
                             activeRoleTab === i
@@ -414,24 +458,36 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                           </div>
                         ))}
                       </div>
-                      <div className="bg-[#F7F9FC] rounded-2xl p-6 border border-[#E3E7EF]">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-xl bg-[#1B6BF1] flex items-center justify-center">
-                            {React.createElement(getIcon(roles[activeRoleTab]?.icon || 'LayoutDashboard'), { className: 'w-5 h-5 text-white' })}
-                          </div>
-                          <span className="font-bold text-[#021E4A]">{isRTL ? roles[activeRoleTab]?.name : (roles[activeRoleTab]?.nameEn || roles[activeRoleTab]?.name)}</span>
+                      {roles[activeRoleTab]?.image ? (
+                        <div className="relative rounded-2xl overflow-hidden border border-[#E3E7EF] bg-white">
+                          <Image
+                            src={encodeImagePath(roles[activeRoleTab]!.image as string)}
+                            alt={isRTL ? (roles[activeRoleTab]?.name || '') : (roles[activeRoleTab]?.nameEn || roles[activeRoleTab]?.name || '')}
+                            width={560}
+                            height={420}
+                            className="w-full h-auto object-cover"
+                          />
                         </div>
-                        <div className="space-y-3">
-                          {[1, 2, 3].map((_, i) => (
-                            <div key={i} className="bg-white rounded-xl p-3 border border-[#E3E7EF]">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-[#1B6BF1] rounded-full" />
-                                <div className="h-2 bg-slate-200 rounded flex-1" style={{ width: `${70 - i * 15}%` }} />
-                              </div>
+                      ) : (
+                        <div className="bg-[#F7F9FC] rounded-2xl p-6 border border-[#E3E7EF]">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-[#1B6BF1] flex items-center justify-center">
+                              {React.createElement(getIcon(roles[activeRoleTab]?.icon || 'LayoutDashboard'), { className: 'w-5 h-5 text-white' })}
                             </div>
-                          ))}
+                            <span className="font-bold text-[#021E4A]">{isRTL ? roles[activeRoleTab]?.name : (roles[activeRoleTab]?.nameEn || roles[activeRoleTab]?.name)}</span>
+                          </div>
+                          <div className="space-y-3">
+                            {[1, 2, 3].map((_, i) => (
+                              <div key={i} className="bg-white rounded-xl p-3 border border-[#E3E7EF]">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-[#1B6BF1] rounded-full" />
+                                  <div className="h-2 bg-slate-200 rounded flex-1" style={{ width: `${70 - i * 15}%` }} />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -447,7 +503,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
         const CurrentIcon = getIcon(currentModule?.icon || 'LayoutDashboard');
 
         return (
-          <section id="features" className={`${getCmsMarginBefore(cmsPage, 'schoolbit-modules', '')} ${getCmsSpacing(cmsPage, 'schoolbit-modules', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-modules', '')} bg-[#F7F9FC]`}>
+          <section id="features" style={secStyle('schoolbit-modules')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-modules', '')} ${getCmsSpacing(cmsPage, 'schoolbit-modules', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-modules', '')} bg-[#F7F9FC]`}>
             <div className="container mx-auto px-4 md:px-6">
               <div className="text-center max-w-2xl mx-auto mb-10">
                 <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A]`}>
@@ -461,7 +517,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                     const isActive = activeModuleTab === i;
                     return (
                       <button
-                        key={mod.key}
+                        key={mod.key || `mod-${i}`}
                         onClick={() => handleModuleTabClick(i)}
                         className={`flex items-center gap-2 px-4 md:px-6 py-3 rounded-xl font-semibold text-sm transition-all whitespace-nowrap ${
                           isActive ? 'bg-[#1B6BF1] text-white shadow-md' : 'text-slate-500 hover:text-[#021E4A] hover:bg-slate-50'
@@ -484,24 +540,36 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                   className="grid lg:grid-cols-2 gap-8 md:gap-16 items-center"
                 >
                   <div>
-                    <div className="bg-white rounded-2xl shadow-xl border border-[#E3E7EF] p-6 md:p-8 max-w-md mx-auto">
-                      <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#E3E7EF]">
-                        <div className="w-10 h-10 rounded-xl bg-[#1B6BF1] flex items-center justify-center">
-                          <CurrentIcon className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-bold text-[#021E4A]">{isRTL ? currentModule.title : (currentModule.titleEn || currentModule.title)}</span>
+                    {(currentModule as { image?: string }).image ? (
+                      <div className="relative rounded-2xl overflow-hidden shadow-xl border border-[#E3E7EF] bg-white max-w-md mx-auto">
+                        <Image
+                          src={encodeImagePath((currentModule as { image?: string }).image as string)}
+                          alt={isRTL ? currentModule.title : (currentModule.titleEn || currentModule.title)}
+                          width={480}
+                          height={420}
+                          className="w-full h-auto object-cover"
+                        />
                       </div>
-                      <div className="space-y-3">
-                        {(isRTL ? currentModule.bullets : (currentModule.bulletsEn || currentModule.bullets)).slice(0, 4).map((_: string, bi: number) => (
-                          <div key={bi} className="bg-[#F7F9FC] rounded-lg p-3 border border-[#E3E7EF]">
-                            <div className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 bg-[#1B6BF1] rounded-full" />
-                              <div className="h-2 bg-slate-200 rounded flex-1" style={{ width: `${80 - bi * 10}%` }} />
-                            </div>
+                    ) : (
+                      <div className="bg-white rounded-2xl shadow-xl border border-[#E3E7EF] p-6 md:p-8 max-w-md mx-auto">
+                        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#E3E7EF]">
+                          <div className="w-10 h-10 rounded-xl bg-[#1B6BF1] flex items-center justify-center">
+                            <CurrentIcon className="w-5 h-5 text-white" />
                           </div>
-                        ))}
+                          <span className="font-bold text-[#021E4A]">{isRTL ? currentModule.title : (currentModule.titleEn || currentModule.title)}</span>
+                        </div>
+                        <div className="space-y-3">
+                          {(isRTL ? currentModule.bullets : (currentModule.bulletsEn || currentModule.bullets)).slice(0, 4).map((_: string, bi: number) => (
+                            <div key={bi} className="bg-[#F7F9FC] rounded-lg p-3 border border-[#E3E7EF]">
+                              <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 bg-[#1B6BF1] rounded-full" />
+                                <div className="h-2 bg-slate-200 rounded flex-1" style={{ width: `${80 - bi * 10}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <div>
                     <span className="inline-flex items-center gap-1.5 bg-[#0EA8F1]/10 border border-[#0EA8F1]/20 rounded-full px-3 py-1 text-xs font-semibold text-[#0EA8F1] mb-4">
@@ -543,7 +611,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== AUTOMATION SECTION ===== */}
       {isSectionVisible('schoolbit-automation') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-automation', '')} ${getCmsSpacing(cmsPage, 'schoolbit-automation', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-automation', '')} bg-gradient-to-br from-[#021E4A] to-[#061437] text-white relative overflow-hidden`}>
+        <section style={secStyle('schoolbit-automation')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-automation', '')} ${getCmsSpacing(cmsPage, 'schoolbit-automation', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-automation', '')} bg-gradient-to-br from-[#021E4A] to-[#061437] text-white relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#1B6BF1]/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -577,7 +645,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== INTEGRATIONS SECTION ===== */}
       {isSectionVisible('schoolbit-integrations') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-integrations', '')} ${getCmsSpacing(cmsPage, 'schoolbit-integrations', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-integrations', '')} bg-white`}>
+        <section style={secStyle('schoolbit-integrations')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-integrations', '')} ${getCmsSpacing(cmsPage, 'schoolbit-integrations', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-integrations', '')} bg-white`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
@@ -602,33 +670,28 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== SECURITY & PERMISSIONS ===== */}
       {isSectionVisible('schoolbit-security') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-security', '')} ${getCmsSpacing(cmsPage, 'schoolbit-security', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-security', '')} bg-[#F7F9FC]`}>
+        <section style={secStyle('schoolbit-security')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-security', '')} ${getCmsSpacing(cmsPage, 'schoolbit-security', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-security', '')} bg-[#F7F9FC]`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="bg-white rounded-2xl shadow-xl border border-[#E3E7EF] p-6">
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b">
                   <Shield className="w-6 h-6 text-[#1B6BF1]" />
-                  <h4 className={`${headingFontClass} font-bold text-[#021E4A]`}>{isRTL ? 'إدارة الصلاحيات' : 'Permission Management'}</h4>
+                  <h4 className={`${headingFontClass} font-bold text-[#021E4A]`}>{getCmsField(cmsPage, 'schoolbit-security', 'perm_title', isRTL, isRTL ? 'إدارة الصلاحيات' : 'Permission Management')}</h4>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#E3E7EF]">
-                        <th className="py-2 text-start text-slate-500 font-medium">{isRTL ? 'الصلاحية' : 'Permission'}</th>
-                        <th className="py-2 text-center text-slate-500 font-medium">{isRTL ? 'المدير' : 'Principal'}</th>
-                        <th className="py-2 text-center text-slate-500 font-medium">{isRTL ? 'وكيل' : 'Vice'}</th>
-                        <th className="py-2 text-center text-slate-500 font-medium">{isRTL ? 'معلم' : 'Teacher'}</th>
+                        <th className="py-2 text-start text-slate-500 font-medium">{getCmsField(cmsPage, 'schoolbit-security', 'col_perm', isRTL, isRTL ? 'الصلاحية' : 'Permission')}</th>
+                        <th className="py-2 text-center text-slate-500 font-medium">{getCmsField(cmsPage, 'schoolbit-security', 'col_admin', isRTL, isRTL ? 'المدير' : 'Principal')}</th>
+                        <th className="py-2 text-center text-slate-500 font-medium">{getCmsField(cmsPage, 'schoolbit-security', 'col_vice', isRTL, isRTL ? 'وكيل' : 'Vice')}</th>
+                        <th className="py-2 text-center text-slate-500 font-medium">{getCmsField(cmsPage, 'schoolbit-security', 'col_teacher', isRTL, isRTL ? 'معلم' : 'Teacher')}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { perm: isRTL ? 'إدارة الطلاب' : 'Student Management', admin: true, vice: true, teacher: false },
-                        { perm: isRTL ? 'التقارير' : 'Reports', admin: true, vice: true, teacher: true },
-                        { perm: isRTL ? 'إرسال رسائل' : 'Send Messages', admin: true, vice: true, teacher: false },
-                        { perm: isRTL ? 'إدارة الجداول' : 'Schedule Management', admin: true, vice: true, teacher: false },
-                      ].map((row, i) => (
+                      {permRows.map((row, i) => (
                         <tr key={i} className="border-b border-[#E3E7EF]/50">
-                          <td className="py-2.5 text-slate-700 font-medium">{row.perm}</td>
+                          <td className="py-2.5 text-slate-700 font-medium">{isRTL ? row.permAr : (row.permEn || row.permAr)}</td>
                           <td className="py-2.5 text-center">{row.admin ? <Check className="w-4 h-4 text-[#1B6BF1] mx-auto" /> : <span className="text-slate-300">&mdash;</span>}</td>
                           <td className="py-2.5 text-center">{row.vice ? <Check className="w-4 h-4 text-[#1B6BF1] mx-auto" /> : <span className="text-slate-300">&mdash;</span>}</td>
                           <td className="py-2.5 text-center">{row.teacher ? <Check className="w-4 h-4 text-[#1B6BF1] mx-auto" /> : <span className="text-slate-300">&mdash;</span>}</td>
@@ -640,11 +703,11 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                 <div className="flex gap-3 mt-4">
                   <div className="bg-[#F7F9FC] rounded-lg p-3 border border-[#E3E7EF] text-center flex-1">
                     <Lock className="w-4 h-4 text-[#1B6BF1] mx-auto mb-1" />
-                    <span className="text-xs text-slate-600">2FA</span>
+                    <span className="text-xs text-slate-600">{getCmsField(cmsPage, 'schoolbit-security', 'badge_2fa', isRTL, '2FA')}</span>
                   </div>
                   <div className="bg-[#F7F9FC] rounded-lg p-3 border border-[#E3E7EF] text-center flex-1">
                     <Shield className="w-4 h-4 text-[#1B6BF1] mx-auto mb-1" />
-                    <span className="text-xs text-slate-600">{isRTL ? '37 صلاحية' : '37 Permissions'}</span>
+                    <span className="text-xs text-slate-600">{getCmsField(cmsPage, 'schoolbit-security', 'badge_permissions', isRTL, isRTL ? '37 صلاحية' : '37 Permissions')}</span>
                   </div>
                 </div>
               </div>
@@ -676,7 +739,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== PRICING SECTION ===== */}
       {isSectionVisible('schoolbit-pricing') && (
-        <section id="pricing" className={`${getCmsMarginBefore(cmsPage, 'schoolbit-pricing', '')} ${getCmsSpacing(cmsPage, 'schoolbit-pricing', 'py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-pricing', '')} bg-white`}>
+        <section id="pricing" ref={pricingRef} style={secStyle('schoolbit-pricing')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-pricing', '')} ${getCmsSpacing(cmsPage, 'schoolbit-pricing', 'py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-pricing', '')} bg-white`}>
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
               <h2 className={`${headingFontClass} text-3xl md:text-5xl font-extrabold text-[#021E4A] mb-4`}>
@@ -813,9 +876,9 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                       }`}
                     >
                       {plan.isCustom ? (
-                        <Link href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/contact'}>{isRTL ? plan.name : plan.nameEn}</Link>
+                        <Link href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/products/schoolbit/form'} onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: 'custom', planName: plan.nameEn || plan.name })}>{isRTL ? plan.name : plan.nameEn}</Link>
                       ) : (
-                        <a href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || 'https://schoolbit.corbit.sa/'} target="_blank" rel="noopener noreferrer">{plan.featured ? (isRTL ? 'ابدأ الآن' : 'Start Now') : (isRTL ? 'اختر الباقة' : 'Choose Plan')}</a>
+                        <a href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/products/schoolbit/form'} target="_blank" rel="noopener noreferrer" onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: plan.nameEn || plan.name, planName: plan.nameEn || plan.name, price: plan.price ?? undefined })}>{plan.featured ? (isRTL ? 'ابدأ الآن' : 'Start Now') : (isRTL ? 'اختر الباقة' : 'Choose Plan')}</a>
                       )}
                     </Button>
                   </div>
@@ -872,7 +935,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== OUTCOMES SECTION ===== */}
       {isSectionVisible('schoolbit-outcomes') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-outcomes', '')} ${getCmsSpacing(cmsPage, 'schoolbit-outcomes', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-outcomes', '')} bg-[#F7F9FC]`}>
+        <section style={secStyle('schoolbit-outcomes')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-outcomes', '')} ${getCmsSpacing(cmsPage, 'schoolbit-outcomes', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-outcomes', '')} bg-[#F7F9FC]`}>
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A]`}>
@@ -899,7 +962,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== FINAL CTA ===== */}
       {isSectionVisible('schoolbit-cta') && (
-        <section className={`bg-[#021E4A] ${getCmsMarginBefore(cmsPage, 'schoolbit-cta', '')} ${getCmsSpacing(cmsPage, 'schoolbit-cta', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-cta', '')} relative overflow-hidden`}>
+        <section style={secStyle('schoolbit-cta')} className={`bg-[#021E4A] ${getCmsMarginBefore(cmsPage, 'schoolbit-cta', '')} ${getCmsSpacing(cmsPage, 'schoolbit-cta', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-cta', '')} relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
           <div className="container mx-auto px-4 md:px-6 relative z-10 text-center max-w-4xl">
@@ -928,7 +991,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild className="bg-[#FF7A1A] hover:bg-[#e56a0f] text-white h-14 px-10 text-lg font-bold rounded-2xl shadow-xl shadow-[#FF7A1A]/20 transform transition-transform hover:scale-105">
-                <Link href={getCmsField(cmsPage, 'schoolbit-cta', 'button_url', isRTL, st.finalCta.ctaUrl) || '#contact'}>{getCmsField(cmsPage, 'schoolbit-cta', 'button_text', isRTL, st.finalCta.cta)}</Link>
+                <Link data-cta data-cta-id="schoolbit_final_cta" href={resolveCtaLink(cmsPage, 'schoolbit-cta', 'button', 'schoolbit', isRTL, st.finalCta.ctaUrl || '#contact')}>{getCmsField(cmsPage, 'schoolbit-cta', 'button_text', isRTL, st.finalCta.cta)}</Link>
               </Button>
               <Button asChild className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#021E4A] h-14 px-10 text-lg font-bold rounded-2xl">
                 <Link href={getCmsField(cmsPage, 'schoolbit-cta', 'secondary_url', isRTL, st.finalCta.secondaryUrl) || '#'}>{getCmsField(cmsPage, 'schoolbit-cta', 'secondary_text', isRTL, st.finalCta.secondary)}</Link>
@@ -943,7 +1006,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
 
       {/* ===== FAQ SECTION ===== */}
       {isSectionVisible('schoolbit-faq') && (
-        <section className={`${getCmsMarginBefore(cmsPage, 'schoolbit-faq', '')} ${getCmsSpacing(cmsPage, 'schoolbit-faq', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-faq', '')} bg-white`}>
+        <section style={secStyle('schoolbit-faq')} className={`${getCmsMarginBefore(cmsPage, 'schoolbit-faq', '')} ${getCmsSpacing(cmsPage, 'schoolbit-faq', 'py-20 md:py-24')} ${getCmsMarginAfter(cmsPage, 'schoolbit-faq', '')} bg-white`}>
           <div className="container mx-auto px-4 md:px-6 max-w-3xl">
             <div className="text-center mb-10">
               <h2 className={`${headingFontClass} text-3xl md:text-4xl font-bold text-[#021E4A]`}>
@@ -984,6 +1047,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 };

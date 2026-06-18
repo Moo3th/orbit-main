@@ -7,9 +7,9 @@
  * - Google Analytics 4 (GA4)
  */
 
-type EventParams = Record<string, unknown>;
+import { hasAnalyticsConsent, hasAdsConsent } from './consent';
 
-type CookieConsentChangedEvent = CustomEvent<{ consent?: boolean }>;
+type EventParams = Record<string, unknown>;
 
 declare global {
   interface Window {
@@ -18,14 +18,9 @@ declare global {
   }
 }
 
-function hasConsent(): boolean {
-  if (typeof window === 'undefined') return false;
-  const storedConsent = localStorage.getItem('cookie-consent');
-  return storedConsent === 'accepted';
-}
-
+// طبقة التحليلات (GTM dataLayer + GA4): تُطلق عند موافقة 'accepted' أو 'necessary'.
 function pushToDataLayer(event: string, params?: EventParams) {
-  if (typeof window === 'undefined' || !hasConsent()) {
+  if (typeof window === 'undefined' || !hasAnalyticsConsent()) {
     return;
   }
 
@@ -38,7 +33,7 @@ function pushToDataLayer(event: string, params?: EventParams) {
 }
 
 function pushGtag(event: string, params?: EventParams) {
-  if (typeof window === 'undefined' || !hasConsent()) {
+  if (typeof window === 'undefined' || !hasAnalyticsConsent()) {
     return;
   }
 
@@ -47,8 +42,9 @@ function pushGtag(event: string, params?: EventParams) {
   }
 }
 
+// طبقة الإعلانات (Meta Pixel): تُطلق عند موافقة 'accepted' فقط.
 function pushMetaPixel(event: string, params?: EventParams) {
-  if (typeof window === 'undefined' || !hasConsent()) {
+  if (typeof window === 'undefined' || !hasAdsConsent()) {
     return;
   }
 
@@ -105,32 +101,9 @@ export function trackContactFormSubmit(params: {
   });
 }
 
-/**
- * Track WhatsApp service request
- * GTM: whatsapp_request_submit
- * GA4: generate_lead
- * Meta: Lead
- */
-export function trackWhatsAppRequestSubmit(params: {
-  planId: string;
-  tierId: string;
-  industry?: string;
-}) {
-  const gtmParams = {
-    form_id: 'whatsapp_request',
-    plan_id: params.planId,
-    tier_id: params.tierId,
-    industry: params.industry || 'unknown',
-  };
-
-  pushToDataLayer('whatsapp_request_submit', gtmParams);
-  pushGtag('generate_lead', gtmParams);
-  pushMetaPixel('Lead', {
-    content_name: 'WhatsApp Service Request',
-    content_category: 'Lead',
-    content_ids: [params.planId],
-  });
-}
+// ملاحظة: طلب خدمة واتساب لم يَعُد له حدثٌ منفصل (whatsapp_request_submit).
+// وُحِّد مع حدث الفورمات العام form_submit (product: 'whatsapp') — راجع GTM_TRACKING_SPEC.md.
+// فورم الواتساب الحيّ (/products/whatsapp/form عبر DynamicFormPage) يُطلق form_submit بالفعل.
 
 /**
  * Track CTA button click
@@ -167,7 +140,7 @@ export function trackCTAClick(params: {
  * Meta: ViewContent
  */
 export function trackPricingView(params: {
-  serviceType: 'sms' | 'whatsapp' | 'o-time' | 'gov-gate';
+  serviceType: 'sms' | 'whatsapp' | 'o-time' | 'gov-gate' | 'schoolbit';
   plans: Array<{ id: string; name: string; price?: number }>;
 }) {
   const gtmParams = {
@@ -196,7 +169,7 @@ export function trackPricingView(params: {
  * Meta: ViewContent
  */
 export function trackPlanSelected(params: {
-  serviceType: 'sms' | 'whatsapp' | 'o-time' | 'gov-gate';
+  serviceType: 'sms' | 'whatsapp' | 'o-time' | 'gov-gate' | 'schoolbit';
   planId: string;
   planName: string;
   price?: number;
@@ -227,6 +200,77 @@ export function trackOutboundLink(url: string, linkText?: string) {
   pushToDataLayer('outbound_click', {
     link_url: url,
     link_text: linkText || '',
+  });
+}
+
+// المفردات القانونية الموحّدة لمعرّف المنتج عبر الموقع كله (راجع GTM_TRACKING_SPEC.md).
+export type ProductSlug = 'sms' | 'whatsapp' | 'otime' | 'govgate' | 'schoolbit';
+
+/**
+ * Track product page view
+ * GTM: product_view
+ * GA4: view_item (يحمل معرّف المنتج القانوني — قيمة لا يوفّرها page_view)
+ */
+export function trackProductView(product: ProductSlug) {
+  const params = {
+    product,
+    page_path: typeof window !== 'undefined' ? window.location.pathname : '',
+  };
+
+  pushToDataLayer('product_view', params);
+  pushGtag('view_item', { items: [{ item_id: product, item_category: 'product' }] });
+}
+
+/**
+ * Track form start (first interaction with a form)
+ * GTM: form_start
+ */
+export function trackFormStart(params: { formId: string; product?: string }) {
+  pushToDataLayer('form_start', {
+    form_id: params.formId,
+    product: params.product || 'unknown',
+  });
+}
+
+/**
+ * Track successful form submission (lead)
+ * GTM: form_submit
+ * GA4: generate_lead
+ * Meta: Lead (خلف موافقة الإعلانات)
+ */
+export function trackFormSubmit(params: {
+  formId: string;
+  product?: string;
+  serviceType?: string;
+  source?: string;
+  packageName?: string;
+}) {
+  const gtmParams = {
+    form_id: params.formId,
+    product: params.product || 'unknown',
+    service_type: params.serviceType || params.product || 'other',
+    source: params.source || params.formId,
+    package_name: params.packageName || '',
+  };
+
+  pushToDataLayer('form_submit', gtmParams);
+  pushGtag('generate_lead', gtmParams);
+  pushMetaPixel('Lead', {
+    content_name: params.formId,
+    content_category: 'Lead',
+    service_type: gtmParams.service_type,
+  });
+}
+
+/**
+ * Track failed form submission
+ * GTM: form_error
+ */
+export function trackFormError(params: { formId: string; product?: string; message?: string }) {
+  pushToDataLayer('form_error', {
+    form_id: params.formId,
+    product: params.product || 'unknown',
+    error_message: params.message || '',
   });
 }
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { trackFormStart, trackFormSubmit, trackFormError } from '@/lib/analytics/events';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
@@ -64,6 +65,7 @@ function RequestQuoteFormInner({ cmsPage }: { cmsPage: CmsPage | null }) {
   });
 
   const [source, setSource] = useState<string>('');
+  const formStartedRef = useRef(false);
 
   // ── CMS-backed content (with safe fallbacks) ──
   const fontFamily = isRTL ? 'IBM Plex Sans Arabic, sans-serif' : 'IBM Plex Sans, sans-serif';
@@ -176,6 +178,14 @@ function RequestQuoteFormInner({ cmsPage }: { cmsPage: CmsPage | null }) {
 
       if (!response.ok) throw new Error('Failed to submit');
 
+      trackFormSubmit({
+        formId: 'request_quote',
+        product: formData.serviceType || undefined,
+        serviceType: formData.serviceType || undefined,
+        source: source || 'general',
+        packageName: formData.packageName || undefined,
+      });
+
       setShowSuccess(true);
       setFormData({
         name: '', email: '', phone: '', company: '', serviceType: '', message: '',
@@ -185,6 +195,7 @@ function RequestQuoteFormInner({ cmsPage }: { cmsPage: CmsPage | null }) {
       setTimeout(() => { window.location.href = '/'; }, 3000);
     } catch (error) {
       console.error('Error submitting inquiry:', error);
+      trackFormError({ formId: 'request_quote', product: formData.serviceType || undefined, message: error instanceof Error ? error.message : undefined });
       setShowError(true);
     } finally {
       setIsSubmitting(false);
@@ -194,6 +205,10 @@ function RequestQuoteFormInner({ cmsPage }: { cmsPage: CmsPage | null }) {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
+    if (!formStartedRef.current) {
+      formStartedRef.current = true;
+      trackFormStart({ formId: 'request_quote', product: formData.serviceType || undefined });
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 

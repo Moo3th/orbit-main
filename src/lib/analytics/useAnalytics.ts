@@ -1,6 +1,6 @@
 'use client';
 
-import { trackContactFormSubmit, trackWhatsAppRequestSubmit, sendConversionAPIEvent } from '@/lib/analytics/events';
+import { trackContactFormSubmit, trackFormSubmit, sendConversionAPIEvent } from '@/lib/analytics/events';
 
 interface TrackContactFormOptions {
   serviceType: string;
@@ -51,10 +51,13 @@ export function useAnalytics() {
   };
 
   const trackWhatsAppRequest = async (options: TrackWhatsAppRequestOptions) => {
-    trackWhatsAppRequestSubmit({
-      planId: options.planId,
-      tierId: options.tierId,
-      industry: options.industry,
+    // مُوحَّد مع المواصفات: حدث form_submit العام (product: 'whatsapp') بدل whatsapp_request_submit المنفصل.
+    trackFormSubmit({
+      formId: 'whatsapp',
+      product: 'whatsapp',
+      serviceType: 'whatsapp',
+      source: 'whatsapp_request',
+      packageName: options.planId,
     });
 
     if (options.email || options.phone) {

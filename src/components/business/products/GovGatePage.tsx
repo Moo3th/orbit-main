@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Building2, 
@@ -19,7 +19,9 @@ import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/business/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { CmsPage } from '@/lib/cms/types';
-import { getCmsField } from '@/lib/cms/helpers';
+import { getCmsField, getCmsJson, resolveCtaLink } from '@/lib/cms/helpers';
+import CtaTracker from '@/components/analytics/CtaTracker';
+import { trackProductView } from '@/lib/analytics/events';
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <motion.div 
@@ -57,7 +59,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
   const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const g = t.products.govgate;
   
-  const slidesJson = getCmsField(cmsPage, 'gg-hero', 'slides_json', isRTL, '');
+  const slidesJson = getCmsJson(cmsPage, 'gg-hero', 'slides_json', '');
   const slides = React.useMemo(() => {
     try {
       if (slidesJson) {
@@ -93,18 +95,22 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
   const heroTitle = isRTL ? currentSlide.titleAr : currentSlide.titleEn;
   const heroDescription = isRTL ? currentSlide.descAr : currentSlide.descEn;
   const ctaText = isRTL ? currentSlide.ctaTextAr : currentSlide.ctaTextEn;
-  const ctaUrl = currentSlide.ctaUrl || "/products/gov-gate/form";
+  const ctaUrl = resolveCtaLink(cmsPage, 'gg-cta', 'cta', 'gov-gate', isRTL, currentSlide.ctaUrl || "/products/gov-gate/form");
 
   const heroSubtitle = getCmsField(cmsPage, 'gg-hero', 'subtitle', isRTL, g.heroSubtitle);
   const finalCtaTitle = getCmsField(cmsPage, 'gg-cta', 'final_cta_title', isRTL, g.finalCta.title);
   const finalCtaDescription = getCmsField(cmsPage, 'gg-cta', 'final_cta_description', isRTL, g.finalCta.description);
 
+  // تتبّع GTM: مشاهدة صفحة المنتج عند الدخول.
+  useEffect(() => { trackProductView('govgate'); }, []);
+
   return (
-    <div 
-      className={`min-h-screen ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} bg-slate-50`} 
+    <div
+      className={`min-h-screen ${isRTL ? 'font-ibm-plex-arabic' : 'font-ibm-plex'} bg-slate-50`}
       style={{ fontFamily: isRTL ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif' }}
       dir={isRTL ? "rtl" : "ltr"}
     >
+      <CtaTracker />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-[#0A2647] text-white min-h-[600px] flex items-center">
         {/* Background Overlay */}
@@ -151,7 +157,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
                     className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-10 py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all rounded-2xl"
                     asChild
                   >
-                    <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
+                    <a data-cta data-cta-id="govgate_hero" href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
                       {ctaText}
                       {isRTL ? <ArrowLeft className="mr-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
                     </a>
@@ -185,7 +191,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             {(() => {
-               const json = getCmsField(cmsPage, 'gg-features', 'features_json', isRTL, '');
+               const json = getCmsJson(cmsPage, 'gg-features', 'features_json', '');
                try {
                  if (json) {
                    const items = JSON.parse(json);
@@ -330,7 +336,7 @@ export const GovGatePage = ({ cmsPage = null }: GovGatePageProps) => {
             className="bg-[#FFA502] hover:bg-[#E59400] text-[#0A2647] font-bold text-lg px-10 py-6 h-auto shadow-lg"
             asChild
           >
-            <a href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
+            <a data-cta data-cta-id="govgate_final_cta" href={ctaUrl} target={ctaUrl.startsWith('http') ? "_blank" : undefined} rel={ctaUrl.startsWith('http') ? "noopener noreferrer" : undefined}>
               {ctaText}
             </a>
           </Button>

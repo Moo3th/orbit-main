@@ -16,6 +16,7 @@ import {
   BarChart3, PieChart as PieChartIcon
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { FORM_THEME_PRESET_LIST, type FormThemeColors } from '@/lib/forms/themePresets';
 
 export type FormFieldType = 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio' | 'rating' | 'scale' | 'date' | 'time' | 'file' | 'richtext' | 'spacing' | 'divider';
 
@@ -87,7 +88,7 @@ const PRODUCTS = [
 ];
 
 const FORM_URLS: Record<string, string> = {
-  whatsapp: '/products/whatsapp/request',
+  whatsapp: '/products/whatsapp/form',
   otime: '/products/o-time/form',
   govgate: '/products/gov-gate/form',
 };
@@ -195,6 +196,22 @@ export const FormBuilderView = ({ isAr }: Props) => {
   const [successColor, setSuccessColor] = useState('#16a34a');
   const [showRefillButton, setShowRefillButton] = useState(false);
   const [showBackToFormButton, setShowBackToFormButton] = useState(false);
+  // تطبيق ثيم جاهز (preset) — يملأ كل حقول الألوان دفعةً واحدة. (التحكّم اليدوي يبقى متاحًا)
+  const applyThemePreset = useCallback((c: FormThemeColors) => {
+    setPrimaryColor(c.primaryColor);
+    setButtonTextColor(c.buttonTextColor);
+    setButtonHoverColor(c.buttonHoverColor);
+    setOptionSelectedTextColor(c.optionSelectedTextColor);
+    setFormBgColor(c.formBgColor);
+    setFormCardBgColor(c.formCardBgColor);
+    setFormTitleColor(c.formTitleColor);
+    setFieldLabelColor(c.fieldLabelColor);
+    setFieldBorderColor(c.fieldBorderColor);
+    setOptionBgColor(c.optionBgColor);
+    setOptionBorderColor(c.optionBorderColor);
+    setOptionTextColor(c.optionTextColor);
+    setSuccessColor(c.successColor);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -1136,6 +1153,22 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
 
             <div className="pt-2 space-y-3 border-t">
               <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t('ألوان الأزرار والخيارات', 'Buttons & Options Colors')}</h4>
+              {/* ثيمات جاهزة: نقرة واحدة تطبّق هوية المنتج على كل الألوان (يبقى التحكّم اليدوي أدناه) */}
+              <div className="flex flex-wrap items-center gap-2 bg-gray-50 rounded-lg p-2.5 border">
+                <span className="text-[10px] font-bold text-gray-500 me-1">{t('ثيم جاهز:', 'Quick theme:')}</span>
+                {FORM_THEME_PRESET_LIST.map((preset) => (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    onClick={() => applyThemePreset(preset.colors)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border hover:border-gray-400 hover:shadow-sm transition-all"
+                    title={t('طبّق ثيم', 'Apply theme') + ' ' + (t(preset.labelAr, preset.labelEn))}
+                  >
+                    <span className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ backgroundColor: preset.colors.primaryColor }} />
+                    {t(preset.labelAr, preset.labelEn)}
+                  </button>
+                ))}
+              </div>
               <div className="grid grid-cols-4 gap-3">
                 <div>
                   <label className="text-[10px] text-gray-500 block mb-1">{t('اللون الأساسي', 'Primary Color')}</label>

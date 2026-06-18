@@ -166,6 +166,33 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(180deg, #5a1623 0%, var(--color-primary) 100%);
 }
 
+/* صفحة واتساب الداكنة: شريط تمرير أخضر يناسب هويتها بدل اللون العنابي */
+html.wa-page::-webkit-scrollbar-track {
+  background: #0b1f1c;
+}
+html.wa-page::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #25D366 0%, #128C7E 100%);
+}
+html.wa-page::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #128C7E 0%, #25D366 100%);
+}
+html.wa-page {
+  scrollbar-color: #1ea952 #0b1f1c; /* Firefox: إبهام/مسار */
+}
+
+/* إخفاء شريط التمرير المخصّص على الجوال (التمرير باللمس يبقى يعمل) */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+}
+
 /* Selection color - ORBIT Brand (Burgundy) */
 ::selection {
   background-color: var(--color-primary);

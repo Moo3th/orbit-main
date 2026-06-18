@@ -3,29 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/business/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/business/ui/card';
+import { getConsentLevel, CONSENT_STORAGE_KEY } from '@/lib/analytics/consent';
 
 interface PrivacyConsentProps {
   onConsentChange?: (consent: { analytics: boolean; ads: boolean }) => void;
 }
 
-const CONSENT_STORAGE_KEY = 'cookie-consent';
 const CONSENT_COOKIE_MAX_AGE = 31536000;
-
-type ConsentLevel = 'accepted' | 'necessary' | null;
-
-function getConsentLevel(): ConsentLevel {
-  if (typeof window === 'undefined') return null;
-  const stored = localStorage.getItem(CONSENT_STORAGE_KEY);
-  if (stored === 'accepted' || stored === 'necessary') return stored;
-
-  const cookie = document.cookie.split(';').find(c => c.trim().startsWith(`${CONSENT_STORAGE_KEY}=`));
-  if (cookie) {
-    const value = cookie.split('=')[1].trim();
-    if (value === 'accepted' || value === 'necessary') return value;
-  }
-
-  return null;
-}
 
 function setConsent(level: 'accepted' | 'necessary') {
   localStorage.setItem(CONSENT_STORAGE_KEY, level);
