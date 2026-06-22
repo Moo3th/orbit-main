@@ -18,7 +18,7 @@ import {
 import toast from 'react-hot-toast';
 import { FORM_THEME_PRESET_LIST, type FormThemeColors } from '@/lib/forms/themePresets';
 
-export type FormFieldType = 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio' | 'rating' | 'scale' | 'date' | 'time' | 'file' | 'richtext' | 'spacing' | 'divider';
+export type FormFieldType = 'text' | 'textarea' | 'email' | 'tel' | 'number' | 'select' | 'multiselect' | 'radio' | 'rating' | 'scale' | 'date' | 'time' | 'file' | 'richtext' | 'spacing' | 'divider' | 'package';
 
 export interface FormFieldOption {
   value: string;
@@ -113,6 +113,7 @@ const FIELD_TYPES: { value: FormFieldType; labelAr: string; labelEn: string }[] 
   { value: 'select', labelAr: 'قائمة منسدلة', labelEn: 'Dropdown' },
   { value: 'multiselect', labelAr: 'اختيار متعدد', labelEn: 'Multi-Select' },
   { value: 'radio', labelAr: 'اختيار واحد', labelEn: 'Radio' },
+  { value: 'package', labelAr: 'اختيار باقة (تلقائي)', labelEn: 'Package Selector (auto)' },
   { value: 'rating', labelAr: 'تقييم (نجوم)', labelEn: 'Rating (Stars)' },
   { value: 'scale', labelAr: 'مقياس رقمي', labelEn: 'Numeric Scale' },
   { value: 'date', labelAr: 'تاريخ', labelEn: 'Date' },
@@ -124,6 +125,7 @@ const FIELD_TYPES: { value: FormFieldType; labelAr: string; labelEn: string }[] 
 ];
 
 const DEFAULT_WHATSAPP_FIELDS: FormField[] = [
+  { id: 'package', type: 'package', labelAr: 'الباقة المطلوبة', labelEn: 'Selected Package', placeholderAr: '', placeholderEn: '', required: false, step: 2, min: 1, max: 10, stepSize: 1, options: [] },
   { id: 'name', type: 'text', labelAr: 'الاسم الكامل', labelEn: 'Full Name', placeholderAr: 'أدخل اسمك الكامل', placeholderEn: 'Enter your full name', required: true, step: 2, min: 1, max: 10, stepSize: 1, options: [] },
   { id: 'email', type: 'email', labelAr: 'البريد الإلكتروني', labelEn: 'Email', placeholderAr: 'أدخل بريدك الإلكتروني', placeholderEn: 'Enter your email', required: true, step: 2, min: 1, max: 10, stepSize: 1, options: [] },
   { id: 'phone', type: 'tel', labelAr: 'رقم الجوال', labelEn: 'Phone Number', placeholderAr: '05XXXXXXXX', placeholderEn: '05XXXXXXXX', required: true, step: 2, min: 1, max: 10, stepSize: 1, options: [] },
@@ -1460,6 +1462,14 @@ const toggleFormActive = async (productId: string, currentActive: boolean) => {
                           <option value="lg">{t('كبير (64px)', 'Large (64px)')}</option>
                           <option value="xl">{t('كبير جداً (96px)', 'Extra Large (96px)')}</option>
                         </select>
+                      </div>
+                    )}
+                    {field.type === 'package' && (
+                      <div className="border rounded-lg p-3 bg-emerald-50 text-emerald-800 text-xs leading-relaxed">
+                        {t(
+                          'تُحمَّل الباقات تلقائياً من قسم الأسعار في صفحة المنتج، ويختار العميل الباقة والشريحة. تظهر الباقة المختارة في نتيجة الطلب داخل «طلبات واتساب».',
+                          'Packages load automatically from the product pricing section; the customer picks a package and tier. The chosen package appears in the request inside "WhatsApp Requests".'
+                        )}
                       </div>
                     )}
                     {['select', 'multiselect', 'radio'].includes(field.type) && (

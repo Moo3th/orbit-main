@@ -668,3 +668,46 @@
 
 > إصلاح رفع الصور («Unexpected token '<'» في سكول بت وكل حقول الصور). **السبب الجذري**: مسارات Vercel (serverless) تحدّ جسم الطلب بـ ~4.5MB، والعميل كان يسمح حتى 10MB ويستدعي `res.json()` دون فحص؛ فحين يرجّع Vercel صفحة خطأ HTML (413) يتحطّم التحليل. كذلك `/api/upload-image` كان يكتب على نظام الملفات المحلي (معطّل على Vercel: للقراءة فقط) — يؤثّر على شعارات الموقع وصور المدونة. **الحل**: (1) مكتبة عميل مشتركة `src/lib/uploads/clientUpload.ts` تضغط الصورة في المتصفح (canvas، حد 1920px، JPEG للصور وWebP للشفافية) لتنزل تحت الحد، ثم ترفع إلى `/api/uploads` (GridFS) مع فحص `res.ok` ونوع المحتوى قبل `json()` ورسائل خطأ واضحة (عربي/إنجليزي، تمييز 413). (2) `ImageUploader` (سكول بت + كل حقول CMS + شعار SEO) و`AdminDashboard` (صور المدونة + شعارات الموقع) صارا يستخدمان المكتبة. (3) تحويل `/api/upload-image` من نظام الملفات إلى GridFS مع إبقاء التوافق للخلف (حقل `image`، رد `{success,url,filename}`). **التحقق**: tsc نظيف، lint 0 أخطاء على الملفات المعدّلة، بناء إنتاج ناجح (41 صفحة). يلزم اختبار حيّ في لوحة الأدمن (يتطلب تسجيل دخول + قاعدة) بعد النشر.
 - 2026-06-18 12:41 — `.claude\CHANGES.md`
+- 2026-06-22 11:37 — `src\models\FormConfig.ts`
+- 2026-06-22 11:37 — `src\models\WhatsAppRequest.ts`
+- 2026-06-22 11:37 — `src\app\api\product-packages\route.ts`
+- 2026-06-22 11:38 — `src\app\api\form-submit\route.ts`
+- 2026-06-22 11:38 — `src\app\api\form-submit\route.ts`
+- 2026-06-22 11:39 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-06-22 11:39 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-06-22 11:40 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-06-22 11:40 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-06-22 11:40 — `src\app\admin\newAdmin\views\FormBuilderView.tsx`
+- 2026-06-22 11:40 — `src\app\admin\newAdmin\views\FormBuilderView.tsx`
+- 2026-06-22 11:40 — `src\app\admin\newAdmin\views\FormBuilderView.tsx`
+- 2026-06-22 11:41 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-22 11:41 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-22 11:41 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-22 11:41 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-22 11:42 — `src\app\admin\newAdmin\views\FormBuilderView.tsx`
+- 2026-06-22 11:43 — `scripts\add-whatsapp-package-field.js`
+- 2026-06-22 11:43 — `package.json`
+- 2026-06-22 12:26 — `src\app\api\form-submit\route.ts`
+- 2026-06-22 12:26 — `src\app\api\form-submit\route.ts`
+- 2026-06-22 12:27 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-06-22 12:29 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+
+> ربط الباقة بنموذج خدمة الواتساب وتوجيه نتائج الفورمات إلى تبويبات الطلبات الصحيحة. **ما تم**: (1) نوع حقل جديد `package` في FormConfig + محرّر الفورمات (بطاقات باقات حيّة)؛ يعرض الباقات الفعلية من قسم الأسعار (CMS) ويختار العميل الباقة والشريحة فتُسجَّل في نتيجة الطلب. (2) مسار جديد `GET /api/product-packages?product=whatsapp&lang=` يقرأ نفس مصدر التسعير (wa-pricing/plans_list). (3) `/api/form-submit` يعكس طلبات الخدمة: واتساب → `WhatsAppRequest` (تبويب «طلبات واتساب»)، وبقية المنتجات → `ClientInquiry` نوع quote (تبويب «طلبات الأسعار»)؛ الاستبيانات لا تُعكَس. الردود تبقى كاملة في `FormSubmission`. (4) أزرار «اشترك الآن» في أسعار الواتساب توجّه إلى النموذج مع تحديد الباقة مسبقاً (`?plan=&tier=`). (5) عرض الباقة في تبويب «طلبات واتساب» بشكل نظيف، وحقول `planId/tierId` صارت اختيارية. مع مراجعة عدائية (workflow): أُصلح خلط حقل اسم الشركة باسم العميل في فورمات مخصّصة، وتحديث نص الباقة عند تبديل اللغة. **التحقق**: tsc نظيف، lint 0 أخطاء على الملفات المعدّلة، بناء إنتاج ناجح. عوينت `/products/whatsapp` (الأسعار) و`/products/whatsapp/form` على iPhone (390) و Android (412) وسطح المكتب (1280) بلا تمرير أفقي ولا أخطاء console، وRTL سليم. تحقّقت من `/api/product-packages` (ع/En + sms فارغ). **متبقٍّ (يلزم إذن المستخدم)**: تشغيل `npm run seed:wa-package` لإضافة حقل الباقة إلى نموذج الواتساب الحيّ في القاعدة حتى يظهر للزوّار (أو إضافته يدوياً من محرّر الفورمات).
+- 2026-06-22 12:36 — `.claude\CHANGES.md`
+- 2026-06-22 12:36 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
+- 2026-06-22 12:55 — `src\app\admin\newAdmin\SiteDataContext.tsx`
+- 2026-06-22 12:56 — `src\components\business\products\SchoolBitPage.tsx`
+- 2026-06-22 12:56 — `src\components\business\products\SchoolBitPage.tsx`
+- 2026-06-22 12:56 — `src\components\business\products\SchoolBitPage.tsx`
+- 2026-06-22 12:56 — `src\components\business\products\SchoolBitPage.tsx`
+- 2026-06-22 12:56 — `src\app\admin\newAdmin\SiteDataContext.tsx`
+- 2026-06-22 12:56 — `src\app\admin\newAdmin\SiteDataContext.tsx`
+- 2026-06-22 12:56 — `src\app\admin\newAdmin\SiteDataContext.tsx`
+- 2026-06-22 13:01 — `src\lib\cms\helpers.ts`
+- 2026-06-22 13:01 — `src\components\business\products\SchoolBitPage.tsx`
+- 2026-06-22 13:01 — `src\components\business\products\SchoolBitPage.tsx`
+
+> إتاحة خيار «وجهة الزر: فورم / رابط مخصّص» لأزرار SchoolBit و O-Time و Gov Gate في لوحة التحكم. **السبب الجذري**: حقول `<key>_type` كانت مخزّنة في القاعدة كـ `text` (بلا خيارات) رغم تعريفها في الكود كـ `select`، و`ensurePageSection` كان يضيف الحقول الناقصة فقط دون توحيد بيانات العرض للحقول الموجودة — فظهرت كصندوق نص لا كقائمة. **الحل**: (1) `ensurePageSection` صار يوحّد `type`/`options` من تعريفات الكود مع الحفاظ على قيمة المستخدم (يصلح O-Time `cta_primary/secondary_type` و Gov Gate `cta_type` تلقائياً عند تحميل اللوحة، بلا تعديل على القاعدة). (2) SchoolBit: أُضيفت حقول `cta2_type` (هيرو) و`secondary_type` (CTA) و`plans_cta_type` (الأسعار) ووُصِّلت الأزرار. (3) `resolveCtaLink` صار يقبل `defaultType` ('form'|'external') لمنع تحوّل الأزرار الثانوية فجأةً إلى الفورم قبل الحفظ — الأزرار الثانوية تمرّر 'external'. **التحقق**: tsc + lint نظيفان، بناء إنتاج ناجح. حاكيت منطق التوحيد على القاعدة الحيّة: Gov Gate `cta_type` و O-Time `cta_primary/secondary_type` تتحوّل text→select مع حفظ القيمة. عوينت SchoolBit (الأسعار) على iPhone بلا أخطاء console وروابط الأزرار محفوظة (cta2→startoffer، الأسعار→روابط الباقات، الثانوي→/contact). O-Time و Gov Gate HTTP 200. لا حاجة migration؛ يكفي النشر.
+- 2026-06-22 13:06 — `.claude\CHANGES.md`
+- 2026-06-22 13:07 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\cms-cta-editability.md`
+- 2026-06-22 13:07 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`

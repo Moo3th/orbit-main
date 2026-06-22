@@ -29,6 +29,27 @@ interface FormField {
   spacingSize?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
+interface PackageTier {
+  tierName: string;
+  price: string;
+  priceWithTax: string;
+  setupFee: string;
+}
+
+interface ProductPackage {
+  planId: string;
+  planName: string;
+  period: string;
+  popular: boolean;
+  badge: string;
+  currency: string;
+  tiers: PackageTier[];
+}
+
+// نص الباقة المختارة كما يُخزَّن في نتيجة النموذج ويظهر في طلبات اللوحة والبريد.
+const formatPackageLabel = (pkg: ProductPackage, tier: PackageTier): string =>
+  `${pkg.planName} — ${tier.tierName} · ${tier.price} ${pkg.currency}${pkg.period ? `/${pkg.period}` : ''}`;
+
 interface Props {
   productId: string;
   cmsPage: CmsPage | null;
@@ -68,6 +89,8 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
   const [optionBorderColor, setOptionBorderColor] = useState('#e5e7eb');
   const [optionTextColor, setOptionTextColor] = useState('#111827');
   const [successColor, setSuccessColor] = useState('#16a34a');
+  const [packages, setPackages] = useState<ProductPackage[]>([]);
+  const [pkgSelection, setPkgSelection] = useState<Record<string, { planId: string; tierIndex: number }>>({});
   const formRef = useRef<HTMLDivElement>(null);
 
   // Theme configuration using CSS variables
@@ -155,6 +178,73 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     el.style.setProperty('--option-text-color', optionTextColor);
     el.style.setProperty('--success-color', successColor);
   }, [colors, optionSelectedTextColor, formBgColor, formCardBgColor, formTitleColor, fieldLabelColor, fieldBorderColor, optionBgColor, optionBorderColor, optionTextColor, successColor]);
+
+  // تحميل الباقات الحيّة عند وجود حقل من نوع «الباقة» (نفس مصدر قسم الأسعار).
+  useEffect(() => {
+    if (!fields.some(f => f.type === 'package')) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/product-packages?product=${encodeURIComponent(productId)}&lang=${isRTL ? 'ar' : 'en'}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) setPackages(Array.isArray(data.packages) ? data.packages : []);
+        }
+      } catch (e) { console.error('Failed to fetch packages:', e); }
+    })();
+    return () => { cancelled = true; };
+  }, [fields, productId, isRTL]);
+
+  // تحديد الباقة مسبقاً من رابط النموذج (?plan=growth&tier=1) القادم من قسم الأسعار.
+  useEffect(() => {
+    if (packages.length === 0) return;
+    const pkgFields = fields.filter(f => f.type === 'package');
+    if (pkgFields.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const planParam = params.get('plan');
+    if (!planParam) return;
+    const pkg = packages.find(p => p.planId === planParam);
+    if (!pkg || pkg.tiers.length === 0) return;
+    const parsedTier = parseInt(params.get('tier') || '0', 10);
+    const tierIndex = Math.min(Math.max(0, Number.isNaN(parsedTier) ? 0 : parsedTier), pkg.tiers.length - 1);
+    const label = formatPackageLabel(pkg, pkg.tiers[tierIndex]);
+    setPkgSelection(prev => {
+      const next = { ...prev };
+      pkgFields.forEach(f => { if (!next[f.id]) next[f.id] = { planId: pkg.planId, tierIndex }; });
+      return next;
+    });
+    setFormData(prev => {
+      const next = { ...prev };
+      pkgFields.forEach(f => { if (!next[f.id]) next[f.id] = label; });
+      return next;
+    });
+  }, [packages, fields]);
+
+  // عند تغيّر لغة الباقات (إعادة الجلب)، أعد اشتقاق نص الباقة المختارة باللغة الجديدة
+  // حتى لا تُحفظ القيمة المرسَلة بلغة قديمة في الطلب والبريد.
+  useEffect(() => {
+    if (packages.length === 0) return;
+    setFormData(prev => {
+      let changed = false;
+      const next = { ...prev };
+      Object.entries(pkgSelection).forEach(([fieldId, sel]) => {
+        const pkg = packages.find(p => p.planId === sel.planId);
+        const tier = pkg?.tiers[sel.tierIndex] || pkg?.tiers[0];
+        if (!pkg || !tier) return;
+        const label = formatPackageLabel(pkg, tier);
+        if (next[fieldId] !== label) { next[fieldId] = label; changed = true; }
+      });
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packages]);
+
+  const selectPackage = (fieldId: string, pkg: ProductPackage, tierIndex: number) => {
+    const tier = pkg.tiers[tierIndex] || pkg.tiers[0];
+    if (!tier) return;
+    setPkgSelection(prev => ({ ...prev, [fieldId]: { planId: pkg.planId, tierIndex } }));
+    handleChange(fieldId, formatPackageLabel(pkg, tier));
+  };
 
   const stepNumbers = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
   const maxStep = stepNumbers.length > 0 ? stepNumbers[stepNumbers.length - 1] : 1;
@@ -291,6 +381,57 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
           );
         case 'scale':
           return <div className="space-y-3"><input type="range" min={field.min || 1} max={field.max || 10} step={field.stepSize || 1} value={Number(value) || field.min || 1} onChange={e => handleChange(field.id, e.target.value)} className={`w-full ${theme.accent}`} /><div className="flex justify-between text-xs" style={{ color: 'var(--field-label-color)' }}><span>{field.min || 1}</span><span className="font-bold text-lg" style={{ color: 'var(--primary-color)' }}>{value || field.min || 1}</span><span>{field.max || 10}</span></div></div>;
+        case 'package': {
+          if (packages.length === 0) {
+            return <p className="text-sm" style={{ color: 'var(--field-label-color)' }}>{isRTL ? 'جارِ تحميل الباقات…' : 'Loading packages…'}</p>;
+          }
+          const sel = pkgSelection[field.id];
+          return (
+            <div className="space-y-3">
+              {packages.map((pkg) => {
+                const isPlanSelected = sel?.planId === pkg.planId;
+                const activeTierIndex = isPlanSelected ? sel.tierIndex : -1;
+                return (
+                  <div
+                    key={pkg.planId}
+                    className="rounded-xl border-2 p-4 transition-all"
+                    style={isPlanSelected
+                      ? { borderColor: 'var(--primary-color)', backgroundColor: 'color-mix(in srgb, var(--primary-color) 6%, transparent)' }
+                      : { borderColor: 'var(--option-border-color)', backgroundColor: 'var(--option-bg-color)' }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="font-bold" style={{ color: 'var(--option-text-color)' }}>{pkg.planName}</span>
+                      {pkg.badge && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--primary-color)' }}>{pkg.badge}</span>
+                      )}
+                    </div>
+                    {pkg.tiers.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {pkg.tiers.map((tier, ti) => {
+                          const tierSelected = activeTierIndex === ti;
+                          return (
+                            <button
+                              key={ti}
+                              type="button"
+                              onClick={() => selectPackage(field.id, pkg, ti)}
+                              className="px-3 py-2.5 rounded-lg text-xs font-semibold border-2 transition-all text-center"
+                              style={tierSelected
+                                ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' }
+                                : { backgroundColor: 'var(--form-card-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}
+                            >
+                              <span className="block mb-0.5">{tier.tierName}</span>
+                              <span className="block font-extrabold">{tier.price} {pkg.currency}{pkg.period ? `/${pkg.period}` : ''}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
         case 'date':
           return <Input type="date" value={value as string} onChange={e => handleChange(field.id, e.target.value)} className="text-gray-900" style={{ borderColor: 'var(--field-border-color)' }} />;
         case 'time':

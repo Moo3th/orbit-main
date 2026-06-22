@@ -8,7 +8,7 @@ const formFieldOptionSchema = new mongoose.Schema({
 
 const formFieldSchema = new mongoose.Schema({
   id: { type: String, required: true, trim: true },
-  type: { type: String, required: true, enum: ['text', 'textarea', 'email', 'tel', 'number', 'select', 'multiselect', 'radio', 'rating', 'scale', 'date', 'time', 'file', 'richtext', 'spacing', 'divider'], default: 'text' },
+  type: { type: String, required: true, enum: ['text', 'textarea', 'email', 'tel', 'number', 'select', 'multiselect', 'radio', 'rating', 'scale', 'date', 'time', 'file', 'richtext', 'spacing', 'divider', 'package'], default: 'text' },
   labelAr: { type: String, required: true, trim: true },
   labelEn: { type: String, required: true, trim: true },
   placeholderAr: { type: String, default: '', trim: true },

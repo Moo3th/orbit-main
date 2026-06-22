@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const whatsAppRequestSchema = new mongoose.Schema({
   planId: {
     type: String,
-    required: true,
+    default: '',
     trim: true,
   },
   tierId: {
     type: String,
-    required: true,
+    default: '',
     trim: true,
   },
   name: {

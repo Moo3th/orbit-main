@@ -1180,6 +1180,11 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             {displayPlans.map((plan) => {
               const tierIndex = selectedTier[plan.id] ?? 0;
               const tier = plan.tiers[tierIndex];
+              // وجهة «اشترك الآن»: النموذج الداخلي مع تحديد الباقة والشريحة مسبقاً (إلا إذا اختار الأدمن رابطاً خارجياً).
+              const subscribeBase = resolveCtaLink(cmsPage, 'wa-pricing', 'plans_cta', 'whatsapp', isRTL, 'https://app.mobile.net.sa/reg');
+              const subscribeHref = subscribeBase.startsWith('/products/')
+                ? `${subscribeBase}?plan=${encodeURIComponent(plan.id)}&tier=${tierIndex}`
+                : subscribeBase;
               return (
                 <ScrollReveal key={plan.id}>
                   <div className={`relative rounded-2xl overflow-hidden border-2 ${plan.color} ${plan.bgColor} backdrop-blur-xl ${plan.popular ? 'shadow-[0_0_40px_rgba(16,185,129,0.2)] md:scale-105' : ''}`}>
@@ -1219,7 +1224,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                         <p className="text-slate-500 text-[10px]">{plansTaxLabel} {tier.priceWithTax} {plansCurrency}</p>
                         <p className="text-slate-500 text-[10px]">{plansSetupLabel} {tier.setupFee} {plansCurrency}</p>
                       </div>
-                      <a href={resolveCtaLink(cmsPage, 'wa-pricing', 'plans_cta', 'whatsapp', isRTL, 'https://app.mobile.net.sa/reg')} onClick={() => trackPlanSelected({ serviceType: 'whatsapp', planId: plan.id, planName: plan.name, price: Number(tier?.price) || undefined })} className={`w-full block text-center text-white font-bold mb-4 py-3 rounded-xl transition-all ${plan.buttonColor} shadow-lg`}>
+                      <a href={subscribeHref} onClick={() => trackPlanSelected({ serviceType: 'whatsapp', planId: plan.id, planName: plan.name, price: Number(tier?.price) || undefined })} className={`w-full block text-center text-white font-bold mb-4 py-3 rounded-xl transition-all ${plan.buttonColor} shadow-lg`}>
                         {plan.subscribeLabel || plansSubscribeLabel}
                       </a>
                       <div className="space-y-2">

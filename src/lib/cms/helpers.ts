@@ -37,10 +37,13 @@ export function resolveCtaLink(
   baseKey: string,
   productSlug: string,
   isRTL: boolean,
-  defaultUrl = ''
+  defaultUrl = '',
+  defaultType: 'form' | 'external' = 'form'
 ): string {
   const formPath = `/products/${productSlug}/form`;
-  const type = getCmsField(page, sectionId, `${baseKey}_type`, isRTL, 'form');
+  // defaultType يحدّد السلوك حين لا يكون حقل `${baseKey}_type` مخزّناً بعد (مثلاً أزرار ثانوية
+  // كانت تشير لرابط/مرساة افتراضاً) — يمنع تحوّلها فجأةً إلى الفورم قبل الحفظ من اللوحة.
+  const type = getCmsField(page, sectionId, `${baseKey}_type`, isRTL, defaultType);
   if (type === 'form') return formPath;
   const url = getCmsField(page, sectionId, `${baseKey}_url`, isRTL, '');
   return url || defaultUrl || formPath;

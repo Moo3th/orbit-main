@@ -2259,7 +2259,7 @@ const WhatsAppRequestsView = ({ isAr }: { isAr: boolean }) => {
                             </Badge>
                           </div>
                           <p className="text-xs text-gray-500 mt-1 truncate" dir="ltr">{req.phone} • {req.email}</p>
-                          <p className="text-xs text-gray-400 mt-1">{req.companyName || '-'} • {req.planId}</p>
+                          <p className="text-xs text-gray-400 mt-1">{req.companyName || '-'}{req.planId ? ` • ${req.planId}` : ''}</p>
                           <p className="text-xs text-gray-400 mt-1">{formatDate(req.createdAt)}</p>
                         </div>
                         <button onClick={(e) => { e.stopPropagation(); deleteWhatsAppRequest(req._id || req.id); toast.success(isAr ? "تم الحذف" : "Deleted"); }}
@@ -2281,7 +2281,7 @@ const WhatsAppRequestsView = ({ isAr }: { isAr: boolean }) => {
                 <div><label className="text-xs text-gray-400">{isAr ? "البريد" : "Email"}</label><p className="text-sm text-gray-800" dir="ltr">{selected.email}</p></div>
                 <div><label className="text-xs text-gray-400">{isAr ? "الجوال" : "Phone"}</label><p className="text-sm text-gray-800" dir="ltr">{selected.phone}</p></div>
                 {selected.companyName && <div><label className="text-xs text-gray-400">{isAr ? "الشركة" : "Company"}</label><p className="text-sm text-gray-800">{selected.companyName}</p></div>}
-                <div><label className="text-xs text-gray-400">{isAr ? "الباقة" : "Package"}</label><p className="text-sm text-gray-800">{selected.planId} - {selected.tierId}</p></div>
+                <div><label className="text-xs text-gray-400">{isAr ? "الباقة" : "Package"}</label><p className="text-sm text-gray-800">{selected.planId || (isAr ? 'لم تُحدَّد' : 'Not specified')}{selected.tierId ? ` - ${selected.tierId}` : ''}</p></div>
                 {selected.industry && <div><label className="text-xs text-gray-400">{isAr ? "الصناعة" : "Industry"}</label><p className="text-sm text-gray-800">{selected.industry}</p></div>}
                 {selected.goal && <div><label className="text-xs text-gray-400">{isAr ? "الهدف" : "Goal"}</label><p className="text-sm text-gray-800">{selected.goal}</p></div>}
                 {selected.employeeCount && <div><label className="text-xs text-gray-400">{isAr ? "عدد الموظفين" : "Employees"}</label><p className="text-sm text-gray-800">{selected.employeeCount}</p></div>}

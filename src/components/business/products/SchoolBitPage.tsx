@@ -221,7 +221,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                     <Link data-cta data-cta-id="schoolbit_hero_primary" href={resolveCtaLink(cmsPage, 'schoolbit-hero', 'cta1', 'schoolbit', isRTL, '#contact')}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta1_text', isRTL, st.hero.cta1)}</Link>
                   </Button>
                   <Button asChild className="bg-transparent border-2 border-[#021E4A] text-[#021E4A] hover:bg-[#021E4A] hover:text-white h-14 px-10 text-lg font-bold rounded-2xl w-full sm:w-auto">
-                    <Link data-cta data-cta-id="schoolbit_hero_secondary" href={getCmsField(cmsPage, 'schoolbit-hero', 'cta2_url', isRTL, '#features') || '#features'}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta2_text', isRTL, st.hero.cta2)}</Link>
+                    <Link data-cta data-cta-id="schoolbit_hero_secondary" href={resolveCtaLink(cmsPage, 'schoolbit-hero', 'cta2', 'schoolbit', isRTL, '#features', 'external')}>{getCmsField(cmsPage, 'schoolbit-hero', 'cta2_text', isRTL, st.hero.cta2)}</Link>
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-3 pt-2 justify-center lg:justify-start">
@@ -786,7 +786,12 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                 const popularLabel = getCmsField(cmsPage, 'schoolbit-pricing', 'popular_label', isRTL, isRTL ? 'الأكثر طلباً' : 'Most Popular');
                 const customLabel = getCmsField(cmsPage, 'schoolbit-pricing', 'custom_label', isRTL, st.pricing.custom);
                 const allFeaturesLabel = getCmsField(cmsPage, 'schoolbit-pricing', 'all_features_label', isRTL, st.pricing.allFeatures);
-                
+                // وجهة زر الباقة: فورم الخدمة أو رابط الباقة المخصّص (قابل للضبط من اللوحة).
+                const planCtaType = getCmsField(cmsPage, 'schoolbit-pricing', 'plans_cta_type', isRTL, 'external');
+                const planHref = planCtaType === 'form'
+                  ? '/products/schoolbit/form'
+                  : ((isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/products/schoolbit/form');
+
                 return (
                   <div
                     key={index}
@@ -876,9 +881,9 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                       }`}
                     >
                       {plan.isCustom ? (
-                        <Link href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/products/schoolbit/form'} onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: 'custom', planName: plan.nameEn || plan.name })}>{isRTL ? plan.name : plan.nameEn}</Link>
+                        <Link href={planHref} onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: 'custom', planName: plan.nameEn || plan.name })}>{isRTL ? plan.name : plan.nameEn}</Link>
                       ) : (
-                        <a href={(isRTL ? plan.ctaUrl : (plan.ctaUrlEn || plan.ctaUrl)) || '/products/schoolbit/form'} target="_blank" rel="noopener noreferrer" onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: plan.nameEn || plan.name, planName: plan.nameEn || plan.name, price: plan.price ?? undefined })}>{plan.featured ? (isRTL ? 'ابدأ الآن' : 'Start Now') : (isRTL ? 'اختر الباقة' : 'Choose Plan')}</a>
+                        <a href={planHref} target="_blank" rel="noopener noreferrer" onClick={() => trackPlanSelected({ serviceType: 'schoolbit', planId: plan.nameEn || plan.name, planName: plan.nameEn || plan.name, price: plan.price ?? undefined })}>{plan.featured ? (isRTL ? 'ابدأ الآن' : 'Start Now') : (isRTL ? 'اختر الباقة' : 'Choose Plan')}</a>
                       )}
                     </Button>
                   </div>
@@ -994,7 +999,7 @@ export const SchoolBitPage = ({ cmsPage = null, partners = [] }: SchoolBitPagePr
                 <Link data-cta data-cta-id="schoolbit_final_cta" href={resolveCtaLink(cmsPage, 'schoolbit-cta', 'button', 'schoolbit', isRTL, st.finalCta.ctaUrl || '#contact')}>{getCmsField(cmsPage, 'schoolbit-cta', 'button_text', isRTL, st.finalCta.cta)}</Link>
               </Button>
               <Button asChild className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#021E4A] h-14 px-10 text-lg font-bold rounded-2xl">
-                <Link href={getCmsField(cmsPage, 'schoolbit-cta', 'secondary_url', isRTL, st.finalCta.secondaryUrl) || '#'}>{getCmsField(cmsPage, 'schoolbit-cta', 'secondary_text', isRTL, st.finalCta.secondary)}</Link>
+                <Link href={resolveCtaLink(cmsPage, 'schoolbit-cta', 'secondary', 'schoolbit', isRTL, st.finalCta.secondaryUrl || '#contact', 'external')}>{getCmsField(cmsPage, 'schoolbit-cta', 'secondary_text', isRTL, st.finalCta.secondary)}</Link>
               </Button>
             </div>
             <p className="mt-4 text-white/50 text-sm">

@@ -857,7 +857,8 @@ const schoolbitHeroFields: SectionField[] = [
   { key: "cta1_type", label: "وجهة الزر الأول", labelEn: "Primary CTA Destination", type: "select", value: "form", valueEn: "form", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط مخصّص", labelEn: "Custom URL" }] },
   { key: "cta1_url", label: "رابط الزر الأول (إذا كان مخصّصًا)", labelEn: "Primary CTA URL (if custom)", type: "url", value: "#contact", valueEn: "#contact" },
   { key: "cta2_text", label: "نص الزر الثاني", labelEn: "Secondary CTA Text", type: "text", value: "اكتشف المميزات", valueEn: "Explore Features" },
-  { key: "cta2_url", label: "رابط الزر الثاني", labelEn: "Secondary CTA URL", type: "url", value: "#features", valueEn: "#features" },
+  { key: "cta2_type", label: "وجهة الزر الثاني", labelEn: "Secondary CTA Destination", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط مخصّص", labelEn: "Custom URL" }] },
+  { key: "cta2_url", label: "رابط الزر الثاني (إذا كان مخصّصًا)", labelEn: "Secondary CTA URL (if custom)", type: "url", value: "#features", valueEn: "#features" },
   { key: "chip_noor", label: "شارة تكامل نور", labelEn: "Noor Integration Chip", type: "text", value: "تكامل مع نظام نور", valueEn: "Noor Integration" },
   { key: "chip_biotime", label: "شارة ربط البصمة", labelEn: "BioTime Chip", type: "text", value: "ربط أجهزة البصمة", valueEn: "BioTime Devices" },
   { key: "chip_messages", label: "شارة الرسائل", labelEn: "Messages Chip", type: "text", value: "رسائل SMS و WhatsApp", valueEn: "SMS & WhatsApp" },
@@ -1009,6 +1010,7 @@ const schoolbitPricingFields: SectionField[] = [
   { key: "custom_label", label: "نص سعر مخصص", labelEn: "Custom Price Label", type: "text", value: "مخصص", valueEn: "Custom" },
   { key: "all_features_label", label: "نص كل المميزات", labelEn: "All Features Label", type: "text", value: "كل مميزات", valueEn: "All features of" },
   { key: "popular_label", label: "نص الأكثر طلباً", labelEn: "Popular Badge", type: "text", value: "الأكثر طلباً", valueEn: "Most Popular" },
+  { key: "plans_cta_type", label: "وجهة أزرار الباقات", labelEn: "Plan Buttons Destination", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "روابط كل باقة", labelEn: "Per-plan URLs" }] },
   { key: "plans_list", label: "قائمة الباقات", labelEn: "Plans List", type: "list", value: serializeSchoolBitPlans(getDefaultSchoolBitPlans(true)), valueEn: serializeSchoolBitPlans(getDefaultSchoolBitPlans(false)) },
   { key: "biotime_title", label: "عنوان جهاز BioTime", labelEn: "BioTime Title", type: "text", value: "جهاز BioTime للبصمة", valueEn: "BioTime Biometric Device" },
   { key: "biotime_price", label: "سعر جهاز BioTime", labelEn: "BioTime Price", type: "text", value: "60 ر.س / شهرياً", valueEn: "60 SAR / month" },
@@ -1040,7 +1042,8 @@ const schoolbitCtaFields: SectionField[] = [
   { key: "button_type", label: "وجهة الزر الرئيسي", labelEn: "Primary Button Destination", type: "select", value: "form", valueEn: "form", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط مخصّص", labelEn: "Custom URL" }] },
   { key: "button_url", label: "رابط الزر الرئيسي (إذا كان مخصّصًا)", labelEn: "Primary Button URL (if custom)", type: "url", value: "https://app.mobile.net.sa/reg", valueEn: "https://app.mobile.net.sa/reg" },
   { key: "secondary_text", label: "نص الزر الثانوي", labelEn: "Secondary Button Text", type: "text", value: "أو تواصل معنا", valueEn: "Contact Us" },
-  { key: "secondary_url", label: "رابط الزر الثانوي", labelEn: "Secondary Button URL", type: "url", value: "/contact", valueEn: "/contact" },
+  { key: "secondary_type", label: "وجهة الزر الثانوي", labelEn: "Secondary Button Destination", type: "select", value: "external", valueEn: "external", options: [{ value: "form", label: "فورم طلب الخدمة", labelEn: "Request Form" }, { value: "external", label: "رابط مخصّص", labelEn: "Custom URL" }] },
+  { key: "secondary_url", label: "رابط الزر الثانوي (إذا كان مخصّصًا)", labelEn: "Secondary Button URL (if custom)", type: "url", value: "/contact", valueEn: "/contact" },
   { key: "disclaimer", label: "نص إخلاء المسؤولية", labelEn: "Disclaimer", type: "text", value: "لا حاجة لبطاقة ائتمانية — تفعيل فوري", valueEn: "No credit card required — Instant activation" },
   { key: "logo_image", label: "صورة الشعار", labelEn: "Logo Image", type: "image", value: "", valueEn: "" },
   { key: "spacing", label: "تباعد القسم", labelEn: "Section Spacing", type: "spacing", value: "py-20 md:py-24", valueEn: "py-20 md:py-24" },
@@ -1516,10 +1519,25 @@ const ensurePageSection = (pages: PageData[], pageId: string, pagePath: string, 
     }
     const section = page.sections[idx];
     const safeFields = Array.isArray(section.fields) ? section.fields : [];
+    const defByKey = new Map(fields.map((f) => [f.key, f]));
+    // توحيد بيانات العرض (نوع الحقل وخياراته) من تعريفات الكود مع الحفاظ على قيمة المستخدم.
+    // يصلح الحقول القديمة المخزّنة كـ "text" بينما عرّفها الكود كقائمة (مثل مبدّل وجهة الزر form/external)
+    // والتي لا يصلحها دمج الحقول الناقصة وحده لأن مفتاحها موجود مسبقاً.
+    let metaChanged = false;
+    const reconciled = safeFields.map((f) => {
+      const def = defByKey.get(f.key);
+      if (!def) return f;
+      const patch: Partial<SectionField> = {};
+      if (def.type !== undefined && def.type !== f.type) patch.type = def.type;
+      if (def.options !== undefined && JSON.stringify(def.options) !== JSON.stringify(f.options)) patch.options = def.options;
+      if (Object.keys(patch).length === 0) return f;
+      metaChanged = true;
+      return { ...f, ...patch };
+    });
     const existingKeys = new Set(safeFields.map((f) => f.key));
     const missing = fields.filter((f) => !existingKeys.has(f.key)).map((f) => ({ ...f }));
-    if (!missing.length) return page;
-    return { ...page, sections: page.sections.map((s, i) => (i === idx ? { ...s, fields: [...safeFields, ...missing] } : s)) };
+    if (!missing.length && !metaChanged) return page;
+    return { ...page, sections: page.sections.map((s, i) => (i === idx ? { ...s, fields: [...reconciled, ...missing] } : s)) };
   });
 };
 
