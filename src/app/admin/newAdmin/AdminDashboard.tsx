@@ -36,6 +36,8 @@ import { FormBuilderView } from './views/FormBuilderView';
 import { CmsSeoView } from './views/CmsSeoView';
 import { LegalPagesView } from './views/LegalPagesView';
 import { RichTextEditor } from "@/components/business/RichTextEditor";
+import { renderMarkdown } from "@/lib/blog/markdown";
+import { parseArticleMarkdown } from "@/lib/blog/importMarkdown";
 
 type AdminView = "dashboard" | "partners" | "submissions" | "footer" | "blog" | "wa-requests" | "quote-requests" | "cms-pages" | "cms-page-editor" | "cms-seo" | "form-builder" | "legal-pages";
 
@@ -528,6 +530,16 @@ const DashboardView = ({ isAr, onNavigate, onEditPage }: { isAr: boolean; onNavi
 };
 
 // ──────────────────── Blog View ────────────────────
+interface LocalizedTextValue {
+  en?: string;
+  ar?: string;
+}
+
+interface BlogFaqEntry {
+  question?: LocalizedTextValue;
+  answer?: LocalizedTextValue;
+}
+
 interface BlogEntry {
   _id: string;
   title: string;
@@ -536,13 +548,33 @@ interface BlogEntry {
   descriptionAr?: string;
   content?: string;
   contentAr?: string;
+  contentFormat?: "html" | "markdown";
   image?: string;
+  imageAlt?: LocalizedTextValue;
   category: string;
+  author?: string;
+  tags?: string[];
+  seo?: {
+    title?: LocalizedTextValue;
+    description?: LocalizedTextValue;
+    keywords?: LocalizedTextValue;
+    canonical?: string;
+    ogImage?: string;
+    noIndex?: boolean;
+  };
+  faq?: BlogFaqEntry[];
   slug: string;
   isActive: boolean;
   featured?: boolean;
   publishedAt?: string;
   order: number;
+}
+
+interface BlogFaqDraft {
+  questionEn: string;
+  questionAr: string;
+  answerEn: string;
+  answerAr: string;
 }
 
 interface BlogDraft {
@@ -552,9 +584,24 @@ interface BlogDraft {
   descriptionAr: string;
   content: string;
   contentAr: string;
+  contentFormat: "html" | "markdown";
   image: string;
+  imageAltEn: string;
+  imageAltAr: string;
   category: string;
+  author: string;
+  tags: string;
   slug: string;
+  seoTitleEn: string;
+  seoTitleAr: string;
+  seoDescEn: string;
+  seoDescAr: string;
+  seoKeywordsEn: string;
+  seoKeywordsAr: string;
+  canonical: string;
+  ogImage: string;
+  noIndex: boolean;
+  faq: BlogFaqDraft[];
   isActive: boolean;
   featured: boolean;
   order: number;
@@ -567,9 +614,24 @@ const emptyBlogDraft: BlogDraft = {
   descriptionAr: "",
   content: "",
   contentAr: "",
+  contentFormat: "html",
   image: "",
+  imageAltEn: "",
+  imageAltAr: "",
   category: "General",
+  author: "",
+  tags: "",
   slug: "",
+  seoTitleEn: "",
+  seoTitleAr: "",
+  seoDescEn: "",
+  seoDescAr: "",
+  seoKeywordsEn: "",
+  seoKeywordsAr: "",
+  canonical: "",
+  ogImage: "",
+  noIndex: false,
+  faq: [],
   isActive: true,
   featured: false,
   order: 0,
@@ -666,14 +728,95 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
       descriptionAr: post.descriptionAr || "",
       content: post.content || "",
       contentAr: post.contentAr || "",
+      contentFormat: post.contentFormat === "markdown" ? "markdown" : "html",
       image: post.image || "",
+      imageAltEn: post.imageAlt?.en || "",
+      imageAltAr: post.imageAlt?.ar || "",
       category: post.category || "General",
+      author: post.author || "",
+      tags: Array.isArray(post.tags) ? post.tags.join(", ") : "",
       slug: post.slug || "",
+      seoTitleEn: post.seo?.title?.en || "",
+      seoTitleAr: post.seo?.title?.ar || "",
+      seoDescEn: post.seo?.description?.en || "",
+      seoDescAr: post.seo?.description?.ar || "",
+      seoKeywordsEn: post.seo?.keywords?.en || "",
+      seoKeywordsAr: post.seo?.keywords?.ar || "",
+      canonical: post.seo?.canonical || "",
+      ogImage: post.seo?.ogImage || "",
+      noIndex: Boolean(post.seo?.noIndex),
+      faq: Array.isArray(post.faq)
+        ? post.faq.map((item) => ({
+            questionEn: item.question?.en || "",
+            questionAr: item.question?.ar || "",
+            answerEn: item.answer?.en || "",
+            answerAr: item.answer?.ar || "",
+          }))
+        : [],
       isActive: post.isActive,
       featured: Boolean(post.featured),
       order: post.order || 0,
     });
     setEditorOpen(true);
+  };
+
+  const importMarkdownFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const parsed = parseArticleMarkdown(text);
+      setEditingPost(null);
+      setDraft({
+        ...emptyBlogDraft,
+        titleAr: parsed.titleAr,
+        descriptionAr: parsed.descriptionAr,
+        contentAr: parsed.contentAr,
+        contentFormat: "markdown",
+        slug: parsed.slug || toSlug(parsed.titleAr),
+        category: parsed.category || "General",
+        tags: parsed.tags.join(", "),
+        imageAltAr: parsed.imageAltAr,
+        seoTitleAr: parsed.seo.titleAr,
+        seoDescAr: parsed.seo.descriptionAr,
+        seoKeywordsAr: parsed.seo.keywordsAr,
+        canonical: parsed.seo.canonical,
+        ogImage: parsed.seo.ogImage,
+        faq: parsed.faq.map((item) => ({
+          questionEn: "",
+          questionAr: item.question,
+          answerEn: "",
+          answerAr: item.answer,
+        })),
+        isActive: false,
+      });
+      setIsPreviewMode(false);
+      setEditorOpen(true);
+      toast.success(
+        isAr
+          ? `تم استيراد المقال (${parsed.faq.length} سؤال). راجع الحقول ثم انشر.`
+          : `Article imported (${parsed.faq.length} FAQs). Review and publish.`
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error(isAr ? "تعذر استيراد الملف" : "Failed to import file");
+    }
+  };
+
+  const addFaqRow = () => {
+    setDraft((prev) => ({
+      ...prev,
+      faq: [...prev.faq, { questionEn: "", questionAr: "", answerEn: "", answerAr: "" }],
+    }));
+  };
+
+  const updateFaqRow = (index: number, field: keyof BlogFaqDraft, value: string) => {
+    setDraft((prev) => ({
+      ...prev,
+      faq: prev.faq.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
+    }));
+  };
+
+  const removeFaqRow = (index: number) => {
+    setDraft((prev) => ({ ...prev, faq: prev.faq.filter((_, i) => i !== index) }));
   };
 
   const applySmartFill = () => {
@@ -687,12 +830,17 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
   };
 
   const saveDraft = async () => {
-    if (!draft.title.trim()) {
-      toast.error(isAr ? "العنوان الإنجليزي مطلوب" : "English title is required");
+    // Title/description are required at the DB level but may be Arabic-only
+    // (default language). Fall back across languages so Arabic-only posts save.
+    const effectiveTitle = draft.title.trim() || draft.titleAr.trim();
+    const effectiveDescription = draft.description.trim() || draft.descriptionAr.trim();
+
+    if (!effectiveTitle) {
+      toast.error(isAr ? "العنوان مطلوب (عربي أو إنجليزي)" : "Title is required (AR or EN)");
       return;
     }
-    if (!draft.description.trim()) {
-      toast.error(isAr ? "الوصف الإنجليزي مطلوب" : "English description is required");
+    if (!effectiveDescription) {
+      toast.error(isAr ? "الوصف المختصر مطلوب (عربي أو إنجليزي)" : "Short description is required (AR or EN)");
       return;
     }
     if (!draft.category.trim()) {
@@ -700,16 +848,50 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
       return;
     }
 
-    const finalSlug = draft.slug.trim() || toSlug(draft.title);
+    const finalSlug = draft.slug.trim() || toSlug(draft.title) || toSlug(draft.titleAr);
     if (!finalSlug) {
       toast.error(isAr ? "تعذر إنشاء الرابط المختصر" : "Unable to generate slug");
       return;
     }
 
+    const tags = draft.tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+    const faq = draft.faq
+      .map((row) => ({
+        question: { en: row.questionEn.trim(), ar: row.questionAr.trim() },
+        answer: { en: row.answerEn.trim(), ar: row.answerAr.trim() },
+      }))
+      .filter((row) => (row.question.ar || row.question.en) && (row.answer.ar || row.answer.en));
+
     const payload = {
-      ...draft,
-      slug: finalSlug,
+      title: effectiveTitle,
+      titleAr: draft.titleAr,
+      description: effectiveDescription,
+      descriptionAr: draft.descriptionAr,
+      content: draft.content,
+      contentAr: draft.contentAr,
+      contentFormat: draft.contentFormat,
+      image: draft.image,
+      imageAlt: { en: draft.imageAltEn.trim(), ar: draft.imageAltAr.trim() },
       category: draft.category.trim(),
+      author: draft.author.trim(),
+      tags,
+      slug: finalSlug,
+      seo: {
+        title: { en: draft.seoTitleEn.trim(), ar: draft.seoTitleAr.trim() },
+        description: { en: draft.seoDescEn.trim(), ar: draft.seoDescAr.trim() },
+        keywords: { en: draft.seoKeywordsEn.trim(), ar: draft.seoKeywordsAr.trim() },
+        canonical: draft.canonical.trim(),
+        ogImage: draft.ogImage.trim(),
+        noIndex: draft.noIndex,
+      },
+      faq,
+      isActive: draft.isActive,
+      featured: draft.featured,
+      order: draft.order,
       publishedAt: new Date().toISOString(),
     };
 
@@ -822,7 +1004,7 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
                 : "Write articles here using the professional editor. Articles are saved to the DB and appear directly on the public blog page."}
             </p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <Button
               className="bg-[#104E8B] hover:bg-[#0A2647] text-white h-12 rounded-xl shadow-lg shadow-[#104E8B]/10"
               onClick={() => {
@@ -842,6 +1024,20 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
                 {isAr ? "معاينة المدونة" : "Preview Blog"}
               </Link>
             </Button>
+            <label className="inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 cursor-pointer text-sm font-medium">
+              <Upload className="w-4 h-4" />
+              {isAr ? "استيراد Markdown" : "Import Markdown"}
+              <input
+                type="file"
+                accept=".md,.markdown,text/markdown,text/plain"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (file) await importMarkdownFile(file);
+                }}
+              />
+            </label>
             <Button className="bg-primary hover:bg-primary/90 text-white h-12 rounded-xl shadow-lg shadow-primary/20" onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" />
               {isAr ? "إنشاء مقال جديد" : "New Article"}
@@ -983,11 +1179,28 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
                    </div>
                    <h1 className="text-4xl font-black text-gray-900 mb-4">{isAr ? draft.titleAr : draft.title}</h1>
                    <p className="text-xl text-gray-500 mb-8 font-medium italic">{isAr ? draft.descriptionAr : draft.description}</p>
-                   {draft.image && <img src={draft.image} className="w-full h-96 object-cover rounded-3xl mb-10 shadow-lg" alt="Preview" />}
-                   <div 
-                      className="prose prose-lg max-w-none text-gray-800 leading-relaxed prose-img:rounded-2xl" 
-                      dangerouslySetInnerHTML={{ __html: isAr ? draft.contentAr : draft.content }} 
+                   {draft.image && <img src={draft.image} className="w-full h-96 object-cover rounded-3xl mb-10 shadow-lg" alt={(isAr ? draft.imageAltAr : draft.imageAltEn) || "Preview"} />}
+                   <div
+                      className="prose prose-lg max-w-none text-gray-800 leading-relaxed prose-img:rounded-2xl"
+                      dangerouslySetInnerHTML={{
+                        __html: draft.contentFormat === "markdown"
+                          ? renderMarkdown(isAr ? draft.contentAr : draft.content)
+                          : (isAr ? draft.contentAr : draft.content),
+                      }}
                    />
+                   {draft.faq.length > 0 && (
+                     <div className="mt-10 pt-8 border-t">
+                       <h2 className="text-2xl font-bold mb-4">{isAr ? "الأسئلة الشائعة" : "FAQ"}</h2>
+                       <div className="space-y-3">
+                         {draft.faq.map((row, i) => (
+                           <div key={i} className="rounded-xl border p-4">
+                             <p className="font-semibold text-gray-900">{isAr ? (row.questionAr || row.questionEn) : (row.questionEn || row.questionAr)}</p>
+                             <p className="text-gray-600 mt-1">{isAr ? (row.answerAr || row.answerEn) : (row.answerEn || row.answerAr)}</p>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
                 </div>
               ) : (
                 <div className="space-y-5">
@@ -1072,24 +1285,69 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
                     </div>
                   </div>
 
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-gray-500">{isAr ? "تنسيق المحتوى:" : "Content format:"}</span>
+                    <div className="inline-flex rounded-lg border border-gray-200 overflow-hidden text-sm">
+                      <button
+                        type="button"
+                        onClick={() => setDraft((prev) => ({ ...prev, contentFormat: "html" }))}
+                        className={`px-3 py-1.5 ${draft.contentFormat === "html" ? "bg-[#104E8B] text-white" : "bg-white text-gray-600"}`}
+                      >
+                        {isAr ? "محرر نصوص" : "Rich editor"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDraft((prev) => ({ ...prev, contentFormat: "markdown" }))}
+                        className={`px-3 py-1.5 ${draft.contentFormat === "markdown" ? "bg-[#104E8B] text-white" : "bg-white text-gray-600"}`}
+                      >
+                        Markdown
+                      </button>
+                    </div>
+                    {draft.contentFormat === "markdown" && (
+                      <span className="text-xs text-emerald-600">
+                        {isAr ? "يدعم الجداول والعناوين والاقتباسات (GFM)" : "Supports tables, headings, quotes (GFM)"}
+                      </span>
+                    )}
+                  </div>
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-[#104E8B] mb-1 block uppercase tracking-wider">{isAr ? "محتوى المقال (EN)" : "Full Content (EN)"}</label>
-                      <RichTextEditor 
-                        content={draft.content} 
-                        onChange={(html) => setDraft(prev => ({ ...prev, content: html }))} 
-                        placeholder="Write article in English..."
-                      />
+                      {draft.contentFormat === "markdown" ? (
+                        <textarea
+                          value={draft.content}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, content: e.target.value }))}
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono min-h-[350px]"
+                          dir="ltr"
+                          placeholder="# Heading\n\nWrite markdown..."
+                        />
+                      ) : (
+                        <RichTextEditor
+                          content={draft.content}
+                          onChange={(html) => setDraft(prev => ({ ...prev, content: html }))}
+                          placeholder="Write article in English..."
+                        />
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-[#104E8B] mb-1 block uppercase tracking-wider">{isAr ? "محتوى المقال (AR)" : "Full Content (AR)"}</label>
-                      <div dir="rtl">
-                        <RichTextEditor 
-                          content={draft.contentAr} 
-                          onChange={(html) => setDraft(prev => ({ ...prev, contentAr: html }))} 
-                          placeholder="اكتب المقال بالعربية..."
+                      {draft.contentFormat === "markdown" ? (
+                        <textarea
+                          value={draft.contentAr}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, contentAr: e.target.value }))}
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono min-h-[350px]"
+                          dir="rtl"
+                          placeholder="# عنوان\n\nاكتب المحتوى بصيغة ماركداون..."
                         />
-                      </div>
+                      ) : (
+                        <div dir="rtl">
+                          <RichTextEditor
+                            content={draft.contentAr}
+                            onChange={(html) => setDraft(prev => ({ ...prev, contentAr: html }))}
+                            placeholder="اكتب المقال بالعربية..."
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1121,8 +1379,141 @@ const BlogView = ({ isAr, onEditPage }: { isAr: boolean; onEditPage: (id: string
                       </label>
                     </div>
                     {draft.image && (
-                      <img src={resolveImageSrc(draft.image)} alt="Preview" className="w-full max-w-sm h-44 object-cover rounded-xl border border-gray-200" />
+                      <img src={resolveImageSrc(draft.image)} alt={draft.imageAltAr || draft.imageAltEn || "Preview"} className="w-full max-w-sm h-44 object-cover rounded-xl border border-gray-200" />
                     )}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "نص بديل للصورة (EN)" : "Image Alt (EN)"}</label>
+                        <input
+                          type="text"
+                          value={draft.imageAltEn}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, imageAltEn: e.target.value }))}
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                          dir="ltr"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "نص بديل للصورة (AR)" : "Image Alt (AR)"}</label>
+                        <input
+                          type="text"
+                          value={draft.imageAltAr}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, imageAltAr: e.target.value }))}
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Author + tags */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">{isAr ? "الكاتب" : "Author"}</label>
+                      <input
+                        type="text"
+                        value={draft.author}
+                        onChange={(e) => setDraft((prev) => ({ ...prev, author: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                        placeholder={isAr ? "CORBIT | كوربت" : "CORBIT | كوربت"}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">{isAr ? "الوسوم (مفصولة بفاصلة)" : "Tags (comma-separated)"}</label>
+                      <input
+                        type="text"
+                        value={draft.tags}
+                        onChange={(e) => setDraft((prev) => ({ ...prev, tags: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                        dir="rtl"
+                      />
+                    </div>
+                  </div>
+
+                  {/* SEO section */}
+                  <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4 space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-bold text-[#104E8B]">
+                      <Globe className="w-4 h-4" />
+                      {isAr ? "تحسين محركات البحث (SEO)" : "SEO Settings"}
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "عنوان SEO (AR)" : "SEO Title (AR)"}</label>
+                        <input type="text" value={draft.seoTitleAr} onChange={(e) => setDraft((prev) => ({ ...prev, seoTitleAr: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="rtl" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "عنوان SEO (EN)" : "SEO Title (EN)"}</label>
+                        <input type="text" value={draft.seoTitleEn} onChange={(e) => setDraft((prev) => ({ ...prev, seoTitleEn: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="ltr" />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "وصف الميتا (AR)" : "Meta Description (AR)"}</label>
+                        <textarea rows={2} value={draft.seoDescAr} onChange={(e) => setDraft((prev) => ({ ...prev, seoDescAr: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" dir="rtl" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "وصف الميتا (EN)" : "Meta Description (EN)"}</label>
+                        <textarea rows={2} value={draft.seoDescEn} onChange={(e) => setDraft((prev) => ({ ...prev, seoDescEn: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" dir="ltr" />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "الكلمات المفتاحية (AR)" : "Keywords (AR)"}</label>
+                        <input type="text" value={draft.seoKeywordsAr} onChange={(e) => setDraft((prev) => ({ ...prev, seoKeywordsAr: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="rtl" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "الكلمات المفتاحية (EN)" : "Keywords (EN)"}</label>
+                        <input type="text" value={draft.seoKeywordsEn} onChange={(e) => setDraft((prev) => ({ ...prev, seoKeywordsEn: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="ltr" />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "الرابط الأساسي (Canonical)" : "Canonical URL"}</label>
+                        <input type="text" value={draft.canonical} onChange={(e) => setDraft((prev) => ({ ...prev, canonical: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="ltr" placeholder="https://corbit.sa/blog/..." />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">{isAr ? "صورة المشاركة (OG Image)" : "OG Image"}</label>
+                        <input type="text" value={draft.ogImage} onChange={(e) => setDraft((prev) => ({ ...prev, ogImage: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="ltr" placeholder="https://..." />
+                      </div>
+                    </div>
+                    <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                      <input type="checkbox" checked={draft.noIndex} onChange={(e) => setDraft((prev) => ({ ...prev, noIndex: e.target.checked }))} className="rounded border-gray-300" />
+                      {isAr ? "منع الفهرسة (noindex)" : "No-index this post"}
+                    </label>
+                  </div>
+
+                  {/* FAQ editor */}
+                  <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm font-bold text-[#104E8B]">
+                        <ListChecks className="w-4 h-4" />
+                        {isAr ? `الأسئلة الشائعة (${draft.faq.length})` : `FAQ (${draft.faq.length})`}
+                      </div>
+                      <Button type="button" size="sm" variant="outline" className="h-8 text-xs border-[#104E8B]/30 text-[#104E8B]" onClick={addFaqRow}>
+                        <Plus className="w-3.5 h-3.5" />
+                        {isAr ? "إضافة سؤال" : "Add question"}
+                      </Button>
+                    </div>
+                    {draft.faq.length === 0 && (
+                      <p className="text-xs text-gray-500">{isAr ? "لا توجد أسئلة بعد. تُعرض في الصفحة وتُرسل كـ FAQPage في بيانات SEO." : "No questions yet. They render on the page and emit FAQPage structured data."}</p>
+                    )}
+                    {draft.faq.map((row, index) => (
+                      <div key={index} className="rounded-xl border border-gray-200 bg-white p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">#{index + 1}</span>
+                          <button type="button" onClick={() => removeFaqRow(index)} className="text-red-500 hover:text-red-700" title={isAr ? "حذف" : "Remove"}>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-2">
+                          <input type="text" value={row.questionAr} onChange={(e) => updateFaqRow(index, "questionAr", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="rtl" placeholder={isAr ? "السؤال (AR)" : "Question (AR)"} />
+                          <input type="text" value={row.questionEn} onChange={(e) => updateFaqRow(index, "questionEn", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" dir="ltr" placeholder="Question (EN)" />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-2">
+                          <textarea rows={2} value={row.answerAr} onChange={(e) => updateFaqRow(index, "answerAr", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" dir="rtl" placeholder={isAr ? "الإجابة (AR)" : "Answer (AR)"} />
+                          <textarea rows={2} value={row.answerEn} onChange={(e) => updateFaqRow(index, "answerEn", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" dir="ltr" placeholder="Answer (EN)" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">

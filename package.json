@@ -11,7 +11,8 @@
     "seed": "node scripts/init-db.js",
     "seed:cms": "node scripts/seed-site-cms.js",
     "seed:legal": "node scripts/seed-legal.js",
-    "seed:wa-package": "node scripts/add-whatsapp-package-field.js"
+    "seed:wa-package": "node scripts/add-whatsapp-package-field.js",
+    "seed:blog": "node scripts/seed-blog-article.js"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
@@ -65,6 +66,7 @@
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.562.0",
+    "marked": "^14.1.4",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.2",
     "next": "^16.1.0",

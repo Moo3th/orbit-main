@@ -37,8 +37,19 @@ export default function BlogPostPageClient({ post }: BlogPostPageClientProps) {
   const { isRTL } = useLanguage();
   const title = isRTL ? (post.titleAr || post.title || '') : (post.title || '');
   const description = isRTL ? (post.descriptionAr || post.description || '') : (post.description || '');
-  const content = isRTL ? (post.contentAr || post.content || description) : (post.content || post.contentAr || description);
+  // Prefer the server-resolved HTML (markdown rendered / html passed through),
+  // falling back to the raw stored body for safety.
+  const contentEn = post.contentHtml || post.content || '';
+  const contentAr = post.contentArHtml || post.contentAr || '';
+  const content = isRTL ? (contentAr || contentEn || description) : (contentEn || contentAr || description);
   const locale = isRTL ? 'ar-SA' : 'en-US';
+  const imageAlt = (isRTL ? post.imageAlt?.ar : post.imageAlt?.en) || post.imageAlt?.ar || post.imageAlt?.en || title;
+  const faqItems = (post.faq || [])
+    .map((item) => ({
+      q: (isRTL ? item.question?.ar : item.question?.en) || item.question?.ar || item.question?.en || '',
+      a: (isRTL ? item.answer?.ar : item.answer?.en) || item.answer?.ar || item.answer?.en || '',
+    }))
+    .filter((item) => item.q && item.a);
 
   return (
     <div
@@ -77,13 +88,13 @@ export default function BlogPostPageClient({ post }: BlogPostPageClientProps) {
                 {isRemoteImage(post.image) ? (
                   <img
                     src={resolveImageSrc(post.image)}
-                    alt={title}
+                    alt={imageAlt}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
                   <Image
                     src={resolveImageSrc(post.image)}
-                    alt={title}
+                    alt={imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 1024px"
@@ -93,15 +104,57 @@ export default function BlogPostPageClient({ post }: BlogPostPageClientProps) {
               </div>
             )}
 
-            <div 
-              className="prose prose-lg max-w-none text-gray-800 dark:text-gray-100 leading-8 prose-img:rounded-3xl prose-headings:text-slate-900 prose-a:text-primary"
+            <div
+              className="blog-content prose prose-lg max-w-none text-gray-800 dark:text-gray-100 leading-8 prose-img:rounded-3xl prose-headings:text-slate-900 dark:prose-headings:text-white prose-a:text-primary prose-table:text-sm prose-th:bg-primary/5"
               dangerouslySetInnerHTML={{ __html: content }}
             />
+
+            {faqItems.length > 0 && (
+              <section className="mt-14 pt-10 border-t border-gray-200 dark:border-gray-700">
+                <h2 className="text-2xl md:text-3xl text-gray-900 dark:text-white mb-6">
+                  {isRTL ? 'الأسئلة الشائعة' : 'Frequently Asked Questions'}
+                </h2>
+                <div className="space-y-3">
+                  {faqItems.map((item, index) => (
+                    <details
+                      key={index}
+                      className="group rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/40 px-5 py-4 open:bg-white dark:open:bg-gray-800"
+                    >
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base md:text-lg font-medium text-gray-900 dark:text-white">
+                        <span>{item.q}</span>
+                        <span className="text-primary transition-transform group-open:rotate-45 text-2xl leading-none">+</span>
+                      </summary>
+                      <p className="mt-3 text-gray-600 dark:text-gray-300 leading-relaxed">{item.a}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
           </article>
         </div>
       </main>
 
       <Footer />
+
+      <style jsx global>{`
+        .blog-content .blog-table-scroll {
+          margin: 1.5rem 0;
+        }
+        .blog-content table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .blog-content th,
+        .blog-content td {
+          border: 1px solid rgb(229 231 235);
+          padding: 0.625rem 0.875rem;
+          text-align: inherit;
+        }
+        .dark .blog-content th,
+        .dark .blog-content td {
+          border-color: rgb(55 65 81);
+        }
+      `}</style>
     </div>
   );
 }

@@ -711,3 +711,37 @@
 - 2026-06-22 13:06 — `.claude\CHANGES.md`
 - 2026-06-22 13:07 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\cms-cta-editability.md`
 - 2026-06-22 13:07 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`
+- 2026-06-23 09:18 — `src\models\News.ts`
+- 2026-06-23 09:19 — `src\models\News.ts`
+- 2026-06-23 09:19 — `src\lib\blog\markdown.ts`
+- 2026-06-23 09:19 — `src\lib\blog\server.ts`
+- 2026-06-23 09:19 — `src\lib\blog\jsonld.ts`
+- 2026-06-23 09:20 — `src\app\blog\[slug]\page.tsx`
+- 2026-06-23 09:20 — `src\components\blog\BlogPostPageClient.tsx`
+- 2026-06-23 09:20 — `src\components\blog\BlogPostPageClient.tsx`
+- 2026-06-23 09:22 — `src\lib\blog\importMarkdown.ts`
+- 2026-06-23 09:22 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:22 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:23 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:23 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:24 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:24 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:24 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:25 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-06-23 09:27 — `scripts\seed-blog-article.js`
+- 2026-06-23 09:27 — `package.json`
+- 2026-06-23 09:27 — `scripts\seed-blog-article.js`
+- 2026-06-23 09:27 — `scripts\seed-blog-article.js`
+- 2026-06-23 12:40 — `package.json` (marked dependency + seed:blog script)
+- 2026-06-23 12:40 — `src\models\News.ts` (SEO/FAQ/imageAlt/author/tags/contentFormat fields)
+- 2026-06-23 12:40 — `src\lib\blog\markdown.ts` (new — markdown→HTML, mobile table wrap)
+- 2026-06-23 12:40 — `src\lib\blog\jsonld.ts` (new — Article/FAQPage/BreadcrumbList JSON-LD)
+- 2026-06-23 12:40 — `src\lib\blog\importMarkdown.ts` (new — .md template parser)
+- 2026-06-23 12:40 — `src\lib\blog\server.ts` (carry new fields + resolve body HTML)
+- 2026-06-23 12:40 — `src\app\blog\[slug]\page.tsx` (generateMetadata + JSON-LD)
+- 2026-06-23 12:40 — `src\components\blog\BlogPostPageClient.tsx` (resolved HTML, alt, FAQ section)
+- 2026-06-23 12:40 — `src\app\admin\newAdmin\AdminDashboard.tsx` (markdown import, SEO/FAQ/alt/author/tags editors)
+- 2026-06-23 12:40 — `scripts\seed-blog-article.js` (new — publish article from .md)
+- 2026-06-23 12:40 — `content\articles\01-whatsapp-business-api-saudi-arabia.md` (new — article source)
+- 2026-06-23 09:33 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\blog-publishing.md`
+- 2026-06-23 09:33 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`
