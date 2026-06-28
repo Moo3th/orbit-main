@@ -1,6 +1,7 @@
 /**
  * تحسين SEO صفحة واتساب بناءً على أبحاث Ahrefs (السوق السعودي):
- * واتساب اعمال (7500/KD7)، واتساب api (250/KD0)، واتساب بزنس (300/KD13)، ربط واتساب (90/KD8).
+ * المرتكز عنقود «واتساب API»: واتساب api (250/KD0)، واتساب بزنس api (60)، سعر/تكلفة/تفعيل/اشتراك/مقدمي حلول واتساب api.
+ * الاستراتيجية: قيادة العنوان و H1 بالعبارة المستهدفة حرفياً + تغطية نية الكلمات التعريفية والتجارية.
  *
  * التشغيل: node scripts/optimize-whatsapp-seo.js
  */
@@ -8,16 +9,16 @@ const mongoose = require('mongoose');
 require('dotenv').config({ path: '.env.local' });
 
 const WA_SEO = {
-  title: 'واتساب أعمال API | منصة واتساب بزنس للشركات — المدار',
-  titleEn: 'WhatsApp Business API for Companies in Saudi Arabia | CORBIT',
+  title: 'واتساب بزنس API في السعودية | أسعار وتفعيل واتساب API — المدار',
+  titleEn: 'WhatsApp Business API in Saudi Arabia — Pricing & Activation | CORBIT',
   description:
-    'واتساب أعمال API من المدار: أطلق حملات واتساب بزنس، قوالب رسائل معتمدة، علامة موثّقة (Green Tick)، ردود آلية عبر شات بوت، وتكامل مع متجرك — بدعم سعودي على مدار الساعة. ابدأ تجربتك المجانية.',
+    'واتساب بزنس API من المدار، مزوّد حلول واتساب API في السعودية: تفعيل واشتراك سريع، أسعار واضحة، قوالب رسائل معتمدة، شات بوت، الشارة الخضراء، وتكامل مع سلة ودفترة. ابدأ تجربتك المجانية.',
   descriptionEn:
-    'CORBIT WhatsApp Business API: launch WhatsApp Business campaigns, approved message templates, verified green tick, chatbot auto-replies, and store integrations — with 24/7 Saudi support. Start your free trial.',
+    'CORBIT — your WhatsApp Business API provider in Saudi Arabia: fast activation, clear pricing, approved templates, chatbot, green tick, and Salla/Daftra integration. Start your free trial.',
   keywords:
-    'واتساب أعمال, واتساب اعمال, واتساب بزنس, واتساب API, واتساب للأعمال, ربط واتساب, قوالب واتساب, العلامة الموثقة, شات بوت واتساب, حملات واتساب, واتساب السعودية, المدار, CORBIT',
+    'واتساب api, واتساب بزنس api, واتساب بيزنس api, api واتساب, api واتساب للأعمال, واتساب للأعمال api, واتساب أعمال api, واجهة api واتساب للأعمال في السعودية, سعر واتساب api, تكاليف واتساب api, اشتراك واتساب api, تفعيل واتساب api, رابط واتساب api, تحميل واتساب api, مقدمي حلول واتساب api, تكامل api واتساب, خدمة واتساب بزنس api, ماهو واتساب api, واتساب api مجانا, واتساب api السعودية, قوالب واتساب, الشارة الخضراء, المدار, CORBIT',
   keywordsEn:
-    'WhatsApp Business API, WhatsApp Business, WhatsApp API Saudi Arabia, WhatsApp templates, green tick verification, WhatsApp chatbot, WhatsApp marketing, business messaging, CORBIT',
+    'WhatsApp Business API, WhatsApp API, WhatsApp Business API Saudi Arabia, WhatsApp API pricing, WhatsApp API provider, WhatsApp API integration, WhatsApp API activation, WhatsApp API subscription, WhatsApp cloud API, business messaging, CORBIT',
 };
 
 async function run() {

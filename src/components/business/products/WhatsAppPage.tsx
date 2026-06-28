@@ -47,14 +47,14 @@ import WAFooter from './WAFooter';
 import { Faq } from '@/components/business/landing/Faq';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CmsPage } from '@/lib/cms/types';
-import { getCmsField, makeSectionStyle, resolveCtaLink } from '@/lib/cms/helpers';
+import { getCmsField, getCmsJson, makeSectionStyle, resolveCtaLink } from '@/lib/cms/helpers';
 import CtaTracker from '@/components/analytics/CtaTracker';
 import { trackProductView, trackPricingView, trackPlanSelected } from '@/lib/analytics/events';
 import { useInViewOnce } from '@/lib/analytics/useInViewOnce';
 import { WA_FAQ_DEFAULTS } from '@/lib/cms/waFaq';
 
 // الترتيب البصري القانوني لأقسام واتساب (الهيرو wa-chatbot مثبّت أولاً، والبقية قابلة لإعادة الترتيب).
-const WA_SECTION_ORDER = ['wa-chatbot', 'wa-stats', 'wa-partners', 'wa-features', 'wa-why', 'wa-marketing', 'wa-pricing', 'wa-green-tick', 'wa-integrations', 'wa-persona', 'wa-footer-cta', 'wa-faq'];
+const WA_SECTION_ORDER = ['wa-chatbot', 'wa-about-api', 'wa-stats', 'wa-partners', 'wa-features', 'wa-why', 'wa-marketing', 'wa-pricing', 'wa-green-tick', 'wa-integrations', 'wa-persona', 'wa-footer-cta', 'wa-faq'];
 import {
   getDefaultWhatsAppConversationPrices,
   getDefaultWhatsAppPlans,
@@ -232,6 +232,15 @@ const WHY_CORBIT = [
   { icon: Smartphone, titleAr: 'سهل الاستخدام', titleEn: 'Easy to Use', descAr: 'تطبيق مألوف للجميع بدون تعقيد', descEn: 'Familiar app for everyone without complexity' },
 ];
 
+// قسم تعريفي «ما هو واتساب API؟» — يلتقط عنقود الكلمات التعريفية/التجارية (ماهو/الفرق/التفعيل/السعر/مقدّم الحلول).
+const ABOUT_API_BLOCKS = [
+  { titleAr: 'ما هو واتساب API؟', titleEn: 'What is WhatsApp API?', descAr: 'واتساب API (واجهة واتساب الأعمال الرسمية من Meta) حلٌّ للشركات لإرسال الإشعارات والحملات والردود الآلية وإدارة محادثات آلاف العملاء عبر أنظمتك — دون تطبيق على الهاتف، وعبر مزوّد حلول معتمد (BSP).', descEn: 'WhatsApp API (Meta’s official WhatsApp Business interface) lets businesses send notifications, campaigns, and automated replies and manage conversations with thousands of customers through your systems — without a phone app, via an authorized provider (BSP).' },
+  { titleAr: 'الفرق عن تطبيق واتساب بزنس', titleEn: 'Difference from the WhatsApp Business app', descAr: 'تطبيق واتساب بزنس لجهاز واحد وأعمال صغيرة. أما واتساب بزنس API فيدعم تعدد المستخدمين، الحملات الجماعية، الشات بوت، والتكامل البرمجي مع متجرك وأنظمتك — بلا حدود الجهاز الواحد.', descEn: 'The WhatsApp Business app is for a single device and small businesses. WhatsApp Business API supports multiple users, bulk campaigns, chatbots, and programmatic integration with your store and systems — without single-device limits.' },
+  { titleAr: 'كيف تشترك وتفعّل واتساب API؟', titleEn: 'How to subscribe and activate WhatsApp API', descAr: 'تختار الباقة، نوثّق حساب أعمالك لدى Meta، نعتمد رقمك وقوالبك، ثم نسلّمك مفاتيح API ولوحة التحكم. لا حاجة لتحميل برنامج — الخدمة سحابية بالكامل، ويُنجَز التفعيل عادةً خلال أيام قليلة.', descEn: 'Pick a plan, we verify your business with Meta, approve your number and templates, then hand over API keys and a dashboard. No software download — it’s fully cloud-based, and activation usually completes within a few days.' },
+  { titleAr: 'أسعار وتكلفة واتساب API', titleEn: 'WhatsApp API pricing and cost', descAr: 'التكلفة = اشتراك المنصة الشهري + تكلفة المحادثات حسب أسعار Meta ونوعها (تسويقية/خدمية/مصادقة). محادثات خدمة العملاء مجانية خلال 24 ساعة. اطّلع على الباقات والأسعار في هذه الصفحة أو اطلب عرضاً.', descEn: 'Cost = monthly platform subscription + per-conversation cost per Meta’s rates and type (marketing/utility/authentication). Customer-service conversations are free within 24 hours. See plans and pricing on this page or request a quote.' },
+  { titleAr: 'المدار: مقدّم حلول واتساب API في السعودية', titleEn: 'CORBIT: WhatsApp API provider in Saudi Arabia', descAr: 'المدار مزوّد معتمد ومرخّص من هيئة الاتصالات والفضاء والتقنية، يوفّر تفعيل واتساب API، العلامة الخضراء، اعتماد القوالب، شات بوت، وتكامل مع سلة ودفترة ونور — بدعم عربي وفوترة محلية.', descEn: 'CORBIT is a CST-licensed provider offering WhatsApp API activation, the green tick, template approval, chatbots, and integration with Salla, Daftra, and Noor — with Arabic support and local invoicing.' },
+];
+
 const COMPETITIVE_EDGE = [
   { icon: BadgeCheck, titleAr: 'ظهور اسم الشركة', titleEn: 'Company Name Visibility', descAr: 'يظهر اسم شركتك بجانب رقم الهاتف في واتساب', descEn: 'Your company name appears next to the phone number in WhatsApp' },
   { icon: BadgeCheck, titleAr: 'الشارة الخضراء الرسمية', titleEn: 'Official Green Badge', descAr: 'احصل على الشارة الخضراء التي تمنح ثقة عملائك', descEn: 'Get the official green badge that gives your customers confidence' },
@@ -395,8 +404,8 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
 
   // CMS-driven data with fallbacks
   const heroBadge = getCmsField(cmsPage, 'wa-chatbot', 'badge_ar', isRTL, 'واتساب أعمال API المعتمد');
-  const heroTitle = getCmsField(cmsPage, 'wa-chatbot', 'hero_title_ar', isRTL, 'تواصل احترافي مع عملائك عبر واتساب أعمال');
-  const heroSubtitle = getCmsField(cmsPage, 'wa-chatbot', 'hero_subtitle_ar', isRTL, 'كن أقرب لعملائك على واتساب — رسائل تسويقية معتمدة، ردود آلية ذكية، وإدارة محادثات مركزية من لوحة تحكم واحدة');
+  const heroTitle = getCmsField(cmsPage, 'wa-chatbot', 'hero_title_ar', isRTL, 'واتساب بزنس API — واجهة واتساب الرسمية للتواصل مع عملائك في السعودية');
+  const heroSubtitle = getCmsField(cmsPage, 'wa-chatbot', 'hero_subtitle_ar', isRTL, 'فعّل واجهة واتساب الأعمال الرسمية (WhatsApp Business API): قوالب رسائل معتمدة، ردود آلية وشات بوت، الشارة الخضراء، وتكامل مع متجرك — بأسعار واضحة ودعم سعودي.');
   const heroCtaPrimary = getCmsField(cmsPage, 'wa-chatbot', 'cta_primary_text_ar', isRTL, 'ابدأ الآن — تجربة مجانية لواتساب أعمال');
   const heroCtaSecondary = getCmsField(cmsPage, 'wa-chatbot', 'cta_secondary_text_ar', isRTL, 'تحدث مع المبيعات');
   const socialProof = getCmsField(cmsPage, 'wa-chatbot', 'social_proof_ar', isRTL, '+20,000 جهة تستخدم واتساب أعمال معنا');
@@ -407,10 +416,20 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const mockInputPlaceholder = getCmsField(cmsPage, 'wa-chatbot', 'mock_input_placeholder', isRTL, 'اكتب رسالة...');
   const mockTime = getCmsField(cmsPage, 'wa-chatbot', 'mock_time', isRTL, '9:41');
 
-  const whyTitle = getCmsField(cmsPage, 'wa-why', 'title', isRTL, 'لماذا واتساب الأعمال؟');
+  // قسم «ما هو واتساب API؟» التعريفي (CMS: wa-about-api) — عنوان + مقدّمة + بطاقات (blocks_json blob ثنائي اللغة).
+  const aboutTitle = getCmsField(cmsPage, 'wa-about-api', 'title', isRTL, 'ما هو واتساب API؟ ولماذا تحتاجه؟');
+  const aboutSubtitle = getCmsField(cmsPage, 'wa-about-api', 'subtitle', isRTL, 'دليل سريع لفهم واجهة واتساب الأعمال الرسمية (WhatsApp Business API): ما هي، الفرق عن التطبيق، التفعيل والاشتراك، الأسعار، وكيف تبدأ مع مزوّد معتمد في السعودية.');
+  const aboutBlocksJson = getCmsJson(cmsPage, 'wa-about-api', 'blocks_json', '');
+  const aboutBlocks = useMemo(() => {
+    try { const p = aboutBlocksJson ? JSON.parse(aboutBlocksJson) : null; return Array.isArray(p) && p.length ? p : ABOUT_API_BLOCKS; } catch { return ABOUT_API_BLOCKS; }
+  }, [aboutBlocksJson]);
+  const aboutCtaText = getCmsField(cmsPage, 'wa-about-api', 'cta_text', isRTL, 'اقرأ الدليل الكامل: واتساب API خطوة بخطوة');
+  const aboutCtaUrl = getCmsField(cmsPage, 'wa-about-api', 'cta_url', isRTL, '/blog/whatsapp-business-api-saudi-arabia');
+
+  const whyTitle = getCmsField(cmsPage, 'wa-why', 'title', isRTL, 'لماذا واتساب بزنس API مع المدار؟');
   const whySubtitle = getCmsField(cmsPage, 'wa-why', 'subtitle', isRTL, 'المنصة الأكثر ثقة وانتشاراً للتواصل مع عملائك في المملكة');
 
-  const featuresTitle = getCmsField(cmsPage, 'wa-features', 'solutions_title', isRTL, 'أدوات احترافية لإدارة محادثاتك');
+  const featuresTitle = getCmsField(cmsPage, 'wa-features', 'solutions_title', isRTL, 'كل ما تحتاجه من واتساب API لإدارة محادثاتك');
   const featuresBadge = getCmsField(cmsPage, 'wa-features', 'title', isRTL, 'واتساب أعمال API');
   const featuresSubtitle = getCmsField(cmsPage, 'wa-features', 'subtitle', isRTL, 'كل ما تحتاجه لتحويل واتساب إلى قناة تواصل احترافية مع عملائك');
 
@@ -946,6 +965,51 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
 
       {/* الأقسام القابلة لإعادة الترتيب من اللوحة (flex order) — الهيرو أعلاه مثبّت */}
       <div className="flex flex-col">
+
+      {/* ================================================================= */}
+      {/* 2. ما هو واتساب API؟ — قسم تعريفي (SEO: عنقود الكلمات التعريفية)    */}
+      {/* ================================================================= */}
+      <section style={secStyle('wa-about-api')} className="py-16 md:py-20 bg-slate-950 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-1/4 w-[400px] h-[250px] rounded-full bg-green-500/5 blur-[120px]" />
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-10">
+          <ScrollReveal className="text-center mb-10 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold text-white">
+              {aboutTitle}
+            </h2>
+            {aboutSubtitle && (
+              <p className="mt-3 text-slate-400 text-sm md:text-lg max-w-3xl mx-auto leading-relaxed">
+                {aboutSubtitle}
+              </p>
+            )}
+          </ScrollReveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {aboutBlocks.map((block: any, i: number) => (
+              <ScrollReveal key={i}>
+                <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-7 border border-white/10 hover:border-green-500/30 transition-all h-full">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2">
+                    {isRTL ? block.titleAr : block.titleEn}
+                  </h3>
+                  <p className="text-slate-400 text-sm md:text-[15px] leading-relaxed">
+                    {isRTL ? block.descAr : block.descEn}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+          {aboutCtaText && (
+            <div className="text-center mt-8 md:mt-10">
+              <a
+                href={aboutCtaUrl}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-green-500/30 bg-green-500/10 text-green-300 text-sm md:text-base font-semibold hover:bg-green-500/20 hover:border-green-500/50 transition-all"
+              >
+                {aboutCtaText}
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* 3. STATS BAR - Glass cards                                        */}

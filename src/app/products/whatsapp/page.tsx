@@ -1,11 +1,14 @@
 import { WhatsAppPage } from '@/components/business/products/WhatsAppPage';
 import { getSiteCmsSnapshot } from '@/lib/cms/siteCms';
-import { getCmsPageById, extractPageSeo, getCmsField } from '@/lib/cms/helpers';
+import { getCmsPageById, extractPageSeo, getCmsField, getCmsJson } from '@/lib/cms/helpers';
 import { getCachedSeoSettings, generatePageMetadata } from '@/lib/seo';
+import { parseWhatsAppPlans, getDefaultWhatsAppPlans } from '@/lib/cms/whatsappPricing';
 import type { CmsPage } from '@/lib/cms/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { WA_FAQ_DEFAULTS } from '@/lib/cms/waFaq';
+
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa').replace(/\/$/, '');
 
 function buildWaFaqJsonLd(page: CmsPage | null) {
   let items: { q: string; a: string }[] = WA_FAQ_DEFAULTS.map((it) => ({ q: it.qAr, a: it.aAr }));
@@ -34,6 +37,79 @@ function buildWaFaqJsonLd(page: CmsPage | null) {
       name: it.q,
       acceptedAnswer: { '@type': 'Answer', text: it.a },
     })),
+  };
+}
+
+// Service JSON-LD لمنتج واتساب بزنس API مع عروض الأسعار (الباقات) — يستهدف «سعر/تكاليف واتساب api».
+function buildWaServiceJsonLd(page: CmsPage | null) {
+  const rawPlans = getCmsJson(page, 'wa-pricing', 'plans_list', '');
+  const plans = parseWhatsAppPlans(rawPlans, getDefaultWhatsAppPlans(true));
+  const toNum = (s: string): number | null => {
+    const n = parseFloat(String(s).replace(/[^\d.]/g, ''));
+    return Number.isFinite(n) ? n : null;
+  };
+  const offers = plans
+    .map((p) => {
+      const prices = p.tiers.map((t) => toNum(t.price)).filter((n): n is number => n != null);
+      if (!prices.length) return null;
+      return {
+        '@type': 'Offer',
+        name: p.name,
+        price: String(Math.min(...prices)),
+        priceCurrency: 'SAR',
+        url: `${SITE_URL}/products/whatsapp`,
+      };
+    })
+    .filter((o): o is NonNullable<typeof o> => o != null);
+
+  const allPrices = plans
+    .flatMap((p) => p.tiers.map((t) => toNum(t.price)))
+    .filter((n): n is number => n != null);
+
+  const seo = extractPageSeo(page, '/products/whatsapp');
+  const description =
+    seo.description.ar ||
+    'واتساب بزنس API (واجهة واتساب الأعمال الرسمية) من المدار في السعودية: تفعيل واشتراك، أسعار واضحة، قوالب معتمدة، شات بوت، الشارة الخضراء، وتكامل مع سلة ودفترة.';
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    serviceType: 'WhatsApp Business API',
+    name: 'واتساب بزنس API — المدار',
+    alternateName: 'WhatsApp Business API',
+    description,
+    url: `${SITE_URL}/products/whatsapp`,
+    areaServed: { '@type': 'Country', name: 'SA' },
+    provider: {
+      '@type': 'Organization',
+      name: 'CORBIT',
+      alternateName: 'المدار',
+      url: SITE_URL,
+    },
+    ...(offers.length && allPrices.length
+      ? {
+          offers: {
+            '@type': 'AggregateOffer',
+            priceCurrency: 'SAR',
+            lowPrice: String(Math.min(...allPrices)),
+            highPrice: String(Math.max(...allPrices)),
+            offerCount: offers.length,
+            offers,
+          },
+        }
+      : {}),
+  };
+}
+
+// BreadcrumbList JSON-LD (مفقود سابقاً من صفحات المنتجات).
+function buildWaBreadcrumbJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'واتساب بزنس API', item: `${SITE_URL}/products/whatsapp` },
+    ],
   };
 }
 
@@ -74,9 +150,23 @@ export default async function WhatsAppProductPage() {
   }
 
   const faqJsonLd = buildWaFaqJsonLd(cmsPage);
+  const serviceJsonLd = buildWaServiceJsonLd(cmsPage);
+  const breadcrumbJsonLd = buildWaBreadcrumbJsonLd();
 
   return (
     <>
+      {serviceJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+        />
+      )}
+      {breadcrumbJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
+      )}
       {faqJsonLd && (
         <script
           type="application/ld+json"

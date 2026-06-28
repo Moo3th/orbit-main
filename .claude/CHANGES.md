@@ -745,3 +745,30 @@
 - 2026-06-23 12:40 — `content\articles\01-whatsapp-business-api-saudi-arabia.md` (new — article source)
 - 2026-06-23 09:33 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\blog-publishing.md`
 - 2026-06-23 09:33 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`
+- 2026-06-28 11:44 — `..\..\Users\mtc\.claude\plans\ancient-pondering-nebula.md`
+- 2026-06-28 11:48 — `scripts\optimize-whatsapp-seo.js`
+- 2026-06-28 11:48 — `scripts\optimize-whatsapp-seo.js`
+- 2026-06-28 11:49 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:49 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:49 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:51 — `src\lib\cms\waFaq.ts`
+- 2026-06-28 11:52 — `src\app\products\whatsapp\page.tsx`
+- 2026-06-28 11:53 — `src\app\products\whatsapp\page.tsx`
+- 2026-06-28 11:53 — `src\app\products\whatsapp\page.tsx`
+- 2026-06-28 11:54 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:54 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 11:59 — `scripts\_inspect-wa.js`
+- 2026-06-28 12:02 — `scripts\wa-seo-content.js`
+- 2026-06-28 12:04 — `content\articles\01-whatsapp-business-api-saudi-arabia.md`
+- 2026-06-28 12:04 — `content\articles\01-whatsapp-business-api-saudi-arabia.md`
+- 2026-06-28 12:05 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 12:05 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-28 12:06 — `scripts\wa-seo-content.js`
+- 2026-06-28 12:06 — `scripts\wa-seo-content.js`
+
+> 2026-06-28 — تحسين SEO صفحة /products/whatsapp لعنقود «واتساب API» (الكلمة المحورية «واتساب api» 250/KD0): العنوان وH1 يقودان بـ«واتساب بزنس API»، قسم تعريفي جديد wa-about-api («ما هو واتساب API؟» ببطاقات H3 + رابط للمقال)، توسيع الأسئلة الشائعة من 5 إلى 10، سكيما Service+AggregateOffer+BreadcrumbList، ميتا/كلمات موسّعة، ومقال الدليل مربوط داخلياً بالصفحة (3 روابط). الزرع عبر scripts/optimize-whatsapp-seo.js + scripts/wa-seo-content.js + seed-blog-article.js. tsc/lint نظيفان (0 أخطاء)، البناء ناجح (/products/whatsapp ثابتة)، وعوينت الصفحة والمقال على iPhone(390)/Android(412)/سطح المكتب(1280) بلا تمرير أفقي و0 أخطاء console، وتأكّد JSON-LD الثلاثة في HTML.
+- 2026-06-28 12:18 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\homepage-products-seo-initiative.md`
+- 2026-06-28 12:18 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\homepage-products-seo-initiative.md`
