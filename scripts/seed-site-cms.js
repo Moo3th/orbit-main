@@ -200,7 +200,7 @@ const seedSiteCms = async () => {
             { key: 'title', label: 'عنوان قسم الباقات', labelEn: 'Packages Section Title', type: 'text', value: 'اختر الباقة المناسبة لنمو أعمالك', valueEn: 'Choose the right package for your business growth' },
             { key: 'subtitle', label: 'وصف قسم الباقات', labelEn: 'Packages Section Subtitle', type: 'textarea', value: 'باقات مرنة تناسب جميع أحجام الأعمال', valueEn: 'Flexible packages suitable for all business sizes' },
             { key: 'plans_note', label: 'عنوان ملاحظة الباقات', labelEn: 'Plans Note Title', type: 'text', value: 'ملاحظة مهمة', valueEn: 'Important Note' },
-            { key: 'contact_note', label: 'نص ملاحظة الباقات', labelEn: 'Plans Note Text', type: 'textarea', value: 'الأسعار تشمل 3 شرائح لكل باقة', valueEn: 'Prices include 3 tiers for each package' },
+            { key: 'contact_note', label: 'نص ملاحظة الباقات', labelEn: 'Plans Note Text', type: 'textarea', value: 'الأسعار شهرية وشاملة ضريبة القيمة المضافة 15%. رسوم التأسيس والإعداد تُحدّد حسب كل حالة.', valueEn: 'Prices are monthly and include 15% VAT. Setup and onboarding fees are determined case by case.' },
             { key: 'plans_list', label: 'تفاصيل الباقات والشرائح', labelEn: 'Packages and Tiers Details', type: 'list', value: '' },
             { key: 'api_title', label: 'عنوان أسعار محادثات API', labelEn: 'API Pricing Title', type: 'text', value: 'أسعار محادثات واتساب API', valueEn: 'WhatsApp API Conversation Prices' },
             { key: 'api_subtitle', label: 'وصف أسعار محادثات API', labelEn: 'API Pricing Subtitle', type: 'textarea', value: 'الأسعار محددة من واتساب (Meta) للسوق السعودي', valueEn: 'Prices standardized by WhatsApp (Meta) for Saudi Market' },

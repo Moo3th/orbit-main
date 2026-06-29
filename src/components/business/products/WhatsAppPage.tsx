@@ -289,62 +289,11 @@ const DEVELOPER_TOOLS = [
   { titleAr: 'بيئة اختبار Sandbox', titleEn: 'Sandbox Environment' },
 ];
 
-const PRICING_PLANS = [
-  {
-    id: 'basic',
-    nameAr: 'الباقة الأساسية',
-    nameEn: 'Basic Package',
-    popular: false,
-    color: 'border-white/20',
-    bgColor: 'bg-white/5',
-    buttonColor: 'bg-slate-600 hover:bg-slate-700',
-    tiers: [
-      { nameAr: 'الشريحة 1', nameEn: 'Tier 1', price: '399', priceWithTax: '459', setupFee: '850', conversations: '1,000', broadcastMessages: '10,000', users: 7 },
-      { nameAr: 'الشريحة 2', nameEn: 'Tier 2', price: '699', priceWithTax: '804', setupFee: '850', conversations: '2,500', broadcastMessages: '25,000', users: 15 },
-      { nameAr: 'الشريحة 3', nameEn: 'Tier 3', price: '1,199', priceWithTax: '1,379', setupFee: '850', conversations: '5,000', broadcastMessages: '50,000', users: 25 },
-    ],
-    featuresAr: ['الويب هوك وواجهة برمجة التطبيقات', 'ربط المتجر مع المنصة', 'دعم فني فضي'],
-    featuresEn: ['Webhooks and API', 'Store integration with platform', 'Silver technical support'],
-  },
-  {
-    id: 'growth',
-    nameAr: 'باقة النمو',
-    nameEn: 'Growth Package',
-    popular: true,
-    badgeAr: 'الأكثر طلباً',
-    badgeEn: 'Most Popular',
-    color: 'border-green-500/50',
-    bgColor: 'bg-green-500/10',
-    buttonColor: 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700',
-    tiers: [
-      { nameAr: 'الشريحة 1', nameEn: 'Tier 1', price: '659', priceWithTax: '758', setupFee: '1,919', conversations: '1,000', broadcastMessages: '10,000', users: 7 },
-      { nameAr: 'الشريحة 2', nameEn: 'Tier 2', price: '999', priceWithTax: '1,149', setupFee: '1,919', conversations: '2,500', broadcastMessages: '25,000', users: 15 },
-      { nameAr: 'الشريحة 3', nameEn: 'Tier 3', price: '1,619', priceWithTax: '1,862', setupFee: '1,919', conversations: '5,000', broadcastMessages: '50,000', users: 25 },
-    ],
-    featuresAr: ['كل مميزات الباقة الأساسية', 'ربط أكثر من متجر مع المنصة', 'شات بوت ذكي (Smart Chatbot)', 'مدير حساب مخصص', 'دعم فني ذهبي'],
-    featuresEn: ['All features of the Basic Package', 'Multiple store integrations', 'Smart Chatbot', 'Dedicated Account Manager', 'Gold technical support'],
-  },
-  {
-    id: 'professional',
-    nameAr: 'الباقة الاحترافية',
-    nameEn: 'Professional Package',
-    popular: false,
-    color: 'border-purple-500/30',
-    bgColor: 'bg-purple-500/10',
-    buttonColor: 'bg-purple-600 hover:bg-purple-700',
-    tiers: [
-      { nameAr: 'الشريحة 1', nameEn: 'Tier 1', price: '999', priceWithTax: '1,149', setupFee: '2,919', conversations: '1,000', broadcastMessages: '10,000', users: 7 },
-      { nameAr: 'الشريحة 2', nameEn: 'Tier 2', price: '1,499', priceWithTax: '1,724', setupFee: '2,919', conversations: '2,500', broadcastMessages: '25,000', users: 15 },
-      { nameAr: 'الشريحة 3', nameEn: 'Tier 3', price: '2,199', priceWithTax: '2,529', setupFee: '2,919', conversations: '5,000', broadcastMessages: '50,000', users: 25 },
-    ],
-    featuresAr: ['كل مميزات باقة النمو', 'موظف ذكاء اصطناعي (AI Agent)', 'استضافة محلية (حسب الطلب)', 'مدير حساب VIP', 'دعم فني بلاتيني'],
-    featuresEn: ['All features of the Growth Package', 'AI Agent Employee', 'Local Hosting (Upon request)', 'VIP Account Manager', 'Platinum technical support'],
-  },
-];
-
-// لوحة ألوان البطاقات حين تأتي الباقات من الـ CMS (شكل WhatsAppPlanConfig لا يحمل ألواناً).
+// لوحة ألوان البطاقات (الباقات تأتي من الـ CMS/الافتراضي بشكل WhatsAppPlanConfig بلا ألوان).
+// أربعة عناصر للباقات الأربع؛ الفهرس 2 (الأعمال) أخضر ليطابق توهّج «الأكثر طلباً».
 const PLAN_PALETTE = [
   { color: 'border-white/20', bgColor: 'bg-white/5', buttonColor: 'bg-slate-600 hover:bg-slate-700' },
+  { color: 'border-blue-500/40', bgColor: 'bg-blue-500/10', buttonColor: 'bg-blue-600 hover:bg-blue-700' },
   { color: 'border-green-500/50', bgColor: 'bg-green-500/10', buttonColor: 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' },
   { color: 'border-purple-500/30', bgColor: 'bg-purple-500/10', buttonColor: 'bg-purple-600 hover:bg-purple-700' },
 ];
@@ -355,13 +304,6 @@ const CONV_PALETTE = [
   'bg-purple-500/10 border-purple-500/20',
   'bg-blue-500/10 border-blue-500/20',
   'bg-orange-500/10 border-orange-500/20',
-];
-
-const API_PRICING = [
-  { typeAr: 'محادثات خدمة العملاء', typeEn: 'Customer Service Conversations', priceAr: 'مجانية', priceEn: 'Free', durationAr: '24 ساعة', durationEn: '24 Hours', descAr: 'الرد على استفسارات العملاء خلال 24 ساعة من آخر رسالة', descEn: 'Reply to customer inquiries within 24 hours of their last message', isFree: true, color: 'bg-green-500/10 border-green-500/20' },
-  { typeAr: 'رسائل التحقق (OTP)', typeEn: 'Verification Messages (OTP)', priceAr: '0.15', priceEn: '0.15', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رموز التحقق وتأكيد الهوية للمصادقة الآمنة', descEn: 'Verification codes and identity confirmation for secure authentication', isFree: false, color: 'bg-purple-500/10 border-purple-500/20' },
-  { typeAr: 'محادثات التفعيل', typeEn: 'Utility Conversations', priceAr: '0.30', priceEn: '0.30', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'تأكيد الطلبات، إشعارات الشحن، وتحديثات الحساب', descEn: 'Order confirmations, shipping notices, and account updates', isFree: false, color: 'bg-blue-500/10 border-blue-500/20' },
-  { typeAr: 'محادثات التسويق', typeEn: 'Marketing Conversations', priceAr: '0.64', priceEn: '0.64', unitAr: 'ر.س', unitEn: 'SAR', durationAr: 'للمحادثة', durationEn: 'per conversation', descAr: 'رسائل ترويجية وحملات إعلانية للعملاء', descEn: 'Promotional messages and ad campaigns for customers', isFree: false, color: 'bg-orange-500/10 border-orange-500/20' },
 ];
 
 const DEFAULT_DEV_CODE = `// Send WhatsApp Message via Orbit API
@@ -507,12 +449,11 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const pricingTitle = getCmsField(cmsPage, 'wa-pricing', 'title', isRTL, 'اختر الباقة المناسبة لنمو أعمالك');
   const pricingSubtitle = getCmsField(cmsPage, 'wa-pricing', 'subtitle', isRTL, 'باقات مرنة تناسب جميع أحجام الأعمال');
   const pricingNoteTitle = getCmsField(cmsPage, 'wa-pricing', 'plans_note', isRTL, 'ملاحظة مهمة');
-  const pricingNoteText = getCmsField(cmsPage, 'wa-pricing', 'contact_note', isRTL, 'الأسعار الموضحة تشمل 3 شرائح لكل باقة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.');
+  const pricingNoteText = getCmsField(cmsPage, 'wa-pricing', 'contact_note', isRTL, 'الأسعار شهرية وشاملة ضريبة القيمة المضافة 15%. رسوم التأسيس والإعداد تُحدّد حسب كل حالة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.');
   const plansEyebrow = getCmsField(cmsPage, 'wa-pricing', 'plans_eyebrow', isRTL, 'الباقات والأسعار');
   const plansCapacityTitle = getCmsField(cmsPage, 'wa-pricing', 'plans_capacity_title', isRTL, 'السعة والحدود');
   const plansConversationsLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_conversations_label', isRTL, 'محادثة');
   const plansBroadcastsLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_broadcasts_label', isRTL, 'رسالة بث');
-  const plansUsersPrefix = getCmsField(cmsPage, 'wa-pricing', 'plans_users_prefix', isRTL, 'حتى');
   const plansUsersLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_users_label', isRTL, 'مستخدمين');
   const plansCurrency = getCmsField(cmsPage, 'wa-pricing', 'plans_currency', isRTL, 'ر.س');
   const plansPeriodLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_period_label', isRTL, 'شهرياً');
@@ -526,7 +467,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const apiEyebrow = getCmsField(cmsPage, 'wa-pricing', 'api_eyebrow', isRTL, 'تكلفة المحادثات');
   const apiTipTitle = getCmsField(cmsPage, 'wa-pricing', 'api_tip_title', isRTL, 'نصيحة احترافية');
   const apiTipDesc = getCmsField(cmsPage, 'wa-pricing', 'api_tip_description', isRTL, 'محادثات خدمة العملاء مجانية تماماً خلال 24 ساعة من آخر رسالة! استفد من هذه الميزة للرد على استفسارات عملائك دون أي تكلفة إضافية.');
-  const apiNote = getCmsField(cmsPage, 'wa-pricing', 'api_note', isRTL, '* الأسعار قابلة للتغيير من Meta (واتساب) وقد تختلف حسب المنطقة والعملة.');
+  const apiNote = getCmsField(cmsPage, 'wa-pricing', 'api_note', isRTL, '* رسوم Meta لكل رسالة وتُحدّدها Meta وقد تتغيّر ربع سنوياً. التوثيق الدولي 0.191 ر.س للأرقام خارج السعودية، ونافذة CTWA (إعلانات الضغط للواتساب) مجانية 72 ساعة بعد نقر العميل.');
 
   const personaTitle = getCmsField(cmsPage, 'wa-persona', 'title', isRTL, 'اختر مسارك');
   const merchantTitle = getCmsField(cmsPage, 'wa-persona', 'merchant_title_ar', isRTL, 'للمتاجر والمسوقين');
@@ -588,38 +529,25 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
     return null;
   }, [plansJson, isRTL]);
 
-  // تطبيع الباقات لشكل عرض موحّد: من الـ CMS (WhatsAppPlanConfig) أو الافتراضي (PRICING_PLANS).
-  // يضمن أن ما يُحرَّر في لوحة باقات واتساب يظهر فعلاً (الاسم، الشرائح، المميزات، الشارة).
+  // تطبيع الباقات لشكل عرض موحّد: من الـ CMS (WhatsAppPlanConfig) أو الافتراضي (getDefaultWhatsAppPlans).
+  // المصدران بنفس الشكل، فاللون فقط يُضاف بالفهرس عبر PLAN_PALETTE. يضمن ظهور ما يُحرَّر باللوحة (الاسم، السعر، المميزات، الشارة).
   const displayPlans = useMemo(() => {
-    if (waPlans && waPlans.length > 0) {
-      return waPlans.map((p, i) => ({
-        id: p.id,
-        name: p.name,
-        popular: p.popular,
-        badge: p.badge,
-        subscribeLabel: p.subscribeLabel,
-        ...PLAN_PALETTE[i % PLAN_PALETTE.length],
-        tiers: p.tiers.map((t) => ({
-          name: t.name, price: t.price, priceWithTax: t.priceWithTax,
-          setupFee: t.setupFee, conversations: t.conversations,
-          broadcastMessages: t.broadcastMessages, users: t.users,
-        })),
-        features: p.additionalFeatures,
-      }));
-    }
-    return PRICING_PLANS.map((p) => ({
+    const source = (waPlans && waPlans.length > 0) ? waPlans : getDefaultWhatsAppPlans(isRTL);
+    return source.map((p, i) => ({
       id: p.id,
-      name: isRTL ? p.nameAr : p.nameEn,
+      name: p.name,
       popular: p.popular,
-      badge: isRTL ? (p as { badgeAr?: string }).badgeAr ?? '' : (p as { badgeEn?: string }).badgeEn ?? '',
-      subscribeLabel: '',
-      color: p.color, bgColor: p.bgColor, buttonColor: p.buttonColor,
+      badge: p.badge,
+      subscribeLabel: p.subscribeLabel,
+      subscribeUrl: p.subscribeUrl,
+      subscribeUrlType: p.subscribeUrlType,
+      ...PLAN_PALETTE[i % PLAN_PALETTE.length],
       tiers: p.tiers.map((t) => ({
-        name: isRTL ? t.nameAr : t.nameEn, price: t.price, priceWithTax: t.priceWithTax,
+        name: t.name, price: t.price, priceWithTax: t.priceWithTax,
         setupFee: t.setupFee, conversations: t.conversations,
         broadcastMessages: t.broadcastMessages, users: t.users,
       })),
-      features: isRTL ? p.featuresAr : p.featuresEn,
+      features: p.additionalFeatures,
     }));
   }, [waPlans, isRTL]);
 
@@ -646,27 +574,17 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
     return null;
   }, [convJson, isRTL]);
 
-  // تطبيع أسعار محادثات API لشكل عرض موحّد (شكل CMS لا يحمل وحدة/لوناً).
+  // تطبيع أسعار محادثات API لشكل عرض موحّد: من الـ CMS أو الافتراضي (getDefaultWhatsAppConversationPrices). الوحدة واللون يُضافان هنا.
   const displayConvPrices = useMemo(() => {
-    if (waConvPrices && waConvPrices.length > 0) {
-      return waConvPrices.map((it, i) => ({
-        type: it.type,
-        price: it.price,
-        unit: plansCurrency,
-        duration: it.duration,
-        description: it.description,
-        isFree: it.isFree,
-        color: CONV_PALETTE[i % CONV_PALETTE.length],
-      }));
-    }
-    return API_PRICING.map((it) => ({
-      type: isRTL ? it.typeAr : it.typeEn,
-      price: isRTL ? it.priceAr : it.priceEn,
-      unit: isRTL ? (it as { unitAr?: string }).unitAr ?? '' : (it as { unitEn?: string }).unitEn ?? '',
-      duration: isRTL ? it.durationAr : it.durationEn,
-      description: isRTL ? it.descAr : it.descEn,
+    const source = (waConvPrices && waConvPrices.length > 0) ? waConvPrices : getDefaultWhatsAppConversationPrices(isRTL);
+    return source.map((it, i) => ({
+      type: it.type,
+      price: it.price,
+      unit: plansCurrency,
+      duration: it.duration,
+      description: it.description,
       isFree: it.isFree,
-      color: it.color,
+      color: CONV_PALETTE[i % CONV_PALETTE.length],
     }));
   }, [waConvPrices, isRTL, plansCurrency]);
 
@@ -1240,18 +1158,22 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             <p className="text-slate-400 max-w-xl mx-auto">{pricingSubtitle}</p>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          {/* جوال/تابلت: شريط أفقي بالسحب (swipe)؛ سطح المكتب (lg+): شبكة 4 أعمدة */}
+          <div className="flex lg:grid lg:grid-cols-4 gap-5 lg:gap-6 overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {displayPlans.map((plan) => {
               const tierIndex = selectedTier[plan.id] ?? 0;
               const tier = plan.tiers[tierIndex];
-              // وجهة «اشترك الآن»: النموذج الداخلي مع تحديد الباقة والشريحة مسبقاً (إلا إذا اختار الأدمن رابطاً خارجياً).
-              const subscribeBase = resolveCtaLink(cmsPage, 'wa-pricing', 'plans_cta', 'whatsapp', isRTL, 'https://app.mobile.net.sa/reg');
+              const isNumericPrice = /\d/.test(tier?.price || '');
+              // وجهة الزر: تجاوز لكل باقة برابط خارجي (مثل «تواصل معنا» → /contact)؛ وإلا وجهة قسم الأسعار (النموذج الداخلي).
+              const subscribeBase = (plan.subscribeUrlType === 'external' && plan.subscribeUrl)
+                ? plan.subscribeUrl
+                : resolveCtaLink(cmsPage, 'wa-pricing', 'plans_cta', 'whatsapp', isRTL, 'https://app.mobile.net.sa/reg');
               const subscribeHref = subscribeBase.startsWith('/products/')
                 ? `${subscribeBase}?plan=${encodeURIComponent(plan.id)}&tier=${tierIndex}`
                 : subscribeBase;
               return (
-                <ScrollReveal key={plan.id}>
-                  <div className={`relative rounded-2xl overflow-hidden border-2 ${plan.color} ${plan.bgColor} backdrop-blur-xl ${plan.popular ? 'shadow-[0_0_40px_rgba(16,185,129,0.2)] md:scale-105' : ''}`}>
+                <div key={plan.id} className="snap-start shrink-0 w-[82%] sm:w-[47%] md:w-[31%] lg:w-auto">
+                  <div className={`h-full relative rounded-2xl overflow-hidden border-2 ${plan.color} ${plan.bgColor} backdrop-blur-xl ${plan.popular ? 'shadow-[0_0_40px_rgba(16,185,129,0.2)] lg:scale-105' : ''}`}>
                     {plan.popular && plan.badge && (
                       <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-center py-2 text-sm font-bold">
                         ⭐ {plan.badge}
@@ -1275,18 +1197,30 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                         </div>
                         <div className="space-y-1.5 text-[10px] md:text-xs">
                           <div className="flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /><span className="text-slate-300 font-semibold">{tier.conversations} {plansConversationsLabel}</span></div>
-                          <div className="flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /><span className="text-slate-300 font-semibold">{tier.broadcastMessages} {plansBroadcastsLabel}</span></div>
-                          <div className="flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /><span className="text-slate-300 font-semibold">{plansUsersPrefix} {tier.users} {plansUsersLabel}</span></div>
+                          {tier.broadcastMessages && (
+                            <div className="flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /><span className="text-slate-300 font-semibold">{tier.broadcastMessages} {plansBroadcastsLabel}</span></div>
+                          )}
+                          <div className="flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /><span className="text-slate-300 font-semibold">{tier.users} {plansUsersLabel}</span></div>
                         </div>
                       </div>
                       <div className="text-center mb-2">
-                        <div className="flex items-baseline justify-center gap-1.5">
-                          <span className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{tier.price}</span>
-                          <span className="text-green-400 font-bold text-lg">{plansCurrency}</span>
+                        <div className="flex items-baseline justify-center gap-1.5 min-h-[3rem] md:min-h-[3.75rem]">
+                          {isNumericPrice ? (
+                            <>
+                              <span className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{tier.price}</span>
+                              <span className="text-green-400 font-bold text-lg">{plansCurrency}</span>
+                            </>
+                          ) : (
+                            <span className="text-2xl md:text-3xl font-extrabold text-white self-center drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{tier.price}</span>
+                          )}
                         </div>
-                        <p className="text-slate-400 text-sm">{plansPeriodLabel}</p>
-                        <p className="text-slate-500 text-[10px]">{plansTaxLabel} {tier.priceWithTax} {plansCurrency}</p>
-                        <p className="text-slate-500 text-[10px]">{plansSetupLabel} {tier.setupFee} {plansCurrency}</p>
+                        {isNumericPrice && <p className="text-slate-400 text-sm">{plansPeriodLabel}</p>}
+                        {isNumericPrice && tier.priceWithTax && (
+                          <p className="text-slate-500 text-[10px]">{plansTaxLabel} {tier.priceWithTax} {plansCurrency}</p>
+                        )}
+                        {tier.setupFee && (
+                          <p className="text-slate-500 text-[10px]">{plansSetupLabel} {tier.setupFee}{/\d/.test(tier.setupFee) ? ` ${plansCurrency}` : ''}</p>
+                        )}
                       </div>
                       <a href={subscribeHref} onClick={() => trackPlanSelected({ serviceType: 'whatsapp', planId: plan.id, planName: plan.name, price: Number(tier?.price) || undefined })} className={`w-full block text-center text-white font-bold mb-4 py-3 rounded-xl transition-all ${plan.buttonColor} shadow-lg`}>
                         {plan.subscribeLabel || plansSubscribeLabel}
@@ -1305,7 +1239,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                       </div>
                     </div>
                   </div>
-                </ScrollReveal>
+                </div>
               );
             })}
           </div>

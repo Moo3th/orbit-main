@@ -1122,8 +1122,8 @@ const defaultWhatsAppPricingFields: SectionField[] = [
     label: "نص ملاحظة الباقات",
     labelEn: "Plans Note Text",
     type: "textarea",
-    value: "الأسعار الموضحة تشمل 3 شرائح لكل باقة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.",
-    valueEn: "The stated prices include 3 tiers for each package. Special discounts are available for large companies and government entities.",
+    value: "الأسعار شهرية وشاملة ضريبة القيمة المضافة 15%. رسوم التأسيس والإعداد تُحدّد حسب كل حالة. تتوفر خصومات خاصة للشركات الكبرى والجهات الحكومية.",
+    valueEn: "Prices are monthly and include 15% VAT. Setup and onboarding fees are determined case by case. Special discounts are available for large companies and government entities.",
   },
   {
     key: "plans_list",
