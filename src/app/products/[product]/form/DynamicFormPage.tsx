@@ -46,9 +46,18 @@ interface ProductPackage {
   tiers: PackageTier[];
 }
 
+// السعر النصّي (مثل «تواصل معنا») يُعرض كما هو بلا عملة/فترة.
+const formatPackagePrice = (pkg: ProductPackage, tier: PackageTier): string =>
+  /\d/.test(tier.price)
+    ? `${tier.price} ${pkg.currency}${pkg.period ? `/${pkg.period}` : ''}`
+    : tier.price;
+
 // نص الباقة المختارة كما يُخزَّن في نتيجة النموذج ويظهر في طلبات اللوحة والبريد.
+// عند شريحة واحدة تكفي تسمية الباقة (اسم الشريحة عندها عام مثل «الباقة»).
 const formatPackageLabel = (pkg: ProductPackage, tier: PackageTier): string =>
-  `${pkg.planName} — ${tier.tierName} · ${tier.price} ${pkg.currency}${pkg.period ? `/${pkg.period}` : ''}`;
+  pkg.tiers.length > 1
+    ? `${pkg.planName} — ${tier.tierName} · ${formatPackagePrice(pkg, tier)}`
+    : `${pkg.planName} · ${formatPackagePrice(pkg, tier)}`;
 
 interface Props {
   productId: string;
@@ -419,8 +428,8 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
                                 ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' }
                                 : { backgroundColor: 'var(--form-card-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}
                             >
-                              <span className="block mb-0.5">{tier.tierName}</span>
-                              <span className="block font-extrabold">{tier.price} {pkg.currency}{pkg.period ? `/${pkg.period}` : ''}</span>
+                              {pkg.tiers.length > 1 && <span className="block mb-0.5">{tier.tierName}</span>}
+                              <span className="block font-extrabold">{formatPackagePrice(pkg, tier)}</span>
                             </button>
                           );
                         })}

@@ -803,3 +803,12 @@
 - 2026-06-29 12:45 — `scripts\wa-new-pricing.js`
 - 2026-06-29 13:14 — `src\components\business\products\WhatsAppPage.tsx`
 - 2026-06-29 13:14 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-06-29 13:19 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\whatsapp-cms-editability.md`
+- 2026-07-06 07:37 — `scripts\set-gsc-verification.js`
+- 2026-07-06 08:31 — `..\..\Users\mtc\AppData\Local\Temp\claude\C--orbitWebsite-orbit-main-master\6a32f3c0-c50c-4c48-aafc-117b710732f7\scratchpad\check-wa-form.js`
+- 2026-07-06 08:32 — `..\..\Users\mtc\AppData\Local\Temp\claude\C--orbitWebsite-orbit-main-master\6a32f3c0-c50c-4c48-aafc-117b710732f7\scratchpad\check-plans-cta.js`
+- 2026-07-06 08:34 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:34 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+
+> إصلاح «الباقة لم تُحدَّد» في طلبات الواتساب: أُضيف حقل الباقة لإعداد فورم الواتساب في القاعدة الحيّة (npm run seed:wa-package)، وأُصلح تنسيق السعر النصّي (تواصل معنا) في DynamicFormPage — البناء ناجح، عوينت /products/whatsapp/form على iPhone و Android وسطح المكتب (عربي/إنجليزي) بلا أخطاء console.
+- 2026-07-06 08:41 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
