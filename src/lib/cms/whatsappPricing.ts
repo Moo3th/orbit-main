@@ -22,6 +22,63 @@ export interface WhatsAppPlanConfig {
   tiers: WhatsAppPlanTier[];
 }
 
+export type BillingCycle = 'monthly' | 'yearly';
+
+export interface BillingDiscounts {
+  monthlyDiscount: number; // نسبة مئوية 0-100
+  yearlyDiscount: number;
+}
+
+// عرض سعر شريحة لدورة فوترة: المبلغ المعروض دائماً **قيمة شهرية** (في السنوي: المكافئ الشهري بعد
+// خصم السنوي)، والأصل الشهري قبل الخصم (للشطب)، وإجمالي السنة بعد الخصم كسطر توضيحي في الدورة السنوية.
+// الأسعار النصّية (مثل «تواصل معنا») تمرّ كما هي بلا عملة/فترة/خصم.
+export interface TierPriceView {
+  isNumeric: boolean;
+  amount: string;
+  original: string | null;
+  discountPercent: number;
+  yearlyTotal: string | null;
+}
+
+export const parseDiscountPercent = (raw: string): number => {
+  const n = parseFloat(String(raw ?? '').replace(/[^\d.]/g, ''));
+  if (!Number.isFinite(n)) return 0;
+  return Math.min(100, Math.max(0, n));
+};
+
+const formatAmount = (n: number): string => {
+  const rounded = Math.round(n * 100) / 100;
+  return rounded.toLocaleString('en-US', { maximumFractionDigits: 2 });
+};
+
+export const getTierPriceView = (
+  price: string,
+  cycle: BillingCycle,
+  discounts: BillingDiscounts
+): TierPriceView => {
+  const numeric = parseFloat(String(price).replace(/[^\d.]/g, ''));
+  if (!/\d/.test(price) || !Number.isFinite(numeric)) {
+    return { isNumeric: false, amount: price, original: null, discountPercent: 0, yearlyTotal: null };
+  }
+  const discountPercent = cycle === 'yearly' ? discounts.yearlyDiscount : discounts.monthlyDiscount;
+  const amount = numeric * (1 - discountPercent / 100);
+  return {
+    isNumeric: true,
+    amount: formatAmount(amount),
+    original: discountPercent > 0 ? formatAmount(numeric) : null,
+    discountPercent,
+    yearlyTotal: cycle === 'yearly' ? formatAmount(amount * 12) : null,
+  };
+};
+
+// السعر شامل الضريبة 15% للمبلغ المعروض (يُعاد حسابه لأن المخزّن شهري قبل الخصم).
+export const getTaxedAmount = (view: TierPriceView): string | null => {
+  if (!view.isNumeric) return null;
+  const n = parseFloat(view.amount.replace(/,/g, ''));
+  if (!Number.isFinite(n)) return null;
+  return formatAmount(n * 1.15);
+};
+
 export interface WhatsAppConversationPrice {
   type: string;
   price: string;

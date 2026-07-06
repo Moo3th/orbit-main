@@ -4,6 +4,7 @@ import { getCmsPageById, getCmsField } from '@/lib/cms/helpers';
 import {
   parseWhatsAppPlans,
   getDefaultWhatsAppPlans,
+  parseDiscountPercent,
 } from '@/lib/cms/whatsappPricing';
 
 export const dynamic = 'force-dynamic';
@@ -55,6 +56,16 @@ export async function GET(request: NextRequest) {
       const plansJson = getCmsField(page, 'wa-pricing', 'plans_list', isRTL, '');
       const currency = getCmsField(page, 'wa-pricing', 'plans_currency', isRTL, isRTL ? 'ر.س' : 'SAR');
       const periodFallback = getCmsField(page, 'wa-pricing', 'plans_period_label', isRTL, isRTL ? 'شهرياً' : 'Monthly');
+      // إعدادات الفوترة (شهري/سنوي) والخصومات — نفس مصدر قسم الأسعار حتى يتطابق الفورم مع الصفحة.
+      const billing = {
+        monthlyLabel: getCmsField(page, 'wa-pricing', 'billing_monthly_label', isRTL, isRTL ? 'شهري' : 'Monthly'),
+        yearlyLabel: getCmsField(page, 'wa-pricing', 'billing_yearly_label', isRTL, isRTL ? 'سنوي' : 'Yearly'),
+        monthlyPeriodLabel: periodFallback,
+        yearlyPeriodLabel: getCmsField(page, 'wa-pricing', 'billing_yearly_period_label', isRTL, isRTL ? 'سنوياً' : 'Yearly'),
+        monthlyDiscount: parseDiscountPercent(getCmsField(page, 'wa-pricing', 'billing_monthly_discount', isRTL, '0')),
+        yearlyDiscount: parseDiscountPercent(getCmsField(page, 'wa-pricing', 'billing_yearly_discount', isRTL, '0')),
+        discountBadge: getCmsField(page, 'wa-pricing', 'billing_discount_badge', isRTL, isRTL ? 'خصم' : 'Save'),
+      };
       const plans = plansJson
         ? parseWhatsAppPlans(plansJson, getDefaultWhatsAppPlans(isRTL))
         : getDefaultWhatsAppPlans(isRTL);
@@ -74,7 +85,7 @@ export async function GET(request: NextRequest) {
         })),
       }));
 
-      return NextResponse.json({ packages, currency });
+      return NextResponse.json({ packages, currency, billing });
     }
 
     return NextResponse.json({ packages: [] });

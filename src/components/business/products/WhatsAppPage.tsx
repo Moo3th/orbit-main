@@ -60,6 +60,10 @@ import {
   getDefaultWhatsAppPlans,
   parseWhatsAppConversationPrices,
   parseWhatsAppPlans,
+  parseDiscountPercent,
+  getTierPriceView,
+  getTaxedAmount,
+  type BillingCycle,
 } from '@/lib/cms/whatsappPricing';
 
 function useCountUp(end: number, duration: number = 2000, trigger: boolean) {
@@ -331,6 +335,7 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   // استخدام لغة الموقع العامة (موحّدة مع بقية الموقع والهيدر الرئيسي).
   const { isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState<'merchant' | 'developer'>('merchant');
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
 
   // وسم <html> أثناء وجود صفحة واتساب لتلوين شريط التمرير بالأخضر (بدل العنابي) عبر globals.css.
   useEffect(() => {
@@ -461,6 +466,15 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
   const plansSetupLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_setup_label', isRTL, 'رسوم التأسيس:');
   const plansFeaturesLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_features_label', isRTL, 'المميزات الإضافية');
   const plansSubscribeLabel = getCmsField(cmsPage, 'wa-pricing', 'plans_subscribe_label', isRTL, 'اشترك الآن');
+  // مبدّل الفوترة (شهري/سنوي) وخصومات الدورتين — قابلة للتحرير من قسم «تسعير واتساب» في اللوحة.
+  const billingMonthlyLabel = getCmsField(cmsPage, 'wa-pricing', 'billing_monthly_label', isRTL, isRTL ? 'شهري' : 'Monthly');
+  const billingYearlyLabel = getCmsField(cmsPage, 'wa-pricing', 'billing_yearly_label', isRTL, isRTL ? 'سنوي' : 'Yearly');
+  const billingYearlyPeriodLabel = getCmsField(cmsPage, 'wa-pricing', 'billing_yearly_period_label', isRTL, isRTL ? 'سنوياً' : 'Yearly');
+  const billingDiscountBadge = getCmsField(cmsPage, 'wa-pricing', 'billing_discount_badge', isRTL, isRTL ? 'خصم' : 'Save');
+  const billingDiscounts = {
+    monthlyDiscount: parseDiscountPercent(getCmsField(cmsPage, 'wa-pricing', 'billing_monthly_discount', isRTL, '0')),
+    yearlyDiscount: parseDiscountPercent(getCmsField(cmsPage, 'wa-pricing', 'billing_yearly_discount', isRTL, '0')),
+  };
 
   const apiPricingTitle = getCmsField(cmsPage, 'wa-pricing', 'api_title', isRTL, getCmsField(cmsPage, 'wa-features', 'api_pricing_title', isRTL, 'أسعار محادثات واتساب API'));
   const apiSubtitle = getCmsField(cmsPage, 'wa-pricing', 'api_subtitle', isRTL, 'الأسعار التالية محددة من واتساب (Meta) للسوق السعودي');
@@ -1156,6 +1170,27 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
               {pricingTitle}
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto">{pricingSubtitle}</p>
+            {/* مبدّل الفوترة شهري/سنوي — الخصومات تُضبط من اللوحة (قسم تسعير واتساب). */}
+            <div className="inline-flex items-center gap-1 mt-6 p-1 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              {([
+                { cycle: 'monthly' as BillingCycle, label: billingMonthlyLabel, discount: billingDiscounts.monthlyDiscount },
+                { cycle: 'yearly' as BillingCycle, label: billingYearlyLabel, discount: billingDiscounts.yearlyDiscount },
+              ]).map(({ cycle, label, discount }) => (
+                <button
+                  key={cycle}
+                  type="button"
+                  onClick={() => setBillingCycle(cycle)}
+                  className={`min-h-[44px] px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === cycle ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'text-slate-400 hover:text-white'}`}
+                >
+                  {label}
+                  {discount > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${billingCycle === cycle ? 'bg-white/20 text-white' : 'bg-green-500/15 text-green-400'}`}>
+                      {billingDiscountBadge} {discount}%
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </ScrollReveal>
 
           {/* جوال/تابلت: شريط أفقي بالسحب (swipe)؛ سطح المكتب (lg+): شبكة 4 أعمدة */}
@@ -1163,13 +1198,15 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
             {displayPlans.map((plan) => {
               const tierIndex = selectedTier[plan.id] ?? 0;
               const tier = plan.tiers[tierIndex];
-              const isNumericPrice = /\d/.test(tier?.price || '');
+              const priceView = getTierPriceView(tier?.price || '', billingCycle, billingDiscounts);
+              const isNumericPrice = priceView.isNumeric;
+              const taxedAmount = getTaxedAmount(priceView);
               // وجهة الزر: تجاوز لكل باقة برابط خارجي (مثل «تواصل معنا» → /contact)؛ وإلا وجهة قسم الأسعار (النموذج الداخلي).
               const subscribeBase = (plan.subscribeUrlType === 'external' && plan.subscribeUrl)
                 ? plan.subscribeUrl
                 : resolveCtaLink(cmsPage, 'wa-pricing', 'plans_cta', 'whatsapp', isRTL, 'https://app.mobile.net.sa/reg');
               const subscribeHref = subscribeBase.startsWith('/products/')
-                ? `${subscribeBase}?plan=${encodeURIComponent(plan.id)}&tier=${tierIndex}`
+                ? `${subscribeBase}?plan=${encodeURIComponent(plan.id)}&tier=${tierIndex}&billing=${billingCycle}`
                 : subscribeBase;
               return (
                 <div key={plan.id} className="snap-start shrink-0 w-[82%] sm:w-[47%] md:w-[31%] lg:w-auto">
@@ -1207,16 +1244,25 @@ export const WhatsAppPage = ({ cmsPage = null }: WhatsAppPageProps) => {
                         <div className="flex items-baseline justify-center gap-1.5 min-h-[3rem] md:min-h-[3.75rem]">
                           {isNumericPrice ? (
                             <>
-                              <span className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{tier.price}</span>
+                              <span className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{priceView.amount}</span>
                               <span className="text-green-400 font-bold text-lg">{plansCurrency}</span>
                             </>
                           ) : (
                             <span className="text-2xl md:text-3xl font-extrabold text-white self-center drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">{tier.price}</span>
                           )}
                         </div>
+                        {isNumericPrice && priceView.original && (
+                          <p className="text-sm">
+                            <span className="text-slate-500 line-through">{priceView.original} {plansCurrency}</span>
+                            <span className="text-green-400 font-bold text-xs ms-2">{billingDiscountBadge} {priceView.discountPercent}%</span>
+                          </p>
+                        )}
                         {isNumericPrice && <p className="text-slate-400 text-sm">{plansPeriodLabel}</p>}
-                        {isNumericPrice && tier.priceWithTax && (
-                          <p className="text-slate-500 text-[10px]">{plansTaxLabel} {tier.priceWithTax} {plansCurrency}</p>
+                        {isNumericPrice && priceView.yearlyTotal && (
+                          <p className="text-green-400/80 text-xs font-semibold">{priceView.yearlyTotal} {plansCurrency} {billingYearlyPeriodLabel}</p>
+                        )}
+                        {isNumericPrice && taxedAmount && (
+                          <p className="text-slate-500 text-[10px]">{plansTaxLabel} {taxedAmount} {plansCurrency}</p>
                         )}
                         {tier.setupFee && (
                           <p className="text-slate-500 text-[10px]">{plansSetupLabel} {tier.setupFee}{/\d/.test(tier.setupFee) ? ` ${plansCurrency}` : ''}</p>

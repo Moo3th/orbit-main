@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import type { CmsPage } from '@/lib/cms/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackFormStart, trackFormSubmit, trackFormError } from '@/lib/analytics/events';
+import { getTierPriceView, type BillingCycle, type TierPriceView } from '@/lib/cms/whatsappPricing';
 
 interface FormField {
   id: string;
@@ -46,18 +47,55 @@ interface ProductPackage {
   tiers: PackageTier[];
 }
 
+// إعدادات الفوترة (شهري/سنوي) والخصومات — تأتي من /api/product-packages (نفس مصدر قسم الأسعار).
+interface PackageBilling {
+  monthlyLabel: string;
+  yearlyLabel: string;
+  monthlyPeriodLabel: string;
+  yearlyPeriodLabel: string;
+  monthlyDiscount: number;
+  yearlyDiscount: number;
+  discountBadge: string;
+}
+
+const defaultPackageBilling = (isRTL: boolean): PackageBilling => ({
+  monthlyLabel: isRTL ? 'شهري' : 'Monthly',
+  yearlyLabel: isRTL ? 'سنوي' : 'Yearly',
+  monthlyPeriodLabel: isRTL ? 'شهرياً' : 'Monthly',
+  yearlyPeriodLabel: isRTL ? 'سنوياً' : 'Yearly',
+  monthlyDiscount: 0,
+  yearlyDiscount: 0,
+  discountBadge: isRTL ? 'خصم' : 'Save',
+});
+
+const packagePriceView = (tier: PackageTier, cycle: BillingCycle, billing: PackageBilling): TierPriceView =>
+  getTierPriceView(tier.price, cycle, {
+    monthlyDiscount: billing.monthlyDiscount,
+    yearlyDiscount: billing.yearlyDiscount,
+  });
+
 // السعر النصّي (مثل «تواصل معنا») يُعرض كما هو بلا عملة/فترة.
-const formatPackagePrice = (pkg: ProductPackage, tier: PackageTier): string =>
-  /\d/.test(tier.price)
-    ? `${tier.price} ${pkg.currency}${pkg.period ? `/${pkg.period}` : ''}`
-    : tier.price;
+// السعر المعروض قيمة شهرية دائماً (في السنوي: المكافئ الشهري بعد خصم السنوي).
+const formatPackagePrice = (pkg: ProductPackage, tier: PackageTier, cycle: BillingCycle, billing: PackageBilling): string => {
+  const view = packagePriceView(tier, cycle, billing);
+  if (!view.isNumeric) return tier.price;
+  return `${view.amount} ${pkg.currency}/${billing.monthlyPeriodLabel}`;
+};
 
 // نص الباقة المختارة كما يُخزَّن في نتيجة النموذج ويظهر في طلبات اللوحة والبريد.
 // عند شريحة واحدة تكفي تسمية الباقة (اسم الشريحة عندها عام مثل «الباقة»).
-const formatPackageLabel = (pkg: ProductPackage, tier: PackageTier): string =>
-  pkg.tiers.length > 1
-    ? `${pkg.planName} — ${tier.tierName} · ${formatPackagePrice(pkg, tier)}`
-    : `${pkg.planName} · ${formatPackagePrice(pkg, tier)}`;
+// الدورة السنوية تُلحق إجمالي السنة حتى يعرف فريق المبيعات دورة الفوترة المختارة، والخصم إن وُجد.
+const formatPackageLabel = (pkg: ProductPackage, tier: PackageTier, cycle: BillingCycle, billing: PackageBilling): string => {
+  const view = packagePriceView(tier, cycle, billing);
+  const discountText = view.discountPercent > 0 ? `${billing.discountBadge} ${view.discountPercent}%` : '';
+  const suffix = view.yearlyTotal
+    ? ` (${billing.yearlyLabel}: ${view.yearlyTotal} ${pkg.currency}${discountText ? ` · ${discountText}` : ''})`
+    : discountText ? ` (${discountText})` : '';
+  const priceText = formatPackagePrice(pkg, tier, cycle, billing);
+  return pkg.tiers.length > 1
+    ? `${pkg.planName} — ${tier.tierName} · ${priceText}${suffix}`
+    : `${pkg.planName} · ${priceText}${suffix}`;
+};
 
 interface Props {
   productId: string;
@@ -100,6 +138,9 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
   const [successColor, setSuccessColor] = useState('#16a34a');
   const [packages, setPackages] = useState<ProductPackage[]>([]);
   const [pkgSelection, setPkgSelection] = useState<Record<string, { planId: string; tierIndex: number }>>({});
+  const [pkgBilling, setPkgBilling] = useState<PackageBilling | null>(null);
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+  const billing = pkgBilling ?? defaultPackageBilling(isRTL);
   const formRef = useRef<HTMLDivElement>(null);
 
   // Theme configuration using CSS variables
@@ -197,12 +238,21 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
         const res = await fetch(`/api/product-packages?product=${encodeURIComponent(productId)}&lang=${isRTL ? 'ar' : 'en'}`);
         if (res.ok) {
           const data = await res.json();
-          if (!cancelled) setPackages(Array.isArray(data.packages) ? data.packages : []);
+          if (!cancelled) {
+            setPackages(Array.isArray(data.packages) ? data.packages : []);
+            setPkgBilling(data.billing && typeof data.billing === 'object' ? data.billing : null);
+          }
         }
       } catch (e) { console.error('Failed to fetch packages:', e); }
     })();
     return () => { cancelled = true; };
   }, [fields, productId, isRTL]);
+
+  // دورة الفوترة من رابط النموذج (?billing=yearly) القادم من مبدّل الأسعار في صفحة المنتج.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('billing') === 'yearly') setBillingCycle('yearly');
+  }, []);
 
   // تحديد الباقة مسبقاً من رابط النموذج (?plan=growth&tier=1) القادم من قسم الأسعار.
   useEffect(() => {
@@ -216,7 +266,7 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
     if (!pkg || pkg.tiers.length === 0) return;
     const parsedTier = parseInt(params.get('tier') || '0', 10);
     const tierIndex = Math.min(Math.max(0, Number.isNaN(parsedTier) ? 0 : parsedTier), pkg.tiers.length - 1);
-    const label = formatPackageLabel(pkg, pkg.tiers[tierIndex]);
+    const label = formatPackageLabel(pkg, pkg.tiers[tierIndex], billingCycle, billing);
     setPkgSelection(prev => {
       const next = { ...prev };
       pkgFields.forEach(f => { if (!next[f.id]) next[f.id] = { planId: pkg.planId, tierIndex }; });
@@ -227,10 +277,12 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
       pkgFields.forEach(f => { if (!next[f.id]) next[f.id] = label; });
       return next;
     });
+    // billing مشتق من pkgBilling؛ تغيّر الدورة/الخصومات يعالجه أثر إعادة الاشتقاق أدناه.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packages, fields]);
 
-  // عند تغيّر لغة الباقات (إعادة الجلب)، أعد اشتقاق نص الباقة المختارة باللغة الجديدة
-  // حتى لا تُحفظ القيمة المرسَلة بلغة قديمة في الطلب والبريد.
+  // عند تغيّر لغة الباقات (إعادة الجلب) أو دورة الفوترة، أعد اشتقاق نص الباقة المختارة
+  // حتى لا تُحفظ القيمة المرسَلة بلغة أو دورة قديمة في الطلب والبريد.
   useEffect(() => {
     if (packages.length === 0) return;
     setFormData(prev => {
@@ -240,19 +292,19 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
         const pkg = packages.find(p => p.planId === sel.planId);
         const tier = pkg?.tiers[sel.tierIndex] || pkg?.tiers[0];
         if (!pkg || !tier) return;
-        const label = formatPackageLabel(pkg, tier);
+        const label = formatPackageLabel(pkg, tier, billingCycle, billing);
         if (next[fieldId] !== label) { next[fieldId] = label; changed = true; }
       });
       return changed ? next : prev;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [packages]);
+  }, [packages, billingCycle, pkgBilling]);
 
   const selectPackage = (fieldId: string, pkg: ProductPackage, tierIndex: number) => {
     const tier = pkg.tiers[tierIndex] || pkg.tiers[0];
     if (!tier) return;
     setPkgSelection(prev => ({ ...prev, [fieldId]: { planId: pkg.planId, tierIndex } }));
-    handleChange(fieldId, formatPackageLabel(pkg, tier));
+    handleChange(fieldId, formatPackageLabel(pkg, tier, billingCycle, billing));
   };
 
   const stepNumbers = Array.from(new Set(fields.map(f => f.step))).sort((a, b) => a - b);
@@ -395,27 +447,111 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
             return <p className="text-sm" style={{ color: 'var(--field-label-color)' }}>{isRTL ? 'جارِ تحميل الباقات…' : 'Loading packages…'}</p>;
           }
           const sel = pkgSelection[field.id];
+          const showBillingToggle = packages.some(p => p.tiers.some(t => /\d/.test(t.price)));
           return (
             <div className="space-y-3">
-              {packages.map((pkg) => {
-                const isPlanSelected = sel?.planId === pkg.planId;
-                const activeTierIndex = isPlanSelected ? sel.tierIndex : -1;
-                return (
-                  <div
-                    key={pkg.planId}
-                    className="rounded-xl border-2 p-4 transition-all"
-                    style={isPlanSelected
-                      ? { borderColor: 'var(--primary-color)', backgroundColor: 'color-mix(in srgb, var(--primary-color) 6%, transparent)' }
-                      : { borderColor: 'var(--option-border-color)', backgroundColor: 'var(--option-bg-color)' }}
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="font-bold" style={{ color: 'var(--option-text-color)' }}>{pkg.planName}</span>
-                      {pkg.badge && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--primary-color)' }}>{pkg.badge}</span>
-                      )}
-                    </div>
-                    {pkg.tiers.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* مبدّل الفوترة شهري/سنوي — الخصومات من اللوحة وتنعكس على القيمة المخزّنة في الطلب. */}
+              {showBillingToggle && (
+                <div
+                  className="inline-flex items-center gap-1 p-1 rounded-xl border-2"
+                  style={{ borderColor: 'var(--option-border-color)', backgroundColor: 'var(--option-bg-color)' }}
+                >
+                  {([
+                    { cycle: 'monthly' as BillingCycle, label: billing.monthlyLabel, discount: billing.monthlyDiscount },
+                    { cycle: 'yearly' as BillingCycle, label: billing.yearlyLabel, discount: billing.yearlyDiscount },
+                  ]).map(({ cycle, label, discount }) => {
+                    const active = billingCycle === cycle;
+                    return (
+                      <button
+                        key={cycle}
+                        type="button"
+                        onClick={() => setBillingCycle(cycle)}
+                        className="min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-1.5"
+                        style={active
+                          ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)' }
+                          : { backgroundColor: 'transparent', color: 'var(--option-text-color)' }}
+                      >
+                        {label}
+                        {discount > 0 && (
+                          <span
+                            className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                            style={active
+                              ? { backgroundColor: 'rgba(255,255,255,0.25)', color: 'var(--option-selected-text-color)' }
+                              : { backgroundColor: 'color-mix(in srgb, var(--primary-color) 12%, transparent)', color: 'var(--primary-color)' }}
+                          >
+                            {billing.discountBadge} {discount}%
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2.5">
+                {packages.map((pkg) => {
+                  const isPlanSelected = sel?.planId === pkg.planId;
+                  const activeTierIndex = isPlanSelected ? sel.tierIndex : -1;
+                  // باقة بشريحة واحدة: مربع مضغوط واحد قابل للنقر يحمل الاسم والسعر (يتلوّن كاملاً عند الاختيار).
+                  if (pkg.tiers.length <= 1) {
+                    const tier = pkg.tiers[0];
+                    if (!tier) return null;
+                    const view = packagePriceView(tier, billingCycle, billing);
+                    return (
+                      <button
+                        key={pkg.planId}
+                        type="button"
+                        onClick={() => selectPackage(field.id, pkg, 0)}
+                        className="min-h-[44px] rounded-xl border-2 p-3 text-center transition-all"
+                        style={isPlanSelected
+                          ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' }
+                          : { backgroundColor: 'var(--option-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}
+                      >
+                        {pkg.badge && (
+                          <span
+                            className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold mb-1"
+                            style={isPlanSelected
+                              ? { backgroundColor: 'rgba(255,255,255,0.25)', color: 'var(--option-selected-text-color)' }
+                              : { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)' }}
+                          >
+                            {pkg.badge}
+                          </span>
+                        )}
+                        <span className="block font-bold text-sm">{pkg.planName}</span>
+                        {view.isNumeric ? (
+                          <>
+                            <span className="block font-extrabold text-xs mt-1">{view.amount} {pkg.currency}/{billing.monthlyPeriodLabel}</span>
+                            {view.original && (
+                              <span className="block text-[10px] mt-0.5">
+                                <span className="line-through opacity-60">{view.original} {pkg.currency}</span>
+                                <span className="font-bold ms-1">{billing.discountBadge} {view.discountPercent}%</span>
+                              </span>
+                            )}
+                            {view.yearlyTotal && (
+                              <span className="block text-[10px] mt-0.5 opacity-80">{view.yearlyTotal} {pkg.currency} {billing.yearlyPeriodLabel}</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="block font-extrabold text-xs mt-1">{tier.price}</span>
+                        )}
+                      </button>
+                    );
+                  }
+                  // باقة متعددة الشرائح: بطاقة بعرض الصف كاملاً مع أزرار الشرائح داخلها.
+                  return (
+                    <div
+                      key={pkg.planId}
+                      className="col-span-2 rounded-xl border-2 p-3 transition-all"
+                      style={isPlanSelected
+                        ? { borderColor: 'var(--primary-color)', backgroundColor: 'color-mix(in srgb, var(--primary-color) 6%, transparent)' }
+                        : { borderColor: 'var(--option-border-color)', backgroundColor: 'var(--option-bg-color)' }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-sm" style={{ color: 'var(--option-text-color)' }}>{pkg.planName}</span>
+                        {pkg.badge && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--primary-color)' }}>{pkg.badge}</span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {pkg.tiers.map((tier, ti) => {
                           const tierSelected = activeTierIndex === ti;
                           return (
@@ -428,16 +564,16 @@ export const DynamicFormPage = ({ productId, cmsPage: _cmsPage }: Props) => {
                                 ? { backgroundColor: 'var(--primary-color)', color: 'var(--option-selected-text-color)', borderColor: 'var(--primary-color)' }
                                 : { backgroundColor: 'var(--form-card-bg-color)', color: 'var(--option-text-color)', borderColor: 'var(--option-border-color)' }}
                             >
-                              {pkg.tiers.length > 1 && <span className="block mb-0.5">{tier.tierName}</span>}
-                              <span className="block font-extrabold">{formatPackagePrice(pkg, tier)}</span>
+                              <span className="block mb-0.5">{tier.tierName}</span>
+                              <span className="block font-extrabold">{formatPackagePrice(pkg, tier, billingCycle, billing)}</span>
                             </button>
                           );
                         })}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           );
         }

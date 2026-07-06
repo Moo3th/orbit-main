@@ -812,3 +812,40 @@
 
 > إصلاح «الباقة لم تُحدَّد» في طلبات الواتساب: أُضيف حقل الباقة لإعداد فورم الواتساب في القاعدة الحيّة (npm run seed:wa-package)، وأُصلح تنسيق السعر النصّي (تواصل معنا) في DynamicFormPage — البناء ناجح، عوينت /products/whatsapp/form على iPhone و Android وسطح المكتب (عربي/إنجليزي) بلا أخطاء console.
 - 2026-07-06 08:41 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
+- 2026-07-06 08:53 — `src\lib\cms\whatsappPricing.ts`
+- 2026-07-06 08:54 — `src\app\admin\newAdmin\SiteDataContext.tsx`
+- 2026-07-06 08:54 — `src\app\api\seed\route.ts`
+- 2026-07-06 08:54 — `src\app\api\product-packages\route.ts`
+- 2026-07-06 08:54 — `src\app\api\product-packages\route.ts`
+- 2026-07-06 08:54 — `src\app\api\product-packages\route.ts`
+- 2026-07-06 08:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:55 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:56 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:56 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:56 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:56 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:56 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 08:57 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:57 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:57 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:58 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:58 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 08:59 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 09:00 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 09:02 — `..\..\Users\mtc\AppData\Local\Temp\claude\C--orbitWebsite-orbit-main-master\6a32f3c0-c50c-4c48-aafc-117b710732f7\scratchpad\set-billing-discount.js`
+- 2026-07-06 09:07 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 09:08 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+
+> فوترة شهري/سنوي مع خصومات من اللوحة: مبدّل في قسم أسعار الواتساب وفي فورم الطلب، مربعات باقات مضغوطة (2×صف) بالاسم داخل المربع المحدد، حقول CMS جديدة (billing_*) في wa-pricing، والخصم يظهر في السعر المشطوب ويُخزَّن في الطلب — tsc/lint نظيفان، البناء ناجح، عوينت /products/whatsapp و /form على 390/412/1280 (عربي/إنجليزي) بلا أخطاء console.
+- 2026-07-06 09:10 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
+- 2026-07-06 09:20 — `src\lib\cms\whatsappPricing.ts`
+- 2026-07-06 09:20 — `src\lib\cms\whatsappPricing.ts`
+- 2026-07-06 09:20 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 09:20 — `src\components\business\products\WhatsAppPage.tsx`
+- 2026-07-06 09:21 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 09:21 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+- 2026-07-06 09:21 — `src\app\products\[product]\form\DynamicFormPage.tsx`
+
+> عرض المكافئ الشهري في الدورة السنوية بدل الإجمالي: السعر الرئيسي شهري دائماً والإجمالي السنوي سطر توضيحي صغير (صفحة المنتج + الفورم + القيمة المخزّنة في الطلب) — tsc نظيف، اختبار وحدة للرياضيات صحيح، البناء ناجح، عوينت الصفحتان بلا أخطاء console.
+- 2026-07-06 09:25 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
