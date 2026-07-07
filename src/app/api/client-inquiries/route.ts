@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
+import { sendServerLeadEvent } from '@/lib/analytics/serverConversions';
 import ClientInquiry from '@/models/ClientInquiry';
 import { SeoSettings } from '@/models/SeoSettings';
 import { sendEmail, buildContactEmailBody, parseEmailRecipients } from '@/lib/email/service';
@@ -97,6 +99,20 @@ export async function POST(request: NextRequest) {
 
     // Send notification email (non-blocking failure)
     await notifyQuoteRequest(inquiry.toObject ? inquiry.toObject() : data);
+
+    // حدث تحويل خادمي (Meta/X/LinkedIn CAPI) بعد إرسال الرد — لا يؤخر ولا يُفشل الطلب.
+    if (data.email || data.phone) {
+      after(() =>
+        sendServerLeadEvent({
+          eventId: `lead_${String(inquiry._id)}`,
+          email: typeof data.email === 'string' ? data.email : undefined,
+          phone: typeof data.phone === 'string' ? data.phone : undefined,
+          firstName: typeof data.name === 'string' ? data.name : undefined,
+          sourceUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'}/request-quote`,
+          customData: { serviceType: data.serviceType || 'other', source: data.source || 'request-quote' },
+        })
+      );
+    }
 
     return NextResponse.json(
       { message: 'Inquiry submitted successfully', inquiry },

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { connectDB } from '@/lib/mongodb';
+import { sendServerLeadEvent } from '@/lib/analytics/serverConversions';
 import Contact from '@/models/Contact';
 import SiteCms from '@/models/SiteCms';
 import { SeoSettings } from '@/models/SeoSettings';
@@ -104,6 +106,18 @@ export async function POST(request: NextRequest) {
         $push: { contactSubmissions: { $each: [submission], $position: 0 } },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    // حدث تحويل خادمي (Meta/X/LinkedIn CAPI) بعد إرسال الرد — لا يؤخر ولا يُفشل الطلب.
+    after(() =>
+      sendServerLeadEvent({
+        eventId: `lead_${String(inquiry._id)}`,
+        email,
+        phone,
+        firstName: name,
+        sourceUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'}/contact`,
+        customData: { product, source },
+      })
     );
 
     revalidateTag('site-cms', 'max');

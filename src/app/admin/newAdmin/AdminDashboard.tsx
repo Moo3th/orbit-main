@@ -424,8 +424,9 @@ const DashboardView = ({ isAr, onNavigate, onEditPage }: { isAr: boolean; onNavi
     fetchWhatsAppRequests();
   }, [fetchWhatsAppRequests]);
 
-  const waRequestsCount = whatsAppRequests.length;
-  const newWaRequests = whatsAppRequests.filter(r => r.status === 'new').length;
+  const newWaRequestsList = whatsAppRequests.filter(r => r.status === 'new');
+  const newWaRequests = newWaRequestsList.length;
+  const newContactSubmissions = contactSubmissions.filter(s => !s.read).length;
 
   return (
     <div className="space-y-6">
@@ -446,14 +447,15 @@ const DashboardView = ({ isAr, onNavigate, onEditPage }: { isAr: boolean; onNavi
             <Newspaper className="w-4 h-4" />
             {isAr ? "إدارة المدونة" : "Manage Blog"}
           </Button>
-          <Button className="bg-[#25D366] hover:bg-[#1da954] text-white justify-start" onClick={() => onNavigate("submissions")}>
+          <Button className="bg-[#25D366] hover:bg-[#1da954] text-white justify-start" onClick={() => onNavigate("wa-requests")}>
             <MessageSquare className="w-4 h-4" />
-            {isAr ? "طلبات واتساب" : "WhatsApp Requests"} ({waRequestsCount})
-            {newWaRequests > 0 && <Badge className="ml-2 bg-white text-[#25D366] text-xs">{newWaRequests}</Badge>}
+            {isAr ? "طلبات واتساب" : "WhatsApp Requests"}
+            {newWaRequests > 0 && <Badge className="ml-2 bg-white text-[#25D366] text-xs">{isAr ? `${newWaRequests} جديد` : `${newWaRequests} new`}</Badge>}
           </Button>
           <Button className="bg-[#104E8B] hover:bg-[#0A2647] text-white justify-start" onClick={() => onNavigate("submissions")}>
             <Inbox className="w-4 h-4" />
-            {isAr ? "طلبات التواصل" : "Contact Submissions"} ({contactSubmissions.length})
+            {isAr ? "طلبات التواصل" : "Contact Submissions"}
+            {newContactSubmissions > 0 && <Badge className="ml-2 bg-white text-[#104E8B] text-xs">{isAr ? `${newContactSubmissions} جديد` : `${newContactSubmissions} new`}</Badge>}
           </Button>
           <Button className="bg-[#104E8B] hover:bg-[#0A2647] text-white justify-start" onClick={() => onNavigate("footer")}>
             <PanelBottom className="w-4 h-4" />
@@ -466,17 +468,18 @@ const DashboardView = ({ isAr, onNavigate, onEditPage }: { isAr: boolean; onNavi
         </CardContent>
       </Card>
 
-      {/* WhatsApp Requests Section */}
-      {waRequestsCount > 0 && (
+      {/* WhatsApp Requests Section — new requests only */}
+      {newWaRequests > 0 && (
         <Card className="border-0 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg text-[#25D366] flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              {isAr ? "طلبات خدمة واتساب" : "WhatsApp Service Requests"}
+              {isAr ? "طلبات واتساب جديدة" : "New WhatsApp Requests"}
+              <Badge className="bg-[#25D366] text-white text-xs">{newWaRequests}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {whatsAppRequests.slice(0, 5).map((req) => (
+            {newWaRequestsList.slice(0, 5).map((req) => (
               <div key={req._id || req.id || req.email + req.phone} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex-1">
                   <p className="font-semibold text-[#161616]">{req.name}</p>
@@ -490,11 +493,14 @@ const DashboardView = ({ isAr, onNavigate, onEditPage }: { isAr: boolean; onNavi
                 </div>
               </div>
             ))}
-            {waRequestsCount > 5 && (
+            {newWaRequests > 5 && (
               <p className="text-center text-sm text-gray-500">
-                {isAr ? `و${waRequestsCount - 5} طلبات أخرى` : `+${waRequestsCount - 5} more requests`}
+                {isAr ? `و${newWaRequests - 5} طلبات جديدة أخرى` : `+${newWaRequests - 5} more new requests`}
               </p>
             )}
+            <Button variant="outline" className="w-full text-[#25D366] border-[#25D366]/40 hover:bg-[#25D366]/5" onClick={() => onNavigate("wa-requests")}>
+              {isAr ? "عرض كل طلبات الواتساب" : "View all WhatsApp requests"}
+            </Button>
           </CardContent>
         </Card>
       )}

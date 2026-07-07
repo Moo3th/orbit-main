@@ -1,97 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { connectDB } from '@/lib/mongodb';
-import { SeoSettings } from '@/models/SeoSettings';
+import { dispatchHashedLeadEvent, HashedIdentifiers } from '@/lib/analytics/serverConversions';
 
-interface ConversionAPIEvent {
-  event_name: string;
-  event_id: string;
-  event_time: number;
-  action_source: string;
-  event_source_url: string;
-  user_data: Record<string, string>;
-  custom_data?: Record<string, unknown>;
-}
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-interface FacebookConversionAPIResponse {
-  success: boolean;
-  error?: string;
-  eventId?: string;
-}
-
-async function hashWithSHA256(value: string): Promise<string> {
-  return crypto.createHash('sha256').update(value.toLowerCase().trim()).digest('hex');
-}
-
-async function sendToFacebookCAPI(
-  pixelId: string,
-  accessToken: string,
-  event: ConversionAPIEvent
-): Promise<FacebookConversionAPIResponse> {
-  const url = `https://graph.facebook.com/v18.0/${pixelId}/events`;
-
-  const eventData = {
-    data: [
-      {
-        event_name: event.event_name,
-        event_time: event.event_time,
-        event_id: event.event_id,
-        action_source: event.action_source,
-        event_source_url: event.event_source_url,
-        user_data: event.user_data,
-        custom_data: event.custom_data || {},
-      },
-    ],
-    access_token: accessToken,
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(eventData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Facebook CAPI error:', errorData);
-      return {
-        success: false,
-        error: errorData.error?.message || 'Failed to send to Facebook CAPI',
-      };
-    }
-
-    return {
-      success: true,
-      eventId: event.event_id,
-    };
-  } catch (error) {
-    console.error('Facebook CAPI error:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
-}
-
+/**
+ * يستقبل حدث تحويل من العميل (user_data مجزّأة SHA-256 مسبقاً في المتصفح —
+ * انظر hashUserData في src/lib/analytics/events.ts) ويوزّعه على كل Conversion APIs
+ * المهيأة من لوحة الأدمن: Meta وX ولينكدإن. المنصات غير المهيأة تُتجاهل.
+ */
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
-    const settings = await SeoSettings.findOne({ key: 'primary' }).lean();
-
-    const pixelId = (settings as any)?.analytics?.facebookPixelId;
-    const accessToken = (settings as any)?.analytics?.facebookAccessToken;
-
-    if (!pixelId || !accessToken) {
-      return NextResponse.json(
-        { success: false, error: 'Facebook Pixel ID or Access Token not configured' },
-        { status: 400 }
-      );
-    }
-
-    const body: ConversionAPIEvent = await request.json();
+    const body = await request.json();
 
     if (!body.event_name || !body.user_data) {
       return NextResponse.json(
@@ -100,9 +20,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await sendToFacebookCAPI(pixelId, accessToken, body);
+    const ids: HashedIdentifiers = {
+      em: body.user_data.em || undefined,
+      ph: body.user_data.ph || undefined,
+      fn: body.user_data.fn || undefined,
+      ln: body.user_data.ln || undefined,
+    };
 
-    return NextResponse.json(result);
+    const results = await dispatchHashedLeadEvent(
+      {
+        eventName: String(body.event_name),
+        eventId: String(body.event_id || `${body.event_name}_${Date.now()}`),
+        sourceUrl: body.event_source_url,
+        customData: body.custom_data,
+      },
+      ids
+    );
+
+    const anyConfigured = results.some((r) => r.error !== 'not configured');
+    const anySuccess = results.some((r) => r.success);
+
+    return NextResponse.json({
+      success: anySuccess || !anyConfigured,
+      results,
+    });
   } catch (error) {
     console.error('Conversion API error:', error);
     return NextResponse.json(

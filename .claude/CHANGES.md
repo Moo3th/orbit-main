@@ -849,3 +849,54 @@
 
 > عرض المكافئ الشهري في الدورة السنوية بدل الإجمالي: السعر الرئيسي شهري دائماً والإجمالي السنوي سطر توضيحي صغير (صفحة المنتج + الفورم + القيمة المخزّنة في الطلب) — tsc نظيف، اختبار وحدة للرياضيات صحيح، البناء ناجح، عوينت الصفحتان بلا أخطاء console.
 - 2026-07-06 09:25 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\forms-system.md`
+- 2026-07-07 10:48 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-07-07 10:48 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-07-07 10:49 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-07-07 10:49 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+- 2026-07-07 10:50 — `src\models\SeoSettings.ts`
+- 2026-07-07 10:50 — `src\models\SeoSettings.ts`
+- 2026-07-07 10:51 — `src\lib\analytics\serverConversions.ts`
+- 2026-07-07 10:51 — `src\components\analytics\XPixel.tsx`
+- 2026-07-07 10:52 — `src\components\analytics\LinkedInInsight.tsx`
+- 2026-07-07 10:52 — `src\app\layout.tsx`
+- 2026-07-07 10:52 — `src\app\layout.tsx`
+- 2026-07-07 10:52 — `src\app\layout.tsx`
+- 2026-07-07 10:52 — `src\app\layout.tsx`
+- 2026-07-07 10:52 — `src\lib\seo\index.ts`
+- 2026-07-07 10:53 — `src\lib\analytics\events.ts`
+- 2026-07-07 10:53 — `src\lib\analytics\events.ts`
+- 2026-07-07 10:53 — `src\lib\analytics\events.ts`
+- 2026-07-07 10:53 — `src\lib\analytics\events.ts`
+- 2026-07-07 10:54 — `src\lib\analytics\serverConversions.ts`
+- 2026-07-07 10:54 — `src\app\api\events\route.ts`
+- 2026-07-07 10:54 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:54 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:54 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:54 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:54 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:55 — `src\app\api\form-submit\route.ts`
+- 2026-07-07 10:55 — `src\app\api\contact\route.ts`
+- 2026-07-07 10:55 — `src\app\api\contact\route.ts`
+- 2026-07-07 10:55 — `src\app\api\whatsapp-request\route.ts`
+- 2026-07-07 10:55 — `src\app\api\whatsapp-request\route.ts`
+- 2026-07-07 10:55 — `src\app\api\client-inquiries\route.ts`
+- 2026-07-07 10:55 — `src\app\api\client-inquiries\route.ts`
+- 2026-07-07 10:56 — `src\app\admin\newAdmin\views\CmsSeoView.tsx`
+- 2026-07-07 10:56 — `src\app\admin\newAdmin\views\CmsSeoView.tsx`
+- 2026-07-07 10:56 — `src\app\admin\newAdmin\views\CmsSeoView.tsx`
+- 2026-07-07 10:57 — `src\app\admin\newAdmin\views\CmsSeoView.tsx`
+- 2026-07-07 10:59 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 10:59 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 10:59 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 10:59 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 10:59 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 11:00 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 11:00 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 11:00 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 11:01 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-07 11:02 — `src\app\sitemap.ts`
+- 2026-07-07 11:02 — `src\app\sitemap.ts`
+
+> دفعة 2026-07-07: (1) داشبورد الأدمن — زر «طلبات واتساب» يوجّه لتبويب wa-requests وأرقام الداشبورد للطلبات الجديدة فقط. (2) نظام تتبع الأحداث — بكسلات X ولينكدإن + Conversion APIs خادمية (Meta/X/LinkedIn) تُطلق من مسارات الفورمات الأربعة، وإعداداتها من تبويب التحليلات باللوحة. (3) محرر الصفحات — toast، شريط حفظ مثبّت، مؤشر لغة، شبكة عمودين، عناوين لحقول الباقات/الشرائح. (4) SEO — حقل توثيق Bing + مقالات المدونة في sitemap. البناء ناجح، tsc نظيف، عوينت / و /admin (داشبورد + محرر واتساب + إعدادات التحليلات) و /sitemap.xml على 390 و412 و1280 بلا أخطاء console ولا تمرير أفقي.
+- 2026-07-07 11:12 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\conversion-tracking-system.md`
+- 2026-07-07 11:12 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`

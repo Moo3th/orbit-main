@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
+import { sendServerLeadEvent } from '@/lib/analytics/serverConversions';
 import FormSubmission from '@/models/FormSubmission';
 import FormConfig from '@/models/FormConfig';
 import WhatsAppRequest from '@/models/WhatsAppRequest';
@@ -69,7 +71,7 @@ const mirrorServiceSubmission = async (
   productId: string,
   configFields: ConfigField[],
   data: Record<string, unknown>
-) => {
+): Promise<{ name: string; email: string; phone: string; company: string }> => {
   // نحلّ الشركة أولاً ثم نستبعدها من بحث الاسم حتى لا يُلتقط حقل «اسم الشركة» كاسم العميل.
   const company = resolveField(data, configFields, ['companyName', 'company'], null, COMPANY_RE);
   const name = resolveField(
@@ -84,8 +86,10 @@ const mirrorServiceSubmission = async (
   const email = resolveField(data, configFields, ['email'], 'email', /e-?mail|البريد/i);
   const phone = resolveField(data, configFields, ['phone', 'mobile', 'tel'], 'tel', /phone|mobile|جوال|هاتف/i);
 
+  const contact = { name: name.value, email: email.value, phone: phone.value, company: company.value };
+
   // لا نعكس بلا بيانات تواصل أساسية (النماذج القياسية تجمعها إجبارياً).
-  if (!name.value || !email.value || !phone.value) return;
+  if (!name.value || !email.value || !phone.value) return contact;
 
   const packageField = configFields.find((cf) => cf.type === 'package');
   const packageValue = packageField ? toStr(data[packageField.id]) : toStr(data.package) || toStr(data.planId);
@@ -104,7 +108,7 @@ const mirrorServiceSubmission = async (
       notes: toStr(data.notes),
       status: 'new',
     });
-    return;
+    return contact;
   }
 
   // بقية الفورمات → طلب سعر. نجمع بقية الحقول في الرسالة حتى لا تُفقد أي معلومة.
@@ -129,6 +133,7 @@ const mirrorServiceSubmission = async (
     source: `form:${productId}`,
     status: 'new',
   });
+  return contact;
 };
 
 const buildDynamicFormEmailBody = (
@@ -233,10 +238,26 @@ export async function POST(request: NextRequest) {
     // انعكاس طلبات الخدمة إلى تبويب اللوحة المناسب (واتساب / طلبات الأسعار).
     // فشل الانعكاس لا يُفشل الإرسال — الرد محفوظ في FormSubmission.
     if ((formConfig.formType || 'service') === 'service') {
+      let leadContact = { name: '', email: '', phone: '', company: '' };
       try {
-        await mirrorServiceSubmission(productId, configFields, data);
+        leadContact = await mirrorServiceSubmission(productId, configFields, data);
       } catch (mirrorError) {
         console.error('Failed to mirror form submission to CRM:', mirrorError);
+      }
+
+      // حدث تحويل خادمي (Meta/X/LinkedIn CAPI) بعد إرسال الرد — لا يؤخر ولا يُفشل الطلب.
+      if (leadContact.email || leadContact.phone) {
+        const leadEventId = `lead_${String(submission._id)}`;
+        after(() =>
+          sendServerLeadEvent({
+            eventId: leadEventId,
+            email: leadContact.email,
+            phone: leadContact.phone,
+            firstName: leadContact.name,
+            sourceUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'}/products/${productId}/form`,
+            customData: { product: productId, source: 'form-submit' },
+          })
+        );
       }
     }
 

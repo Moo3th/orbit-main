@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
+import { sendServerLeadEvent } from '@/lib/analytics/serverConversions';
 import WhatsAppRequest from '@/models/WhatsAppRequest';
 import { SeoSettings } from '@/models/SeoSettings';
 import { sendEmail, buildWhatsAppRequestEmailBody, parseEmailRecipients } from '@/lib/email/service';
@@ -56,6 +58,18 @@ export async function POST(request: NextRequest) {
       notes,
       status: 'new',
     });
+
+    // حدث تحويل خادمي (Meta/X/LinkedIn CAPI) بعد إرسال الرد — لا يؤخر ولا يُفشل الطلب.
+    after(() =>
+      sendServerLeadEvent({
+        eventId: `lead_${String(whatsAppRequest._id)}`,
+        email,
+        phone,
+        firstName: name,
+        sourceUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://corbit.sa'}/products/whatsapp`,
+        customData: { product: 'whatsapp', source: 'whatsapp-request' },
+      })
+    );
 
     const seoSettings = await SeoSettings.findOne({ key: 'primary' }).lean();
     const rawNotificationEmail = (seoSettings as any)?.notificationEmail || process.env.NOTIFICATION_EMAIL || 'info@corbit.sa';

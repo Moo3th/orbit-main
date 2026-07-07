@@ -15,6 +15,10 @@ declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
     gtag?: (...args: unknown[]) => void;
+    twq?: (...args: unknown[]) => void;
+    lintrk?: { (...args: unknown[]): void; q?: unknown[] };
+    __xLeadEventId?: string;
+    __liLeadConversionId?: string;
   }
 }
 
@@ -50,6 +54,26 @@ function pushMetaPixel(event: string, params?: EventParams) {
 
   if (typeof window.fbq === 'function') {
     window.fbq('track', event, params);
+  }
+}
+
+// بكسل X (Twitter): حدث الـ Lead يتطلب معرّف حدث من X Ads — يضبطه مكوّن XPixel
+// في window.__xLeadEventId من إعدادات اللوحة. موافقة إعلانات فقط.
+function pushXPixelLead(params?: EventParams) {
+  if (typeof window === 'undefined' || !hasAdsConsent()) return;
+  const eventId = window.__xLeadEventId;
+  if (eventId && typeof window.twq === 'function') {
+    window.twq('event', eventId, params || {});
+  }
+}
+
+// LinkedIn Insight: تحويل الـ Lead يتطلب conversion_id رقمياً من Campaign Manager —
+// يضبطه مكوّن LinkedInInsight في window.__liLeadConversionId. موافقة إعلانات فقط.
+function pushLinkedInLead() {
+  if (typeof window === 'undefined' || !hasAdsConsent()) return;
+  const conversionId = window.__liLeadConversionId;
+  if (conversionId && typeof window.lintrk === 'function') {
+    window.lintrk('track', { conversion_id: Number(conversionId) });
   }
 }
 
@@ -99,6 +123,8 @@ export function trackContactFormSubmit(params: {
     content_category: 'Lead',
     service_type: params.serviceType,
   });
+  pushXPixelLead({ content_name: 'Contact Form' });
+  pushLinkedInLead();
 }
 
 // ملاحظة: طلب خدمة واتساب لم يَعُد له حدثٌ منفصل (whatsapp_request_submit).
@@ -260,6 +286,8 @@ export function trackFormSubmit(params: {
     content_category: 'Lead',
     service_type: gtmParams.service_type,
   });
+  pushXPixelLead({ content_name: params.formId });
+  pushLinkedInLead();
 }
 
 /**

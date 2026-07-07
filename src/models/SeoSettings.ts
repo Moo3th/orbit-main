@@ -33,9 +33,22 @@ export interface ISeoEmailConfig {
 export interface ISeoAnalytics {
   gtmId: string;
   gscVerification: string;
+  bingVerification: string;
   facebookPixelId: string;
   facebookAccessToken: string;
   clarityProjectId: string;
+  // X (Twitter) — البكسل + Conversion API (OAuth 1.0a من X Ads API)
+  xPixelId: string;
+  xLeadEventId: string;
+  xApiKey: string;
+  xApiSecret: string;
+  xAccessToken: string;
+  xAccessSecret: string;
+  // LinkedIn — Insight Tag + Conversions API
+  linkedInPartnerId: string;
+  linkedInConversionId: string;
+  linkedInAccessToken: string;
+  linkedInConversionUrn: string;
 }
 
 export interface ISeoAppearance {
@@ -90,9 +103,20 @@ const seoOrganizationSchema = new Schema<ISeoOrganization>({
 const seoAnalyticsSchema = new Schema<ISeoAnalytics>({
   gtmId: { type: String, default: '' },
   gscVerification: { type: String, default: '' },
+  bingVerification: { type: String, default: '' },
   facebookPixelId: { type: String, default: '' },
   facebookAccessToken: { type: String, default: '' },
   clarityProjectId: { type: String, default: '' },
+  xPixelId: { type: String, default: '' },
+  xLeadEventId: { type: String, default: '' },
+  xApiKey: { type: String, default: '' },
+  xApiSecret: { type: String, default: '' },
+  xAccessToken: { type: String, default: '' },
+  xAccessSecret: { type: String, default: '' },
+  linkedInPartnerId: { type: String, default: '' },
+  linkedInConversionId: { type: String, default: '' },
+  linkedInAccessToken: { type: String, default: '' },
+  linkedInConversionUrn: { type: String, default: '' },
 });
 
 const seoEmailConfigSchema = new Schema<ISeoEmailConfig>({

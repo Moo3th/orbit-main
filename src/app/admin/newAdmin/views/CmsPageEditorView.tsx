@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { Reorder, useDragControls } from 'framer-motion';
 import { Save, Plus, ChevronDown, ChevronUp, GripVertical, Pin, ExternalLink, FileText, Search, Image as ImageIcon, Globe, Shield, Lightbulb, Users, ArrowRight, Star, Mail, Newspaper, Zap, Palette, MessageSquare, LayoutGrid, Settings, Tag, Layers } from 'lucide-react';
 import { Button } from '@/components/business/ui/button';
@@ -66,45 +67,60 @@ const SmsPlansListEditor = ({ value, onChange, isAr }: { value: string; onChange
       <label className="text-xs text-gray-500 font-medium block mb-2">{isAr ? "باقات الرسائل" : "SMS Plans"}</label>
       {rows.map((row, index) => (
         <div key={index} className="border border-gray-100 rounded-xl p-4 bg-white space-y-3 shadow-sm hover:border-gray-200 transition-all">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={row.messages}
-              onChange={(e) => updateRow(index, { messages: e.target.value })}
-              disabled={row.custom}
-              placeholder={isAr ? "عدد الرسائل (مثال: 1000)" : "Messages count (e.g. 1000)"}
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400"
-            />
-            <input
-              type="text"
-              value={row.price}
-              onChange={(e) => updateRow(index, { price: e.target.value })}
-              disabled={row.custom}
-              placeholder={isAr ? "السعر الجديد (مثال: 110)" : "Offer Price (e.g. 110)"}
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 font-bold text-primary"
-            />
-            <input
-              type="text"
-              value={row.originalPrice || ""}
-              onChange={(e) => updateRow(index, { originalPrice: e.target.value })}
-              disabled={row.custom}
-              placeholder={isAr ? "السعر الأصلي (قبل الخصم)" : "Original Price (Strike)"}
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 italic text-gray-400"
-            />
-            <input
-              type="text"
-              value={row.feature}
-              onChange={(e) => updateRow(index, { feature: e.target.value })}
-              placeholder={isAr ? "عنوان الباقة" : "Plan feature/title"}
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
-            />
-            <input
-              type="text"
-              value={row.description}
-              onChange={(e) => updateRow(index, { description: e.target.value })}
-              placeholder={isAr ? "وصف الباقة" : "Plan description"}
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all md:col-span-2"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "عدد الرسائل" : "Messages count"}</label>
+              <input
+                type="text"
+                value={row.messages}
+                onChange={(e) => updateRow(index, { messages: e.target.value })}
+                disabled={row.custom}
+                placeholder={isAr ? "مثال: 1000" : "e.g. 1000"}
+                className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "السعر الجديد" : "Offer price"}</label>
+              <input
+                type="text"
+                value={row.price}
+                onChange={(e) => updateRow(index, { price: e.target.value })}
+                disabled={row.custom}
+                placeholder={isAr ? "مثال: 110" : "e.g. 110"}
+                className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 font-bold text-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "السعر الأصلي (قبل الخصم)" : "Original price (strike)"}</label>
+              <input
+                type="text"
+                value={row.originalPrice || ""}
+                onChange={(e) => updateRow(index, { originalPrice: e.target.value })}
+                disabled={row.custom}
+                placeholder={isAr ? "اختياري" : "Optional"}
+                className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all disabled:bg-gray-50 disabled:text-gray-400 italic text-gray-400"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "عنوان الباقة" : "Plan title"}</label>
+              <input
+                type="text"
+                value={row.feature}
+                onChange={(e) => updateRow(index, { feature: e.target.value })}
+                placeholder={isAr ? "مثال: الأنسب للمتاجر" : "e.g. Best for stores"}
+                className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "وصف الباقة" : "Plan description"}</label>
+              <input
+                type="text"
+                value={row.description}
+                onChange={(e) => updateRow(index, { description: e.target.value })}
+                placeholder={isAr ? "وصف مختصر يظهر تحت الباقة" : "Short description shown under the plan"}
+                className="w-full h-10 border border-gray-200 rounded-xl px-3 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20 focus:border-[#104E8B] transition-all"
+              />
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
@@ -260,29 +276,38 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={plan.name}
-              onChange={(e) => updatePlan(planIndex, { name: e.target.value })}
-              placeholder={isAr ? "اسم الباقة" : "Package name"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
-            <input
-              type="text"
-              value={plan.period}
-              onChange={(e) => updatePlan(planIndex, { period: e.target.value })}
-              placeholder={isAr ? "الدورية (مثال: شهرياً)" : "Period (e.g. Monthly)"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
-            <input
-              type="text"
-              value={plan.badge}
-              onChange={(e) => updatePlan(planIndex, { badge: e.target.value })}
-              placeholder={isAr ? "شارة الباقة الشائعة" : "Popular badge text"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
-            <label className="flex items-center gap-2 text-xs text-gray-600 px-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "اسم الباقة" : "Package name"}</label>
+              <input
+                type="text"
+                value={plan.name}
+                onChange={(e) => updatePlan(planIndex, { name: e.target.value })}
+                placeholder={isAr ? "اسم الباقة" : "Package name"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "الدورية" : "Period"}</label>
+              <input
+                type="text"
+                value={plan.period}
+                onChange={(e) => updatePlan(planIndex, { period: e.target.value })}
+                placeholder={isAr ? "مثال: شهرياً" : "e.g. Monthly"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "شارة الباقة الشائعة" : "Popular badge text"}</label>
+              <input
+                type="text"
+                value={plan.badge}
+                onChange={(e) => updatePlan(planIndex, { badge: e.target.value })}
+                placeholder={isAr ? "مثال: الأكثر طلباً" : "e.g. Most popular"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-600 px-1 self-end pb-2">
               <input
                 type="checkbox"
                 checked={plan.popular}
@@ -290,13 +315,16 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
               />
               {isAr ? "تمييز هذه الباقة كالأكثر طلباً" : "Mark as most popular"}
             </label>
-            <input
-              type="text"
-              value={plan.subscribeLabel}
-              onChange={(e) => updatePlan(planIndex, { subscribeLabel: e.target.value })}
-              placeholder={isAr ? "نص زر الاشتراك" : "Subscribe button text"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "نص زر الاشتراك" : "Subscribe button text"}</label>
+              <input
+                type="text"
+                value={plan.subscribeLabel}
+                onChange={(e) => updatePlan(planIndex, { subscribeLabel: e.target.value })}
+                placeholder={isAr ? "مثال: اشترك الآن" : "e.g. Subscribe now"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
             <div className="flex items-center gap-2">
               <select
                 value={plan.subscribeUrlType || 'form'}
@@ -363,15 +391,27 @@ const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChang
                     {isAr ? "حذف الشريحة" : "Delete tier"}
                   </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <input type="text" value={tier.name} onChange={(e) => updateTier(planIndex, tierIndex, { name: e.target.value })} placeholder={isAr ? "اسم الشريحة" : "Tier name"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.price} onChange={(e) => updateTier(planIndex, tierIndex, { price: e.target.value })} placeholder={isAr ? "السعر الجديد" : "Offer Price"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs font-bold text-primary" />
-                  <input type="text" value={tier.originalPrice || ""} onChange={(e) => updateTier(planIndex, tierIndex, { originalPrice: e.target.value })} placeholder={isAr ? "السعر الأصلي" : "Original Price"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs italic text-gray-400" />
-                  <input type="text" value={tier.priceWithTax} onChange={(e) => updateTier(planIndex, tierIndex, { priceWithTax: e.target.value })} placeholder={isAr ? "السعر شامل الضريبة" : "Tax-included"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.setupFee} onChange={(e) => updateTier(planIndex, tierIndex, { setupFee: e.target.value })} placeholder={isAr ? "رسوم التأسيس" : "Setup fee"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.conversations} onChange={(e) => updateTier(planIndex, tierIndex, { conversations: e.target.value })} placeholder={isAr ? "عدد المحادثات" : "Conversations"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.broadcastMessages} onChange={(e) => updateTier(planIndex, tierIndex, { broadcastMessages: e.target.value })} placeholder={isAr ? "رسائل البث" : "Broadcast"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
-                  <input type="text" value={tier.users} onChange={(e) => updateTier(planIndex, tierIndex, { users: e.target.value })} placeholder={isAr ? "عدد المستخدمين" : "Users"} className="border border-gray-200 rounded-md px-2.5 py-2 text-xs" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  {([
+                    { key: 'name', value: tier.name, label: isAr ? "اسم الشريحة" : "Tier name", extra: '' },
+                    { key: 'price', value: tier.price, label: isAr ? "السعر الجديد" : "Offer price", extra: ' font-bold text-primary' },
+                    { key: 'originalPrice', value: tier.originalPrice || "", label: isAr ? "السعر الأصلي (قبل الخصم)" : "Original price", extra: ' italic text-gray-400' },
+                    { key: 'priceWithTax', value: tier.priceWithTax, label: isAr ? "السعر شامل الضريبة" : "Tax-included price", extra: '' },
+                    { key: 'setupFee', value: tier.setupFee, label: isAr ? "رسوم التأسيس" : "Setup fee", extra: '' },
+                    { key: 'conversations', value: tier.conversations, label: isAr ? "عدد المحادثات" : "Conversations", extra: '' },
+                    { key: 'broadcastMessages', value: tier.broadcastMessages, label: isAr ? "رسائل البث" : "Broadcast messages", extra: '' },
+                    { key: 'users', value: tier.users, label: isAr ? "عدد المستخدمين" : "Users", extra: '' },
+                  ] as const).map((f) => (
+                    <div key={f.key}>
+                      <label className="block text-[11px] font-medium text-gray-500 mb-1">{f.label}</label>
+                      <input
+                        type="text"
+                        value={f.value}
+                        onChange={(e) => updateTier(planIndex, tierIndex, { [f.key]: e.target.value } as Partial<WhatsAppPlanTier>)}
+                        className={`w-full border border-gray-200 rounded-md px-2.5 py-2 text-sm bg-white${f.extra}`}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -414,32 +454,39 @@ const WhatsAppApiPricesEditor = ({ value, onChange, isAr }: { value: string; onC
       <label className="text-xs text-gray-500 block">{isAr ? "أسعار محادثات واتساب API" : "WhatsApp API conversation prices"}</label>
       {rows.map((row, index) => (
         <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white space-y-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={row.type}
-              onChange={(e) => updateRow(index, { type: e.target.value })}
-              placeholder={isAr ? "نوع المحادثة" : "Conversation type"}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-            />
-            <input
-              type="text"
-              value={row.price}
-              onChange={(e) => updateRow(index, { price: e.target.value })}
-              placeholder={isAr ? "السعر" : "Price"}
-              disabled={row.isFree}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100"
-            />
-          </div>
-          <input
-            type="text"
-            value={row.duration}
-            onChange={(e) => updateRow(index, { duration: e.target.value })}
-            placeholder={isAr ? "المدة" : "Duration"}
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-          />
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-xs text-gray-600 px-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "نوع المحادثة" : "Conversation type"}</label>
+              <input
+                type="text"
+                value={row.type}
+                onChange={(e) => updateRow(index, { type: e.target.value })}
+                placeholder={isAr ? "مثال: محادثة تسويقية" : "e.g. Marketing conversation"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "السعر" : "Price"}</label>
+              <input
+                type="text"
+                value={row.price}
+                onChange={(e) => updateRow(index, { price: e.target.value })}
+                placeholder={isAr ? "مثال: 0.35" : "e.g. 0.35"}
+                disabled={row.isFree}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm disabled:bg-gray-100"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "المدة / الوحدة" : "Duration / unit"}</label>
+              <input
+                type="text"
+                value={row.duration}
+                onChange={(e) => updateRow(index, { duration: e.target.value })}
+                placeholder={isAr ? "مثال: للرسالة" : "e.g. per message"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-600 px-1 self-end pb-2">
               <input
                 type="checkbox"
                 checked={row.isFree}
@@ -448,13 +495,16 @@ const WhatsAppApiPricesEditor = ({ value, onChange, isAr }: { value: string; onC
               {isAr ? "مجانية" : "Free"}
             </label>
           </div>
-          <input
-            type="text"
-            value={row.description}
-            onChange={(e) => updateRow(index, { description: e.target.value })}
-            placeholder={isAr ? "الوصف" : "Description"}
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-          />
+          <div>
+            <label className="block text-[11px] font-medium text-gray-500 mb-1">{isAr ? "الوصف" : "Description"}</label>
+            <input
+              type="text"
+              value={row.description}
+              onChange={(e) => updateRow(index, { description: e.target.value })}
+              placeholder={isAr ? "وصف مختصر" : "Short description"}
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
           <div className="flex justify-end">
             <button onClick={() => removeRow(index)} className="text-xs text-red-500 hover:text-red-600 hover:underline">
               {isAr ? "حذف" : "Delete"}
@@ -2058,13 +2108,13 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
       
       const ok = await saveSiteData(updatedPages);
       if (ok) {
-        alert(isAr ? "تم الحفظ بنجاح!" : "Saved successfully!");
+        toast.success(isAr ? "تم الحفظ والنشر بنجاح" : "Saved & published successfully");
       } else {
-        alert(isAr ? "حدث خطأ أثناء الحفظ" : "Error saving changes");
+        toast.error(isAr ? "حدث خطأ أثناء الحفظ" : "Error saving changes");
       }
     } catch (error) {
       console.error('Save error:', error);
-      alert(isAr ? "حدث خطأ أثناء الحفظ" : "Error saving changes");
+      toast.error(isAr ? "حدث خطأ أثناء الحفظ" : "Error saving changes");
     } finally {
       setSaving(false);
     }
@@ -2349,6 +2399,15 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
     );
   };
 
+  // الحقول العريضة (محرّرات القوائم/الأسعار والنصوص الطويلة) تأخذ عرض الصف كاملاً؛
+  // الحقول القصيرة تُرتَّب في عمودين على الشاشات الواسعة لتقليل التمرير.
+  const isWideField = (field: SectionField) =>
+    field.key === 'plans_list' ||
+    field.key === 'wa_pricing' ||
+    field.key === 'api_prices_list' ||
+    field.key.endsWith('_json') ||
+    ['textarea', 'spacing', 'display', 'margin'].includes(field.type || '');
+
   const renderFields = (sectionId: string, fields: SectionField[]) => {
     const theme = getSectionTheme(sectionId);
     if (shouldUseGroupedFields(sectionId)) {
@@ -2361,13 +2420,13 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#104E8B]" />
                 {getGroupLabel(sectionId, groupKey, isAr)}
               </h4>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {groupFields.map((field) => {
                   const hasOwnLabel = field.key === 'plans_list' || field.key === 'integrations_json' || field.key === 'slides_json' || field.key.endsWith('_json');
                   return (
-                    <div key={field.key}>
+                    <div key={field.key} className={isWideField(field) ? 'lg:col-span-2' : ''}>
                       {!hasOwnLabel && (
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                        <label className="block text-[13px] font-semibold text-gray-700 mb-1.5">
                           {isAr ? field.label : field.labelEn}
                         </label>
                       )}
@@ -2383,13 +2442,13 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
     }
 
     return (
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {fields.map((field) => {
           const hasOwnLabel = field.key === 'plans_list' || field.key === 'integrations_json' || field.key === 'slides_json' || field.key.endsWith('_json');
           return (
-            <div key={field.key} className={`bg-white rounded-xl border border-gray-100 shadow-sm hover:border-gray-200 transition-all ${hasOwnLabel ? 'p-0' : 'p-3'}`}>
+            <div key={field.key} className={`bg-white rounded-xl border border-gray-100 shadow-sm hover:border-gray-200 transition-all ${hasOwnLabel ? 'p-0' : 'p-3'} ${isWideField(field) ? 'lg:col-span-2' : ''}`}>
               {!hasOwnLabel && (
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                <label className="block text-[13px] font-semibold text-gray-700 mb-1.5">
                   {isAr ? field.label : field.labelEn}
                 </label>
               )}
@@ -2403,7 +2462,7 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between bg-white rounded-xl p-4 shadow-sm border border-gray-100 lg:sticky lg:top-20 lg:z-20">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Button variant="ghost" onClick={onBack} className="text-gray-500 hover:text-[#104E8B] -ml-2">
             <ChevronDown className="w-4 h-4 rotate-90" />
@@ -2450,19 +2509,28 @@ export function CmsPageEditorView({ isAr, pageId, onBack }: Props) {
         </div>
 
         {activeEditorTab === 'content' && (
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-full sm:w-fit">
-            <button
-              onClick={() => setActiveLangTab("ar")}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeLangTab === "ar" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
-            >
-              العربية
-            </button>
-            <button
-              onClick={() => setActiveLangTab("en")}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeLangTab === "en" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
-            >
-              English
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-full sm:w-fit">
+              <button
+                onClick={() => setActiveLangTab("ar")}
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeLangTab === "ar" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
+              >
+                {activeLangTab === "ar" && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                العربية
+              </button>
+              <button
+                onClick={() => setActiveLangTab("en")}
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeLangTab === "en" ? "bg-white text-[#104E8B] shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}
+              >
+                {activeLangTab === "en" && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                English
+              </button>
+            </div>
+            <span className="text-xs text-gray-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5">
+              {activeLangTab === "ar"
+                ? (isAr ? "تحرّر الآن النسخة العربية من المحتوى" : "Editing the Arabic content version")
+                : (isAr ? "تحرّر الآن النسخة الإنجليزية من المحتوى" : "Editing the English content version")}
+            </span>
           </div>
         )}
       </div>

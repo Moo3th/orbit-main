@@ -38,9 +38,20 @@ interface SeoSettings {
   analytics: {
     gtmId: string;
     gscVerification: string;
+    bingVerification: string;
     facebookPixelId: string;
     facebookAccessToken: string;
     clarityProjectId: string;
+    xPixelId: string;
+    xLeadEventId: string;
+    xApiKey: string;
+    xApiSecret: string;
+    xAccessToken: string;
+    xAccessSecret: string;
+    linkedInPartnerId: string;
+    linkedInConversionId: string;
+    linkedInAccessToken: string;
+    linkedInConversionUrn: string;
   };
   robotsTxt: string;
 }
@@ -81,7 +92,13 @@ export function CmsSeoView({ isAr }: Props) {
         settings.defaultSeo.description = { en: '', ar: '', ...(settings.defaultSeo.description || {}) };
         settings.defaultSeo.keywords = { en: '', ar: '', ...(settings.defaultSeo.keywords || {}) };
         settings.siteName = { en: '', ar: '', ...(settings.siteName || {}) };
-        settings.analytics = { gtmId: '', gscVerification: '', facebookPixelId: '', facebookAccessToken: '', clarityProjectId: '', ...(settings.analytics || {}) };
+        settings.analytics = {
+          gtmId: '', gscVerification: '', bingVerification: '',
+          facebookPixelId: '', facebookAccessToken: '', clarityProjectId: '',
+          xPixelId: '', xLeadEventId: '', xApiKey: '', xApiSecret: '', xAccessToken: '', xAccessSecret: '',
+          linkedInPartnerId: '', linkedInConversionId: '', linkedInAccessToken: '', linkedInConversionUrn: '',
+          ...(settings.analytics || {}),
+        };
         if (!settings.emailConfig) {
           settings.emailConfig = {
             provider: 'none',
@@ -139,6 +156,28 @@ export function CmsSeoView({ isAr }: Props) {
   }
 
   if (!settings) return null;
+
+  // حقل موحّد لتبويب التحليلات — يضمن اتساق الشكل بين كل مفاتيح المنصات.
+  const analyticsField = (
+    key: keyof SeoSettings['analytics'],
+    label: string,
+    placeholder: string,
+    hint: string,
+    secret = false
+  ) => (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <input
+        type={secret ? 'password' : 'text'}
+        value={settings.analytics[key] || ''}
+        onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, [key]: e.target.value } })}
+        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20"
+        dir="ltr"
+        placeholder={placeholder}
+      />
+      {hint && <p className="text-xs text-gray-500 mt-1">{hint}</p>}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -657,89 +696,63 @@ export function CmsSeoView({ isAr }: Props) {
       )}
 
       {activeTab === 'analytics' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-          <h3 className="font-bold text-gray-700 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-[#104E8B]" />
-            {isAr ? 'أدوات التحليل والتتبع' : 'Analytics & Tracking Tools'}
-          </h3>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-amber-800">
-              {isAr 
-                ? '💡 هذه الأدوات تساعدك في تحليل زوار الموقع وتتبع الأداء.' 
-                : '💡 These tools help you analyze visitors and track performance.'}
-            </p>
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <h3 className="font-bold text-gray-700 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-[#104E8B]" />
+              {isAr ? 'أدوات التحليل والتتبع' : 'Analytics & Tracking Tools'}
+            </h3>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-sm text-amber-800">
+                {isAr
+                  ? '💡 البكسلات تُحمَّل تلقائياً عند تعبئة المعرّف، وأحداث التحويل الخادمية (Conversion API) تُرسل عند كل طلب/فورم بمجرد إكمال مفاتيح المنصة. المفاتيح السرية لا تظهر للزوار أبداً.'
+                  : '💡 Pixels load automatically once an ID is set, and server-side Conversion API events fire on every lead once the platform keys are complete. Secret keys are never exposed to visitors.'}
+              </p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Google Tag Manager ID</label>
-              <input 
-                type="text" 
-                value={settings.analytics.gtmId} 
-                onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, gtmId: e.target.value } })} 
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                dir="ltr" 
-                placeholder="GTM-XXXXXXX"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {isAr ? 'مثال: GTM-P3F8K2' : 'Example: GTM-P3F8K2'}
-              </p>
+
+          {/* Google & Bing */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <h4 className="font-bold text-gray-700">{isAr ? 'جوجل وبينج (محركات البحث والوسوم)' : 'Google & Bing (Search & Tags)'}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {analyticsField('gtmId', 'Google Tag Manager ID', 'GTM-XXXXXXX', isAr ? 'مثال: GTM-MKGST5S6' : 'Example: GTM-MKGST5S6')}
+              {analyticsField('gscVerification', isAr ? 'Google Search Console (التحقق)' : 'Google Search Console (Verification)', 'google-site-verification: ...', isAr ? 'كود التحقق من Google Search Console' : 'Verification code from Google Search Console')}
+              {analyticsField('bingVerification', isAr ? 'Bing Webmaster (التحقق)' : 'Bing Webmaster (Verification)', 'msvalidate.01 ...', isAr ? 'كود التحقق من Bing Webmaster Tools — يظهر كوسم msvalidate.01' : 'Verification code from Bing Webmaster Tools — rendered as msvalidate.01 meta tag')}
+              {analyticsField('clarityProjectId', 'Microsoft Clarity Project ID', 'v2xrletty3', isAr ? 'معرف مشروع Clarity للخرائط الحرارية وتسجيل الجلسات' : 'Clarity Project ID for heatmaps and session recordings')}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'Google Search Console (التحقق)' : 'Google Search Console (Verification)'}</label>
-              <input 
-                type="text" 
-                value={settings.analytics.gscVerification} 
-                onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, gscVerification: e.target.value } })} 
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                dir="ltr" 
-                placeholder="google-site-verification: ..."
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {isAr ? 'كود التحقق من Google Search Console' : 'Verification code from Google Search Console'}
-              </p>
+          </div>
+
+          {/* Meta */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <h4 className="font-bold text-gray-700">Meta (Facebook / Instagram)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {analyticsField('facebookPixelId', 'Meta Pixel ID', 'XXXXXXXXXXXXXXX', isAr ? 'معرف البكسل — يُفعّل بكسل الزيارات وأحداث Lead' : 'Pixel ID — enables visit tracking and Lead events')}
+              {analyticsField('facebookAccessToken', 'Meta Access Token (Conversions API)', 'EAAB...', isAr ? 'رمز الوصول لإرسال أحداث التحويل من الخادم (من Events Manager)' : 'Access token for server-side conversion events (from Events Manager)', true)}
             </div>
-<div>
-               <label className="block text-sm font-medium text-gray-700 mb-2">Facebook Pixel ID</label>
-               <input 
-                 type="text" 
-                 value={settings.analytics.facebookPixelId} 
-                 onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, facebookPixelId: e.target.value } })} 
-                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                 dir="ltr" 
-                 placeholder="XXXXXXXXXXXXXXXXXX"
-               />
-               <p className="text-xs text-gray-500 mt-1">
-                 {isAr ? 'معرف Pixel لتتبع زيارات فيسبوك' : 'Pixel ID for Facebook visit tracking'}
-               </p>
-             </div>
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-2">{isAr ? 'Facebook Access Token (CAPI)' : 'Facebook Access Token (CAPI)'}</label>
-               <input 
-                 type="password" 
-                 value={settings.analytics.facebookAccessToken || ''} 
-                 onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, facebookAccessToken: e.target.value } })} 
-                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                 dir="ltr" 
-                 placeholder="EAAB..."
-               />
-               <p className="text-xs text-gray-500 mt-1">
-                 {isAr ? 'رمز الوصول لـ Conversion API (آمن ولا يظهر للمستخدمين)' : 'Access Token for Conversion API (secure, not visible to users)'}
-               </p>
-             </div>
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-2">Microsoft Clarity Project ID</label>
-               <input 
-                 type="text" 
-                 value={settings.analytics.clarityProjectId || ''} 
-                 onChange={(e) => setSettings({ ...settings, analytics: { ...settings.analytics, clarityProjectId: e.target.value } })} 
-                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#104E8B]/20" 
-                 dir="ltr" 
-                 placeholder="v2xrletty3"
-               />
-               <p className="text-xs text-gray-500 mt-1">
-                 {isAr ? 'معرف مشروع Clarity للخرائط الحرارية وتسجيل الجلسات' : 'Clarity Project ID for heatmaps and session recordings'}
-               </p>
-             </div>
+          </div>
+
+          {/* X (Twitter) */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <h4 className="font-bold text-gray-700">X (Twitter) Ads</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {analyticsField('xPixelId', 'X Pixel ID', 'oabcd', isAr ? 'معرف البكسل من X Ads (Events Manager → Pixel)' : 'Pixel ID from X Ads (Events Manager → Pixel)')}
+              {analyticsField('xLeadEventId', 'X Lead Event ID', 'tw-oabcd-xxxxx', isAr ? 'معرف حدث الـ Lead — يُستخدم للبكسل وللـ Conversion API معاً' : 'Lead event ID — used by both the pixel and the Conversion API')}
+              {analyticsField('xApiKey', 'X API Key (Consumer Key)', '...', isAr ? 'من تطبيق X Developer المرتبط بحساب الإعلانات' : 'From the X Developer app linked to the ads account', true)}
+              {analyticsField('xApiSecret', 'X API Secret', '...', '', true)}
+              {analyticsField('xAccessToken', 'X Access Token', '...', '', true)}
+              {analyticsField('xAccessSecret', 'X Access Token Secret', '...', isAr ? 'المفاتيح الأربعة مطلوبة معاً لتفعيل إرسال التحويلات من الخادم' : 'All four keys are required to enable server-side conversions', true)}
+            </div>
+          </div>
+
+          {/* LinkedIn */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <h4 className="font-bold text-gray-700">LinkedIn Ads</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {analyticsField('linkedInPartnerId', 'LinkedIn Partner ID (Insight Tag)', '123456', isAr ? 'من Campaign Manager → Insight Tag' : 'From Campaign Manager → Insight Tag')}
+              {analyticsField('linkedInConversionId', 'LinkedIn Conversion ID', '7654321', isAr ? 'معرف التحويل الرقمي لحدث الـ Lead على المتصفح' : 'Numeric conversion ID for the browser-side Lead event')}
+              {analyticsField('linkedInAccessToken', 'LinkedIn Access Token (Conversions API)', 'AQV...', isAr ? 'رمز OAuth لإرسال التحويلات من الخادم' : 'OAuth token for server-side conversions', true)}
+              {analyticsField('linkedInConversionUrn', 'LinkedIn Conversion URN', 'urn:lla:llaPartnerConversion:123456', isAr ? 'معرف قاعدة التحويل (URN) من Campaign Manager' : 'Conversion rule URN from Campaign Manager')}
+            </div>
           </div>
         </div>
       )}

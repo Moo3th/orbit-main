@@ -7,6 +7,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import MetaPixel from "@/components/analytics/MetaPixel";
+import XPixel from "@/components/analytics/XPixel";
+import LinkedInInsight from "@/components/analytics/LinkedInInsight";
 import PrivacyConsent from "@/components/PrivacyConsent";
 import { Toaster } from "react-hot-toast";
 import { OrganizationJsonLd } from "@/components/JsonLd";
@@ -88,17 +90,27 @@ export default async function RootLayout({
   const gtmIdFromSettings = settings?.analytics?.gtmId || process.env.NEXT_PUBLIC_GTM_ID?.trim() || '';
   const facebookPixelIdFromSettings = settings?.analytics?.facebookPixelId || process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() || '';
   const clarityProjectIdFromSettings = settings?.analytics?.clarityProjectId || process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim() || '';
+  const xPixelIdFromSettings = settings?.analytics?.xPixelId || process.env.NEXT_PUBLIC_X_PIXEL_ID?.trim() || '';
+  const xLeadEventIdFromSettings = settings?.analytics?.xLeadEventId || '';
+  const linkedInPartnerIdFromSettings = settings?.analytics?.linkedInPartnerId || process.env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID?.trim() || '';
+  const linkedInConversionIdFromSettings = settings?.analytics?.linkedInConversionId || '';
+  const bingVerification = settings?.analytics?.bingVerification || '';
 
   const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
   const hasGtm = Boolean(gtmIdFromSettings);
   const hasPixel = Boolean(facebookPixelIdFromSettings);
   const hasClarity = Boolean(clarityProjectIdFromSettings);
+  const hasXPixel = Boolean(xPixelIdFromSettings);
+  const hasLinkedIn = Boolean(linkedInPartnerIdFromSettings);
 
   return (
     <html lang="ar" className={`scroll-smooth ${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
       <head>
         {gscVerification && (
           <meta name="google-site-verification" content={gscVerification} />
+        )}
+        {bingVerification && (
+          <meta name="msvalidate.01" content={bingVerification} />
         )}
         <OrganizationJsonLd data={organizationJsonLd} />
         <WebsiteJsonLd data={websiteJsonLd} />
@@ -109,11 +121,17 @@ export default async function RootLayout({
           <MetaPixel pixelId={facebookPixelIdFromSettings} />
         ) : null}
         {analyticsEnabled && hasClarity ? (
-          <ClarityAnalytics 
+          <ClarityAnalytics
             projectId={clarityProjectIdFromSettings}
             enabled={true}
             respectPrivacy={true}
           />
+        ) : null}
+        {analyticsEnabled && hasXPixel ? (
+          <XPixel pixelId={xPixelIdFromSettings} leadEventId={xLeadEventIdFromSettings} />
+        ) : null}
+        {analyticsEnabled && hasLinkedIn ? (
+          <LinkedInInsight partnerId={linkedInPartnerIdFromSettings} conversionId={linkedInConversionIdFromSettings} />
         ) : null}
         <ThemeProvider>
           <LanguageProvider>
