@@ -1755,7 +1755,7 @@ const defaultWhatsAppApiPrice = (isAr: boolean): WhatsAppConversationPrice => ({
 });
 
 const WhatsAppPlansEditor = ({ value, onChange, isAr }: { value: string; onChange: (value: string) => void; isAr: boolean }) => {
-  const plans = parseWhatsAppPlans(value, []);
+  const plans = parseWhatsAppPlans(value, [], { keepEmptyFeatures: true });
 
   const commit = (next: WhatsAppPlanConfig[]) => {
     onChange(serializeWhatsAppPlans(next));

@@ -378,7 +378,7 @@ const normalizePlanTier = (value: unknown): WhatsAppPlanTier | null => {
   };
 };
 
-const normalizePlan = (value: unknown, index: number): WhatsAppPlanConfig | null => {
+const normalizePlan = (value: unknown, index: number, keepEmptyFeatures = false): WhatsAppPlanConfig | null => {
   if (!isRecord(value)) return null;
   const name = asString(value.name).trim();
   if (!name) return null;
@@ -388,9 +388,10 @@ const normalizePlan = (value: unknown, index: number): WhatsAppPlanConfig | null
   if (!tiers.length) return null;
 
   const rawFeatures = Array.isArray(value.additionalFeatures) ? value.additionalFeatures : [];
-  const additionalFeatures = rawFeatures
-    .map((feature) => asString(feature).trim())
-    .filter(Boolean);
+  // المحرّر يعيد قراءة القيمة بعد كل تعديل؛ حذف الفارغ هنا يمحو سطر الميزة الجديد قبل الكتابة فيه.
+  const additionalFeatures = keepEmptyFeatures
+    ? rawFeatures.map((feature) => asString(feature))
+    : rawFeatures.map((feature) => asString(feature).trim()).filter(Boolean);
 
   return {
     id: asString(value.id).trim() || `plan_${index + 1}`,
@@ -420,11 +421,17 @@ const normalizeConversationPrice = (value: unknown): WhatsAppConversationPrice |
   };
 };
 
-export const parseWhatsAppPlans = (raw: string, fallback: WhatsAppPlanConfig[]): WhatsAppPlanConfig[] => {
+export const parseWhatsAppPlans = (
+  raw: string,
+  fallback: WhatsAppPlanConfig[],
+  options?: { keepEmptyFeatures?: boolean }
+): WhatsAppPlanConfig[] => {
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return fallback;
-    const normalized = parsed.map(normalizePlan).filter((plan): plan is WhatsAppPlanConfig => Boolean(plan));
+    const normalized = parsed
+      .map((plan, index) => normalizePlan(plan, index, options?.keepEmptyFeatures))
+      .filter((plan): plan is WhatsAppPlanConfig => Boolean(plan));
     return normalized.length ? normalized : fallback;
   } catch {
     return fallback;

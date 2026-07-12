@@ -900,3 +900,9 @@
 > دفعة 2026-07-07: (1) داشبورد الأدمن — زر «طلبات واتساب» يوجّه لتبويب wa-requests وأرقام الداشبورد للطلبات الجديدة فقط. (2) نظام تتبع الأحداث — بكسلات X ولينكدإن + Conversion APIs خادمية (Meta/X/LinkedIn) تُطلق من مسارات الفورمات الأربعة، وإعداداتها من تبويب التحليلات باللوحة. (3) محرر الصفحات — toast، شريط حفظ مثبّت، مؤشر لغة، شبكة عمودين، عناوين لحقول الباقات/الشرائح. (4) SEO — حقل توثيق Bing + مقالات المدونة في sitemap. البناء ناجح، tsc نظيف، عوينت / و /admin (داشبورد + محرر واتساب + إعدادات التحليلات) و /sitemap.xml على 390 و412 و1280 بلا أخطاء console ولا تمرير أفقي.
 - 2026-07-07 11:12 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\conversion-tracking-system.md`
 - 2026-07-07 11:12 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\MEMORY.md`
+- 2026-07-12 07:14 — `src\lib\cms\whatsappPricing.ts`
+- 2026-07-12 07:15 — `src\lib\cms\whatsappPricing.ts`
+- 2026-07-12 07:15 — `src\app\admin\newAdmin\views\CmsPageEditorView.tsx`
+- 2026-07-12 07:15 — `src\app\admin\newAdmin\AdminDashboard.tsx`
+> إصلاح زر «إضافة ميزة» في محرّري باقات الواتساب باللوحة (CmsPageEditorView + AdminDashboard): كان السطر الفارغ الجديد يُحذف فوراً لأن parseWhatsAppPlans تنقّي الميزات الفارغة عند كل إعادة عرض — أُضيف خيار keepEmptyFeatures للمحرّرين فقط والعرض العام يظل ينقّيها. tsc نظيف، البناء ناجح، عوينت /products/whatsapp على 390 و412 و1280 (عربي وإنجليزي) بلا تمرير أفقي ولا أخطاء console من التعديل، وصفحة /admin تُجمَّع سليمة.
+- 2026-07-12 07:24 — `..\..\Users\mtc\.claude\projects\C--orbitWebsite-orbit-main-master\memory\whatsapp-cms-editability.md`
