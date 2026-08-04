@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Facebook, Github, Globe, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
 import useSWR from 'swr';
 import { encodeImagePath } from '@/utils/imagePath';
+import { resolveLegalLink, type LegalLinkLike } from '@/lib/cms/legalLink';
 
 interface FooterNavItem {
   id: string;
@@ -154,8 +155,8 @@ export default function Footer() {
     }
   );
 
-  // الصفحات القانونية النشطة (ديناميكية — الروابط والأسماء يتحكّم بها الأدمن)
-  const { data: legalPages = [] } = useSWR<Array<{ slug: string; title: { ar: string; en: string } }>>(
+  // الصفحات القانونية النشطة (ديناميكية — الأسماء والروابط وسلوك الضغط من اللوحة)
+  const { data: legalPages = [] } = useSWR<Array<{ slug: string; title: { ar: string; en: string }; link?: LegalLinkLike }>>(
     'footer-legal-pages',
     async () => {
       try {
@@ -273,6 +274,18 @@ export default function Footer() {
     github: Github,
     globe: Globe,
   } as const;
+  // كل رابط سياسة يُحلّ حسب سلوكه: صفحة، أو سطر داخل سياسة أخرى، أو تحميل ملف.
+  const legalLinks = legalPages
+    .map((page) => {
+      const resolved = resolveLegalLink(page);
+      return {
+        slug: page.slug,
+        label: isRTL ? (page.title?.ar || page.slug) : (page.title?.en || page.slug),
+        ...resolved,
+      };
+    })
+    .filter((item) => item.href);
+
   const copyrightText = isRTL ? resolvedFooterData.copyrightAr : resolvedFooterData.copyrightEn;
   const countryText = isRTL ? resolvedFooterData.countryAr : resolvedFooterData.countryEn;
   const commercialRegistry = isRTL ? resolvedFooterData.commercialRegistryAr : resolvedFooterData.commercialRegistryEn;
@@ -550,10 +563,30 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 text-white/40">
             <span>{commercialRegistry}</span>
             <span>{licenseText}</span>
-            {legalPages.map((p) => (
-              <Link key={p.slug} href={`/${p.slug}`} className="hover:text-white transition-colors">
-                {isRTL ? (p.title?.ar || p.slug) : (p.title?.en || p.slug)}
-              </Link>
+            {legalLinks.map((item) => (
+              item.isDownload ? (
+                // تحميل ملف: رابط <a> عادي بسمة download — لا يمرّ عبر توجيه Next.
+                <a
+                  key={item.slug}
+                  href={item.href}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center min-h-[44px] hover:text-white transition-colors"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.slug}
+                  href={item.href}
+                  target={item.openInNewTab ? '_blank' : undefined}
+                  rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+                  className="inline-flex items-center min-h-[44px] hover:text-white transition-colors"
+                >
+                  {item.label}
+                </Link>
+              )
             ))}
           </div>
         </motion.div>

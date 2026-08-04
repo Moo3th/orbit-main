@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { connectDB } from '@/lib/mongodb';
-import { LegalPage, normalizeSlug, isReservedSlug } from '@/models/LegalPage';
+import { LegalPage, normalizeSlug, isReservedSlug, normalizeLegalLink } from '@/models/LegalPage';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -41,6 +41,7 @@ export async function PUT(
     if (body.title) update.title = body.title;
     if (body.content) update.content = body.content;
     if (body.seo) update.seo = body.seo;
+    if (body.link) update.link = normalizeLegalLink(body.link);
     if (typeof body.isActive === 'boolean') update.isActive = body.isActive;
     if (typeof body.order === 'number') update.order = body.order;
 

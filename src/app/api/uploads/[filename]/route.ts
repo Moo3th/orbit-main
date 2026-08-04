@@ -43,15 +43,24 @@ export async function GET(
     });
     
     const buffer = Buffer.concat(chunks);
-    
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Type': file.contentType || 'application/octet-stream',
-        'Content-Length': buffer.length.toString(),
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    });
-    
+
+    const headers: Record<string, string> = {
+      'Content-Type': file.contentType || 'application/octet-stream',
+      'Content-Length': buffer.length.toString(),
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    };
+
+    // ‏?download=1 يجبر المتصفح على تنزيل الملف بدل عرضه (مهم لروابط PDF في
+    // التذييل). نستعمل الاسم الأصلي — وترميز RFC 5987 يحفظ الأسماء العربية.
+    if (request.nextUrl.searchParams.get('download') === '1') {
+      const originalName = (file.metadata?.originalName as string | undefined) || filename;
+      const asciiName = originalName.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_');
+      headers['Content-Disposition'] =
+        `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(originalName)}`;
+    }
+
+    return new NextResponse(buffer, { headers });
+
   } catch (error) {
     console.error('Download error:', error);
     return NextResponse.json({ error: 'Failed to download file' }, { status: 500 });

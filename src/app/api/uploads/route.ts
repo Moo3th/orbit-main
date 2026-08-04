@@ -6,43 +6,72 @@ import mongoose from 'mongoose';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+
+// مستندات مسموحة لروابط «تحميل ملف» في التذييل (السياسات بصيغة PDF/Word).
+const ALLOWED_DOCUMENT_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+];
+
+// بعض المتصفحات ترسل نوعاً فارغاً أو عاماً — نقبل بالامتداد كخطة بديلة.
+const ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt'];
+
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+const hasAllowedExtension = (name: string) =>
+  ALLOWED_DOCUMENT_EXTENSIONS.some((ext) => name.toLowerCase().endsWith(ext));
+
+const EXTENSION_CONTENT_TYPES: Record<string, string> = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.txt': 'text/plain',
+};
+
+const guessContentType = (name: string) => {
+  const match = Object.entries(EXTENSION_CONTENT_TYPES).find(([ext]) => name.toLowerCase().endsWith(ext));
+  return match ? match[1] : 'application/octet-stream';
+};
 
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const folder = formData.get('folder') as string || 'general';
-    
+
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-    
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG' }, { status: 400 });
+
+    if (!ALLOWED_TYPES.includes(file.type) && !hasAllowedExtension(file.name || '')) {
+      return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG, PDF, DOC, DOCX, TXT' }, { status: 400 });
     }
-    
+
     if (file.size > MAX_SIZE) {
       return NextResponse.json({ error: 'File too large. Maximum size: 10MB' }, { status: 400 });
     }
     
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
+
     const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    
+    const contentType = file.type || guessContentType(file.name || '');
+
     const db = mongoose.connection.db;
     if (!db) throw new Error('Database not connected');
-    
+
     const bucket = new mongoose.mongo.GridFSBucket(db, {
       bucketName: 'uploads'
     });
-    
+
     const uploadStream = bucket.openUploadStream(filename, {
-      contentType: file.type,
+      contentType,
       metadata: {
         originalName: file.name,
         folder,

@@ -76,13 +76,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   staticPages.push(...blogEntries);
 
-  // الصفحات القانونية (ديناميكية من قاعدة البيانات)
-  const legalEntries: MetadataRoute.Sitemap = legalPages.map((p) => ({
-    url: `${baseUrl}/${p.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'yearly' as const,
-    priority: 0.3,
-  }));
+  // الصفحات القانونية (ديناميكية من قاعدة البيانات).
+  // نستثني المدخلات التي هي مجرد رابط في التذييل (تحميل ملف أو انتقال إلى سطر
+  // في سياسة أخرى) لأنها بلا محتوى خاص بها يستحق الفهرسة.
+  const legalEntries: MetadataRoute.Sitemap = legalPages
+    .filter((p) => !p.link?.type || p.link.type === 'page')
+    .map((p) => ({
+      url: `${baseUrl}/${p.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    }));
   staticPages.push(...legalEntries);
 
   const pages = snapshot?.pages || [];

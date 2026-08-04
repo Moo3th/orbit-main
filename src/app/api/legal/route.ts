@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { connectDB } from '@/lib/mongodb';
-import { LegalPage, normalizeSlug, isReservedSlug } from '@/models/LegalPage';
+import { LegalPage, normalizeSlug, isReservedSlug, normalizeLegalLink, defaultLegalLink } from '@/models/LegalPage';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
       title: body.title ?? { en: '', ar: '' },
       content: body.content ?? { en: '', ar: '' },
       seo: body.seo ?? { title: { en: '', ar: '' }, description: { en: '', ar: '' } },
+      link: body.link ? normalizeLegalLink(body.link) : defaultLegalLink(),
       isActive: body.isActive ?? true,
       isSystem: false,
       order: typeof body.order === 'number' ? body.order : count + 1,

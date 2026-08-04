@@ -337,3 +337,25 @@ html.wa-page {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
 }
+
+/* إبراز السطر المقصود في الصفحات القانونية عند الوصول إليه من رابط التذييل */
+.legal-line-highlight {
+  animation: legal-line-flash 2.6s ease-out;
+  border-radius: 0.5rem;
+}
+@keyframes legal-line-flash {
+  0%, 55% {
+    background-color: rgba(122, 30, 46, 0.14);
+    box-shadow: 0 0 0 0.5rem rgba(122, 30, 46, 0.14);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.5rem transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .legal-line-highlight {
+    animation: none;
+    background-color: rgba(122, 30, 46, 0.12);
+  }
+}
